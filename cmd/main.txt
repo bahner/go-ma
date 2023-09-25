@@ -1,0 +1,63 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/bahner/go-ma/did"
+	"github.com/bahner/go-ma/did/coll"
+	"github.com/bahner/go-ma/did/doc"
+	"github.com/bahner/go-ma/did/pubkey"
+	"github.com/bahner/go-ma/did/vm"
+	"github.com/bahner/go-ma/key"
+	"github.com/bahner/go-ma/message"
+	api "github.com/ipfs/go-ipfs-api"
+)
+
+const theSubEthaMessage = "Share and enjoy!"
+
+var (
+	subEthaMessage *message.Message
+	subEthaKey     *key.Key
+	subEthaDID     *did.DID
+)
+
+func main() {
+
+	subEthaKey, _ = key.New()
+	fmt.Println(subEthaKey.IPNSName)
+
+	subEthaDID = did.New("space", subEthaKey.IPNSName.String())
+	fmt.Println(subEthaDID)
+
+	subEthaDIDDocument, _ := doc.New(subEthaDID.String())
+
+	docControllers, err := coll.New(subEthaDID.Id)
+	if err != nil {
+		fmt.Println(err)
+	}
+	subEthaDIDDocument.Controller = docControllers
+
+	idPubKey, err := pubkey.New(subEthaKey.PrivKey)
+	if err != nil {
+		fmt.Println(err)
+	}
+	idVerificationMethod, err := vm.New(subEthaDID.Id, "#id", *idPubKey)
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = subEthaDIDDocument.AddVerificationMethod(idVerificationMethod)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	sh := api.NewShell("localhost:5001")
+	cid, err := sh.Add(strings.NewReader("hello world!"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %s", err)
+		os.Exit(1)
+	}
+	fmt.Printf("added %s\n", cid)
+
+}

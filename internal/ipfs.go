@@ -1,0 +1,153 @@
+package internal
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"strings"
+	"sync"
+	"time"
+
+	shell "github.com/ipfs/go-ipfs-api"
+	log "github.com/sirupsen/logrus"
+)
+
+const defaultIPFSAPISocket = "localhost:5001"
+
+// FIXME: This is taken completely out of the blue. They must be properly researched.
+
+// This is the life time of the IPNS record.
+const defaultIPNSRecordLifetime = time.Duration(24 * time.Hour) // A day. The default
+
+// This is the max cache time of the IPNS record.
+const defaultIPNSRecordTTL = time.Duration(1 * time.Hour) // An hour.
+
+var ctx = context.Background()
+
+var (
+	once          sync.Once
+	ipfsAPISocket string
+	ipfsAPI       *shell.Shell
+	exists        bool
+)
+
+// initializeApi sets up the ipfsAPI and ipfsAPISocket.
+func initializeApi() {
+	ipfsAPISocket, exists = os.LookupEnv("IPFS_API_SOCKET")
+	if !exists {
+		ipfsAPISocket = defaultIPFSAPISocket
+	}
+	ipfsAPI = shell.NewShell(ipfsAPISocket)
+}
+
+// PublishToIPFS publishes the provided data string to IPFS and returns the CID.
+// This is a simple function which only publishes strings, which is why
+// it is in the internal package.
+
+func IPFSPublishString(data string) (string, error) {
+	once.Do(initializeApi)
+
+	cid, err := ipfsAPI.Add(strings.NewReader(data))
+	if err != nil {
+		log.Printf("ipfs: failed to add data to IPFS: %v", err)
+		return "", err
+	}
+
+	return cid, nil
+}
+
+// Now if ever there was a sugar function.
+func IPFSPublishBytes(data []byte) (string, error) {
+
+	return IPFSPublishString(string(data))
+}
+
+func IPNSPublishCID(contentHash string, key string, resolve bool) (*shell.PublishResponse, error) {
+	once.Do(initializeApi)
+
+	// res, err := ipfsAPI.PublishWithDetails(contentHash, key, lifetime, ttl, resolve)
+	// if err != nil {
+	// 	return nil, LogError("ipfs: failed to publish to IPNS: %v", err)
+	// }
+
+	return ipfsAPI.PublishWithDetails(contentHash,
+		key, // Alias name for IPNS key
+		defaultIPNSRecordLifetime,
+		defaultIPNSRecordTTL,
+		resolve)
+
+}
+
+func IPNSListKeys() ([]*shell.Key, error) {
+	once.Do(initializeApi)
+
+	return ipfsAPI.KeyList(ctx)
+}
+
+func IPNSFindKeyID(name string) (string, error) {
+
+	keys, err := IPNSListKeys()
+	if err != nil {
+		return "", fmt.Errorf("ipfs: failed to list : %v", err)
+	}
+	for _, key := range keys {
+		if key.Name == name {
+			return key.Id, nil
+		}
+	}
+
+	return "", fmt.Errorf("ipfs: key %s not found", name)
+}
+func IPNSFindKeyName(id string) (string, error) {
+
+	keys, err := IPNSListKeys()
+	if err != nil {
+		return "", fmt.Errorf("ipfs: failed to list : %v", err)
+	}
+	for _, key := range keys {
+		if key.Id == id {
+			return key.Name, nil
+		}
+	}
+
+	return "", fmt.Errorf("ipfs: key %s not found", id)
+}
+
+func IPNSLookupKeyName(keyName string) (*shell.Key, error) {
+
+	var key *shell.Key
+
+	keys, err := IPNSListKeys()
+	if err != nil {
+		return key, LogError(fmt.Sprintf("ipfs: failed to list : %v", err))
+	}
+
+	// A little deeper than I usually like to nest, but hey, it's a one off.
+	for _, key := range keys {
+		if key.Name == keyName {
+			err := json.Unmarshal([]byte(keyName), &key)
+			if err != nil {
+				return key, fmt.Errorf("ipfs: failed to unmarshal key: %v", err)
+			}
+
+			return key, nil
+		}
+	}
+
+	return key, fmt.Errorf("ipfs: key %s not found", keyName)
+}
+
+func IPNSGetOrCreateKey(keyName string) (*shell.Key, error) {
+	once.Do(initializeApi)
+
+	var key *shell.Key
+
+	key, err := IPNSLookupKeyName(keyName)
+	if err == nil {
+		log.Debugf("ipfs: found existing key for %s ", keyName)
+		return key, nil
+	}
+
+	return ipfsAPI.KeyGen(ctx, keyName)
+}

@@ -1,0 +1,21 @@
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/bahner/go-ma/message"
+)
+
+func main() {
+
+	m := message.ValidExampleMessage()
+	packed, err := m.Pack()
+	if err != nil {
+		fmt.Printf("Error packing message: %s", err)
+		os.Exit(70) // EX_SOFTWARE
+	}
+
+	fmt.Println(packed)
+
+}

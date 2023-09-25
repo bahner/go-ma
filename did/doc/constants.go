@@ -1,0 +1,13 @@
+package doc
+
+import (
+	"crypto"
+
+	"github.com/multiformats/go-multibase"
+)
+
+const (
+	CONTEXT            = "https://w3id.org/did/v1"
+	SIGNATURE_HASHER   = crypto.BLAKE2b_256
+	SIGNATURE_ENCODING = multibase.Base58BTC
+)
