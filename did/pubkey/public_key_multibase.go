@@ -63,3 +63,31 @@ func New(secretKey interface{}) (*PublicKeyMultibase, error) {
 		PublicKeyMultibase: multibaseStr,
 	}, nil
 }
+
+func Decode(publicKeyMultibase string) (*rsa.PublicKey, error) {
+	// Decode the multibase-encoded public key string
+	_, decoded, err := multibase.Decode(publicKeyMultibase)
+	if err != nil {
+		return nil, fmt.Errorf("parse: error decoding multibase string: %s", err)
+	}
+
+	// Read and remove the multicodec prefix
+	_, n, err := varint.FromUvarint(decoded)
+	if err != nil {
+		return nil, fmt.Errorf("parse: error reading multicodec varint: %s", err)
+	}
+	pubKeyBytes := decoded[n:]
+
+	// Parse the decoded bytes (after removing multicodec prefix) to get the *rsa.PublicKey
+	pub, err := x509.ParsePKIXPublicKey(pubKeyBytes)
+	if err != nil {
+		return nil, fmt.Errorf("parse: error parsing public key: %s", err)
+	}
+
+	rsaPubKey, ok := pub.(*rsa.PublicKey)
+	if !ok {
+		return nil, fmt.Errorf("parse: not an RSA public key")
+	}
+
+	return rsaPubKey, nil
+}

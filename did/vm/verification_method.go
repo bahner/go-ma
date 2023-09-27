@@ -15,7 +15,7 @@ type VerificationMethod struct {
 func New(
 	id string,
 	fragment string,
-	publicKeyMultibase pubkey.PublicKeyMultibase) (VerificationMethod, error) {
+	publicKeyMultibase *pubkey.PublicKeyMultibase) (VerificationMethod, error) {
 
 	if !internal.IsAlnum(id) {
 		return VerificationMethod{}, internal.ErrInvalidID

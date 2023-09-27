@@ -1,4 +1,7 @@
 TODO
 ===
 
-Decrypt, needs some TLC. There is a SEGFAULT.
+Signing must be done by a newly added verifiaction method. We can'tt really use the IPNS key for this.
+
+So we created a new key and verification method to sign it with that.
+

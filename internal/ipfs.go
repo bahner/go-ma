@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -116,26 +115,21 @@ func IPNSFindKeyName(id string) (string, error) {
 
 func IPNSLookupKeyName(keyName string) (*shell.Key, error) {
 
-	var key *shell.Key
+	var lookedupKey *shell.Key
 
 	keys, err := IPNSListKeys()
 	if err != nil {
-		return key, LogError(fmt.Sprintf("ipfs: failed to list : %v", err))
+		return lookedupKey, LogError(fmt.Sprintf("ipfs: failed to list : %v", err))
 	}
 
 	// A little deeper than I usually like to nest, but hey, it's a one off.
-	for _, key := range keys {
-		if key.Name == keyName {
-			err := json.Unmarshal([]byte(keyName), &key)
-			if err != nil {
-				return key, fmt.Errorf("ipfs: failed to unmarshal key: %v", err)
-			}
-
-			return key, nil
+	for _, foundKey := range keys {
+		if foundKey.Name == keyName {
+			return foundKey, nil
 		}
 	}
 
-	return key, fmt.Errorf("ipfs: key %s not found", keyName)
+	return lookedupKey, fmt.Errorf("ipfs: key %s not found", keyName)
 }
 
 func IPNSGetOrCreateKey(keyName string) (*shell.Key, error) {
