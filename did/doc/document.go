@@ -2,7 +2,6 @@ package doc
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/bahner/go-ma/did/coll"
 	"github.com/bahner/go-ma/did/vm"
@@ -26,26 +25,6 @@ func New(identifier string) (*Document, error) {
 		ID:      identifier,
 	}
 	return &doc, nil
-}
-
-func (d *Document) AddVerificationMethod(vm vm.VerificationMethod) error {
-	for _, existingVM := range d.VerificationMethod {
-		if existingVM.ID == vm.ID {
-			return fmt.Errorf("verification method with ID %s already exists", vm.ID)
-		}
-	}
-	d.VerificationMethod = append(d.VerificationMethod, vm)
-	return nil
-}
-
-func (d *Document) RemoveVerificationMethod(id string) {
-	filtered := d.VerificationMethod[:0]
-	for _, v := range d.VerificationMethod {
-		if v.ID != id {
-			filtered = append(filtered, v)
-		}
-	}
-	d.VerificationMethod = filtered
 }
 
 func (d *Document) String() (string, error) {

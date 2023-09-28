@@ -1,6 +1,8 @@
 package vm
 
 import (
+	"crypto"
+
 	"github.com/bahner/go-ma/did/pubkey"
 	"github.com/bahner/go-ma/internal"
 )
@@ -30,4 +32,8 @@ func New(
 		Type:               publicKeyMultibase.Type,
 		PublicKeyMultibase: publicKeyMultibase.PublicKeyMultibase,
 	}, nil
+}
+
+func (vm *VerificationMethod) DecodedPublicKeyMultibase(string) (*crypto.PublicKey, error) {
+	return pubkey.Decode(vm.PublicKeyMultibase)
 }

@@ -53,12 +53,12 @@ func main() {
 
 	fmt.Printf("IPNS: %s\n", data)
 
-	ok := doc.Verify()
-	if ok == nil {
-		fmt.Println("Signature verified")
-	} else {
-		fmt.Println("Signature verification failed")
-	}
+	// ok := doc.Verify()
+	// if ok == nil {
+	// 	fmt.Println("Signature verified")
+	// } else {
+	// 	fmt.Println("Signature verification failed")
+	// }
 
 	// os.Setenv("IPFS_API_SOCKET", "localhost:45005")
 
