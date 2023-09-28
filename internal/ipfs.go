@@ -33,7 +33,7 @@ var (
 
 // initializeApi sets up the ipfsAPI and ipfsAPISocket.
 func initializeApi() {
-	ipfsAPISocket, exists = os.LookupEnv("IPFS_API_SOCKET")
+	ipfsAPISocket, exists = os.LookupEnv("IPFS_API_HOST")
 	if !exists {
 		ipfsAPISocket = defaultIPFSAPISocket
 	}
@@ -56,12 +56,25 @@ func IPFSPublishString(data string) (string, error) {
 	return cid, nil
 }
 
+func IPLDPutDag(data string) (string, error) {
+	once.Do(initializeApi)
+
+	// cid, err := ipfsAPI.Add(strings.NewReader(data))
+	cid, err := ipfsAPI.DagPut([]byte(data), "json", "cbor")
+
+	if err != nil {
+		log.Printf("ipld: failed to add data IPLD linked data: %v", err)
+		return "", err
+	}
+
+	return cid, nil
+}
+
 // Now if ever there was a sugar function.
 func IPFSPublishBytes(data []byte) (string, error) {
 
 	return IPFSPublishString(string(data))
 }
-
 func IPNSPublishCID(contentHash string, key string, resolve bool) (*shell.PublishResponse, error) {
 	once.Do(initializeApi)
 
@@ -75,15 +88,12 @@ func IPNSPublishCID(contentHash string, key string, resolve bool) (*shell.Publis
 		defaultIPNSRecordLifetime,
 		defaultIPNSRecordTTL,
 		resolve)
-
 }
-
 func IPNSListKeys() ([]*shell.Key, error) {
 	once.Do(initializeApi)
 
 	return ipfsAPI.KeyList(ctx)
 }
-
 func IPNSFindKeyID(name string) (string, error) {
 
 	keys, err := IPNSListKeys()
@@ -112,7 +122,6 @@ func IPNSFindKeyName(id string) (string, error) {
 
 	return "", fmt.Errorf("ipfs: key %s not found", id)
 }
-
 func IPNSLookupKeyName(keyName string) (*shell.Key, error) {
 
 	var lookedupKey *shell.Key
@@ -131,7 +140,6 @@ func IPNSLookupKeyName(keyName string) (*shell.Key, error) {
 
 	return lookedupKey, fmt.Errorf("ipfs: key %s not found", keyName)
 }
-
 func IPNSGetOrCreateKey(keyName string) (*shell.Key, error) {
 	once.Do(initializeApi)
 
@@ -144,4 +152,9 @@ func IPNSGetOrCreateKey(keyName string) (*shell.Key, error) {
 	}
 
 	return ipfsAPI.KeyGen(ctx, keyName)
+}
+
+func GetShell() *shell.Shell {
+	once.Do(initializeApi)
+	return ipfsAPI
 }

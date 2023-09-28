@@ -7,8 +7,11 @@ import (
 	"github.com/bahner/go-ma/internal"
 )
 
+const MIMEType = "application/x-ma-envelope"
+
 // Bask the encrypted message and the encrypted symmetric key in a JSON envelope.
 type Envelope struct {
+	MIMEType     string `json:"mime_type"`
 	EncryptedKey string `json:"encrypted_key"`
 	EncryptedMsg string `json:"encrypted_msg"`
 }
@@ -16,6 +19,7 @@ type Envelope struct {
 // Use a pointer here, this might be arbitrarily big.
 func New(encodedCipherText, encodedEncryptedSymKey string) (*Envelope, error) {
 	return &Envelope{
+		MIMEType:     MIMEType,
 		EncryptedKey: encodedEncryptedSymKey,
 		EncryptedMsg: encodedCipherText,
 	}, nil
@@ -37,6 +41,14 @@ func UnmarshalFromJSON(data []byte) (*Envelope, error) {
 	return e, nil
 }
 
+func (e *Envelope) String() string {
+	data, err := e.MarshalToJSON()
+	if err != nil {
+		return ""
+	}
+	return string(data)
+}
+
 func (e *Envelope) GetEncryptedKey() string {
 	return e.EncryptedKey
 }
@@ -45,10 +57,6 @@ func (e *Envelope) GetEncryptedMsg() string {
 	return e.EncryptedMsg
 }
 
-func (e *Envelope) String() string {
-	data, err := e.MarshalToJSON()
-	if err != nil {
-		return ""
-	}
-	return string(data)
+func (e *Envelope) GetMIMEType() string {
+	return e.MIMEType
 }

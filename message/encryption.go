@@ -76,7 +76,7 @@ func (m *Message) Encrypt(to_rsa_pubkey *rsa.PublicKey, label string) (*envelope
 	return envelope.New(encodedCipherText, encodedEncryptedSymKey)
 }
 
-func Decrypt(envelope *envelope.Envelope, privKey *rsa.PrivateKey) (*Message, error) {
+func Open(envelope *envelope.Envelope, privKey *rsa.PrivateKey) (*Message, error) {
 	// Decode and Decrypt the symmetric key using the RSA private key
 	_, encryptedSymmetricKey, err := multibase.Decode(envelope.EncryptedKey)
 	if err != nil {

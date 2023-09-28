@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/did/coll"
@@ -16,20 +17,16 @@ import (
 
 func main() {
 
-	did := did.New("space", "bahner")
-	doc, _ := doc.New(did.String())
-	myIPNSKey, err := internal.IPNSGetOrCreateKey("bahner")
+	var err error
+	os.Setenv("IPFS_API_HOST", "localhost:5001")
+
+	shell := internal.GetShell()
+
+	me, err := did.NewIdentity("space")
 	if err != nil {
-		fmt.Println(err)
-	}
-	myKey, err := key.New(myIPNSKey)
-	if err != nil {
-		fmt.Println(err)
-	}
-	myPublicKeyMultibase, err := pkm.New(myKey.RSAPrivateKey)
-	if err != nil {
-		fmt.Println(err)
-	}
+		fmt.Errorf("Error creating new identity in space: %v", err)
+
+		myRSAKey, err := key.NewRSAKey()
 	myVerificationMethod, err := vm.New(did.Id, "#key1", myPublicKeyMultibase)
 	if err != nil {
 		fmt.Println(err)
@@ -47,11 +44,6 @@ func main() {
 		fmt.Println(err)
 	}
 	fmt.Printf("%s\n", docString)
-	cid, _ := internal.IPFSPublishString(docString)
-
-	data, _ := internal.IPNSPublishCID(cid, "bahner", true)
-
-	fmt.Printf("IPNS: %s\n", data)
 
 	// ok := doc.Verify()
 	// if ok == nil {
