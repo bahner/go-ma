@@ -66,11 +66,11 @@ func New(key interface{}) (*PublicKeyMultibase, error) {
 	}, nil
 }
 
-// DecodePublicKeyMultibase decodes a PublicKeyMultibase instance
-func DecodePublicKeyMultibase(pkmb *PublicKeyMultibase) (*PublicKeyMultibase, error) {
+// Parse decodes a PublicKeyMultibase instance
+func Parse(pkmb string) (*PublicKeyMultibase, error) {
 
 	// Decode the multibase-encoded public key string
-	_, decoded, err := multibase.Decode(pkmb.PublicKeyMultibase)
+	_, decoded, err := multibase.Decode(pkmb)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding multibase string: %v", err)
 	}
@@ -103,6 +103,6 @@ func DecodePublicKeyMultibase(pkmb *PublicKeyMultibase) (*PublicKeyMultibase, er
 	return &PublicKeyMultibase{
 		MulticodecCodeString: multicodec.Code(codec).String(),
 		PublicKey:            pub,
-		PublicKeyMultibase:   pkmb.PublicKeyMultibase,
+		PublicKeyMultibase:   pkmb,
 	}, nil
 }

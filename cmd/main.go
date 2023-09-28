@@ -6,7 +6,7 @@ import (
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/did/coll"
 	"github.com/bahner/go-ma/did/doc"
-	"github.com/bahner/go-ma/did/pubkey"
+	"github.com/bahner/go-ma/did/pkm"
 	"github.com/bahner/go-ma/did/vm"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
@@ -26,7 +26,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	myPublicKeyMultibase, err := pubkey.New(myKey.RSAPrivateKey)
+	myPublicKeyMultibase, err := pkm.New(myKey.RSAPrivateKey)
 	if err != nil {
 		fmt.Println(err)
 	}

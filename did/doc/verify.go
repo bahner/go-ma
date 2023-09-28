@@ -4,7 +4,6 @@ import (
 	"crypto/rsa"
 	"fmt"
 
-	"github.com/bahner/go-ma/did/pubkey"
 	"github.com/multiformats/go-multibase"
 )
 
@@ -25,18 +24,15 @@ func (doc *Document) Verify() error {
 		return fmt.Errorf("doc verify: Error decoding signature: %s", err)
 	}
 
-	// Loop through the VerificationMethods and try to verify with each RSA public key found
-	for _, method := range doc.VerificationMethod {
-		if method.Type == "RsaVerificationKey2018" {
-			pubKey, err := pubkey.Decode(method.PublicKeyMultibase) // Directly get the *rsa.PublicKey
-			if err != nil {
-				return fmt.Errorf("doc verify: Error decoding and parsing public key: %s", err)
-			}
+	rsaKeys, err := doc.VerificationMethodRSAPublicKeys()
+	if err != nil {
+		return fmt.Errorf("doc verify: Error getting RSA public keys: %s", err)
+	}
+	for _, rsaKey := range rsaKeys {
 
-			err = rsa.VerifyPKCS1v15(pubKey, SIGNATURE_HASH, hashed, signature)
-			if err == nil { // If the key verifies successfully, return nil immediately
-				return nil
-			}
+		err = rsa.VerifyPKCS1v15(rsaKey, SIGNATURE_HASH, hashed, signature)
+		if err == nil { // If the key verifies successfully, return nil immediately
+			return nil
 		}
 	}
 

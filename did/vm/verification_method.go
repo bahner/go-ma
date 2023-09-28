@@ -1,9 +1,7 @@
 package vm
 
 import (
-	"crypto"
-
-	"github.com/bahner/go-ma/did/pubkey"
+	"github.com/bahner/go-ma/did/pkm"
 	"github.com/bahner/go-ma/internal"
 )
 
@@ -17,7 +15,7 @@ type VerificationMethod struct {
 func New(
 	id string,
 	fragment string,
-	publicKeyMultibase *pubkey.PublicKeyMultibase) (VerificationMethod, error) {
+	publicKeyMultibase *pkm.PublicKeyMultibase) (VerificationMethod, error) {
 
 	if !internal.IsAlnum(id) {
 		return VerificationMethod{}, internal.ErrInvalidID
@@ -27,13 +25,22 @@ func New(
 		return VerificationMethod{}, internal.ErrInvalidFragment
 	}
 
+	// Check if we have a valid method for the given multicodec code
+	// For given key
+	if !IsValidVerificationMethod(publicKeyMultibase.MulticodecCodeString) {
+		return VerificationMethod{}, ErrInvalidVerificationMethod
+	}
+
+	vmType := VerificationMethodTypeFromPKM(publicKeyMultibase)
+
 	return VerificationMethod{
 		ID:                 id + fragment, // A DID.String() and a "#fragment(Of Some Sort)"
-		Type:               publicKeyMultibase.Type,
+		Type:               vmType,
 		PublicKeyMultibase: publicKeyMultibase.PublicKeyMultibase,
 	}, nil
 }
 
-func (vm *VerificationMethod) DecodedPublicKeyMultibase(string) (*crypto.PublicKey, error) {
-	return pubkey.Decode(vm.PublicKeyMultibase)
+func VerificationMethodTypeFromPKM(pkmb *pkm.PublicKeyMultibase) string {
+	// Convert string to multicodec.Code
+	return VerificationPubkeyMethodMapping[pkmb.MulticodecCodeString]
 }

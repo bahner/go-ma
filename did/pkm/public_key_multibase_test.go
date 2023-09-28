@@ -38,7 +38,7 @@ func TestNewAndDecode(t *testing.T) {
 				t.Fatalf("failed to create PublicKeyMultibase: %v", err)
 			}
 
-			decodedPKMB, err := DecodePublicKeyMultibase(pkmb)
+			decodedPKMB, err := Parse(pkmb.PublicKeyMultibase)
 			if err != nil {
 				t.Fatalf("failed to decode PublicKeyMultibase: %v", err)
 			}
