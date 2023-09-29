@@ -9,7 +9,6 @@ import (
 	shell "github.com/ipfs/go-ipfs-api"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/peer"
-	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
 type DID struct {
@@ -41,29 +40,6 @@ func NewFromIPNSKey(method string, keyName *shell.Key) *DID {
 	new_id := keyName.Id + "#" + keyName.Name
 
 	return New(method, new_id)
-
-}
-
-// This creates a New Live Identity for you. This is what you want to use,
-// when you create new entitites.
-
-// This function requires a live ipfs node to be running.
-
-// So not only does it create a new DID, it also creates a new IPNS key, which
-// you can use to publish your DID Document with.
-func NewIdentity(method string) (*DID, error) {
-
-	id, err := nanoid.New()
-	if err != nil {
-		return &DID{}, internal.LogError(fmt.Sprintf("did: failed to generate nanoid: %v", err))
-	}
-
-	new_key, err := internal.IPNSGetOrCreateKey(id)
-	if err != nil {
-		return &DID{}, internal.LogError(fmt.Sprintf("did: failed to get or create key: %v", err))
-	}
-
-	return NewFromIPNSKey(method, new_key), nil
 
 }
 

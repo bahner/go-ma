@@ -10,6 +10,8 @@ import (
 	"github.com/multiformats/go-multibase"
 	"github.com/multiformats/go-multicodec"
 	"github.com/multiformats/go-varint"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // PublicKeyMultibase structure
@@ -51,6 +53,11 @@ func New(key interface{}) (*PublicKeyMultibase, error) {
 		return nil, fmt.Errorf("failed to marshal public key: %v", err)
 	}
 
+	log.Debugf("Public key bytes: %v", pubBytes)
+	log.Debugf("Public key bytes length: %v", len(pubBytes))
+	log.Debugf("Public key: %v", pubKey)
+	log.Debugf("Public key type: %T", pubKey)
+	log.Debugf("Public key multicodec: %v", multicodecCode)
 	multicodecBytes := varint.ToUvarint(uint64(multicodecCode))
 	prefixedPubBytes := append(multicodecBytes, pubBytes...)
 
@@ -66,24 +73,30 @@ func New(key interface{}) (*PublicKeyMultibase, error) {
 	}, nil
 }
 
-// Parse decodes a PublicKeyMultibase instance
 func Parse(pkmb string) (*PublicKeyMultibase, error) {
 
-	// Decode the multibase-encoded public key string
-	_, decoded, err := multibase.Decode(pkmb)
+	// Step 1: Multibase Decoding
+	_, decodedBytes, err := multibase.Decode(pkmb)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding multibase string: %v", err)
 	}
 
-	// Read and remove the multicodec prefix
-	codec, n, err := varint.FromUvarint(decoded)
+	log.Debugf("Multibase decoded bytes: %v", decodedBytes)
+	log.Debugf("Multibase decoded bytes length: %v", len(decodedBytes))
+
+	// Step 2: Reading and removing the Multicodec Prefix
+	codec, n, err := varint.FromUvarint(decodedBytes)
 	if err != nil {
 		return nil, fmt.Errorf("error reading multicodec varint: %v", err)
 	}
 
-	// Process the key bytes based on multicodec
-	pubKeyBytes := decoded[n:]
+	log.Debugf("Multicodec varint: %v", codec)
+	log.Debugf("Multicodec name: %v", multicodec.Code(codec).String())
+
+	// Step 3: Extracting the Public Key Bytes based on Multicodec
+	pubKeyBytes := decodedBytes[n:]
 	var pub crypto.PublicKey
+	// switch multicodec.Code(codec) {
 	switch multicodec.Code(codec) {
 	case multicodec.Ed25519Pub:
 		if len(pubKeyBytes) != ed25519.PublicKeySize {

@@ -37,6 +37,12 @@ func (d *Document) Publish() (*api.PublishResponse, error) {
 			internal.LogError(fmt.Sprintf("doc: failed to find key name: %v", err))
 	}
 
-	return internal.IPNSPublishCID(string(data), name, true)
+	cid, err := internal.IPFSPublishString(data)
+	if err != nil {
+		internal.LogError(fmt.Sprintf("doc: failed to publish document to IPFS: %v", err))
+		return &api.PublishResponse{}, err
+	}
+
+	return internal.IPNSPublishCID(cid, name, true)
 
 }

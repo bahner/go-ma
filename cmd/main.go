@@ -4,61 +4,60 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/did/coll"
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/did/pkm"
 	"github.com/bahner/go-ma/did/vm"
-	"github.com/bahner/go-ma/internal"
-	"github.com/bahner/go-ma/key"
+	"github.com/bahner/go-ma/message/entity"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // const subEthaMessage = "Share and enjoy!"
 
 func main() {
 
+	log.SetLevel(log.InfoLevel)
+
 	var err error
-	os.Setenv("IPFS_API_HOST", "localhost:5001")
+	os.Setenv("IPFS_API_HOST", "localhost:45005")
 
-	shell := internal.GetShell()
+	// shell := internal.GetShell()
 
-	me, err := did.NewIdentity("space")
+	// Create a new person, object - an entity
+	me, err := entity.New("space", "me")
 	if err != nil {
-		fmt.Errorf("Error creating new identity in space: %v", err)
-
-		myRSAKey, err := key.NewRSAKey()
-	myVerificationMethod, err := vm.New(did.Id, "#key1", myPublicKeyMultibase)
-	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Error creating new identity in space: %v", err)
 	}
-	doc.AddVerificationMethod(myVerificationMethod)
-	ctrl, err := coll.New(did.String())
+
+	fmt.Printf("My DID: %s\n", me.DID.Identifier)
+
+	// Create a new DID Document for the entity
+	ddoc, err := doc.New(me.DID.Id)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Error creating new DID Document: %v", err)
 	}
-	doc.Controller = ctrl
 
-	doc.Sign(myKey)
-	docString, err := doc.String()
+	// This is a little overengineering,
+	// Put it's also not bad. We can add sugar functions
+	// for verification methods, that will make it easier
+	ddocPkm, err := pkm.Parse(me.Key.PublicKeyMultibase)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Printf("Error parsing public key multibase: %v", err)
 	}
-	fmt.Printf("%s\n", docString)
 
-	// ok := doc.Verify()
-	// if ok == nil {
-	// 	fmt.Println("Signature verified")
-	// } else {
-	// 	fmt.Println("Signature verification failed")
-	// }
+	ddocVm, err := vm.New(me.DID.Id, "#key-1", ddocPkm)
+	if err != nil {
+		fmt.Printf("Error creating new Verification Method: %v", err)
+	}
 
-	// os.Setenv("IPFS_API_SOCKET", "localhost:45005")
+	ddoc.AddVerificationMethod(ddocVm)
+	ddoc.Sign(me.Key)
 
-	// did, err := did.NewIdentity("space")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
+	res, err := ddoc.Publish()
+	if err != nil {
+		fmt.Printf("Error publishing DID Document: %v", err)
+	}
 
-	// fmt.Println(did.String())
+	fmt.Printf("Published DID Document: %s\n", res)
 
 }

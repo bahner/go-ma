@@ -3,11 +3,10 @@ package key
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/x509"
 	"fmt"
 
+	"github.com/bahner/go-ma/did/pkm"
 	"github.com/bahner/go-ma/internal"
-	"github.com/multiformats/go-multibase"
 
 	ipfs "github.com/ipfs/go-ipfs-api"
 )
@@ -28,19 +27,17 @@ func New(ApiKey *ipfs.Key) (*Key, error) {
 		return nil, err
 	}
 
-	rsaPublicKey := &rsaPrivateKey.PublicKey
-	rsaPublicKeyBytes := x509.MarshalPKCS1PublicKey(rsaPublicKey)
-
-	publicKeyMultibase, err := multibase.Encode(PRIVATE_KEY_ENCODING, []byte(rsaPublicKeyBytes))
+	pkmk, err := pkm.New(rsaPrivateKey)
 	if err != nil {
-		internal.LogError(fmt.Sprintf("key: failed to multibase encode public key: %v", err))
+		return nil,
+			internal.LogError(fmt.Sprintf("key: failed to generate public key multibase: %v", err))
 	}
 
 	return &Key{
 		Id:                 ApiKey.Id,
 		Name:               ApiKey.Name,
 		RSAPrivateKey:      rsaPrivateKey,
-		RSAPublicKey:       rsaPublicKey,
-		PublicKeyMultibase: publicKeyMultibase,
+		RSAPublicKey:       &rsaPrivateKey.PublicKey,
+		PublicKeyMultibase: pkmk.PublicKeyMultibase,
 	}, nil
 }
