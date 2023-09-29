@@ -42,18 +42,28 @@ func main() {
 	// This is a little overengineering,
 	// Put it's also not bad. We can add sugar functions
 	// for verification methods, that will make it easier
-	ddocPkm, err := pkm.Parse(me.Key.PublicKeyMultibase)
+	rsaPKM, err := pkm.New(me.Key.RSAPublicKey)
 	if err != nil {
 		fmt.Printf("Error parsing public key multibase: %v", err)
 	}
 
-	ddocVm, err := vm.New(me.DID.Id, "#key-1", ddocPkm)
+	rsaVM, err := vm.New(me.DID.Id, "#rsa", rsaPKM)
 	if err != nil {
 		fmt.Printf("Error creating new Verification Method: %v", err)
 	}
 
-	ddoc.AddVerificationMethod(ddocVm)
-	ddoc.Sign(me.Key)
+	signKey, err := pkm.New(me.Key.Ed25519PrivateKey)
+	if err != nil {
+		fmt.Printf("Error parsing public key multibase: %v", err)
+	}
+
+	signVM, err := vm.New(me.DID.Id, "#sign", signKey)
+	if err != nil {
+		fmt.Printf("Error creating new Verification Method: %v", err)
+	}
+	ddoc.AddVerificationMethod(rsaVM)
+	ddoc.AddVerificationMethod(signVM)
+	ddoc.Sign(me.Key.Ed25519PrivateKey)
 
 	res, err := ddoc.Publish()
 	if err != nil {
