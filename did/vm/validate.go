@@ -15,8 +15,8 @@ var (
 // The value string is the DID Verification Method
 // and is something we can change, if we meet the requirements.
 var VerificationPubkeyMethodMapping = map[string]string{
-	"rsa-pub":     "RsaVerificationKey2020",
-	"ed25519-pub": "Ed25519VerificationKey2020",
+	"rsa-pub":     "RsaVerificationKey2018",
+	"ed25519-pub": "MultiKey",
 }
 
 func ValidVerificationMethods() []string {
