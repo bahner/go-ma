@@ -5,4 +5,8 @@ Adjust to the did encoded definitions.
 https://www.w3.org/TR/did-spec-registries/#rsaverificationkey2018
 https://www.w3.org/TR/did-spec-registries/#ed25519verificationkey2018
 
+This should be modularised like: https://github.com/digitalbazaar/ed25519-multikey
+Generate a Multikey and use that as vm. Vm addverifiaction method should be used to verify type with the underlying package
+
+one for signing keys one for encryption keys.
 Make the pkm to be a type, which can be added to the DIDDocument an referenced from vm or others.
