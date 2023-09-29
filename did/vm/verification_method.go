@@ -1,6 +1,8 @@
 package vm
 
 import (
+	"fmt"
+
 	"github.com/bahner/go-ma/did/pkm"
 	"github.com/bahner/go-ma/internal"
 )
@@ -27,11 +29,10 @@ func New(
 
 	// Check if we have a valid method for the given multicodec code
 	// For given key
-	if !IsValidVerificationMethod(publicKeyMultibase.MulticodecCodeString) {
-		return VerificationMethod{}, ErrInvalidVerificationMethod
+	vmType, err := getVerificationMethodForKeyType(publicKeyMultibase.MulticodecCodeString)
+	if err != nil {
+		return VerificationMethod{}, fmt.Errorf("no verification matches key type: %s", publicKeyMultibase.MulticodecCodeString)
 	}
-
-	vmType := VerificationMethodTypeFromPKM(publicKeyMultibase)
 
 	return VerificationMethod{
 		ID:                 id + fragment, // A DID.String() and a "#fragment(Of Some Sort)"

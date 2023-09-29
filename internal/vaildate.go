@@ -8,12 +8,10 @@ import (
 )
 
 var (
-	ascii        = regexp.MustCompile("^[a-z]*$")
-	alphanumeric = regexp.MustCompile("^[a-z0-9]*$")
-	nanoAlphabet = regexp.MustCompile("^[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-]*$")
-	// Accept must fewer than normal characters DID fragments.
-	// These are used to name keys in verification methods.
-	fragment           = regexp.MustCompile("^#[a-zA-Z0-9-]+$")
+	ascii              = regexp.MustCompile("^[a-z]*$")
+	alphanumeric       = regexp.MustCompile("^[a-z0-9]*$")
+	nanoid             = regexp.MustCompile("^[a-zA-Z0-9_-]*$")
+	fragment           = regexp.MustCompile("^#[a-zA-Z0-9_-]*$")
 	ErrInvalidID       = errors.New("invalid ID")
 	ErrInvalidFragment = errors.New("invalid fragment")
 )
@@ -33,9 +31,11 @@ func IsValidMultibase(input string) bool {
 
 // ValidateNanoID checks if a string only contains valid NanoID characters.
 func IsValidNanoID(str string) bool {
-	return nanoAlphabet.MatchString(str)
+	return nanoid.MatchString(str)
 }
 
+// This simply checks that the string is a valid nanoID,
+// prefixed with a "#".
 func IsValidFragment(str string) bool {
 	return fragment.MatchString(str)
 }

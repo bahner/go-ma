@@ -2,7 +2,6 @@ package did
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/bahner/go-ma/internal"
@@ -102,19 +101,6 @@ func (d *DID) IsValid() bool {
 	return err == nil
 }
 
-func (d *DID) IsIdenticalTo(did DID) bool {
-
-	return d.Id == did.Id
-}
-
-// AreIdentical checks if two DIDs have the same ID, ignoring the fragment.
-// This is a stretched interpretation of the word Identical, but
-// I couldn't help myself. It means they are derived from the same key,
-// which makes them Identical in my book.
-func AreIdentical(did1 *DID, did2 *DID) bool {
-	return did1.Id == did2.Id
-}
-
 func (d *DID) PublicKey() (crypto.PubKey, error) {
 
 	// Decode the PeerID from the ID which is the IPNS name
@@ -127,13 +113,7 @@ func (d *DID) PublicKey() (crypto.PubKey, error) {
 
 }
 
-// Sometimes we just want the identifier, not the whole DID.
-func ExtractID(didStr string) (string, error) {
+func (d *DID) IsIdenticalTo(did DID) bool {
 
-	did, err := Parse(didStr)
-	if err != nil {
-		return "", internal.LogError(fmt.Sprintf("did: not a valid identifier: %v", err))
-	}
-
-	return did.Id, nil
+	return d.Id == did.Id
 }

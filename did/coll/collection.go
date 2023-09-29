@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // Collections is a type that can be either a single element or a set of elements
@@ -97,12 +99,14 @@ func (s *CollectionSet) UnmarshalJSON(data []byte) error {
 	var multiple []string
 
 	if err := json.Unmarshal(data, &single); err == nil {
+		log.Debug(fmt.Sprintf("coll: UnmarshalJSON: single: %s", single))
 		s.elements = map[string]struct{}{single: {}}
 		s.isSingle = true
 		return nil
 	}
 
 	if err := json.Unmarshal(data, &multiple); err == nil {
+		log.Debug(fmt.Sprintf("coll: UnmarshalJSON: multiple: %s", multiple))
 		s.elements = make(map[string]struct{}, len(multiple))
 		for _, k := range multiple {
 			s.elements[k] = struct{}{}
@@ -111,7 +115,7 @@ func (s *CollectionSet) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	return errors.New("could not unmarshal as either single or multiple elements")
+	return fmt.Errorf("could not unmarshal as either single or multiple elements: single unmarshal error: %v, multiple unmarshal error: %v", json.Unmarshal(data, &single), json.Unmarshal(data, &multiple))
 }
 
 // Factory function to create the appropriate Elements

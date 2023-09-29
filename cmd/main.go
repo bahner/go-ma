@@ -9,6 +9,7 @@ import (
 	"github.com/bahner/go-ma/did/vm"
 	"github.com/bahner/go-ma/message/entity"
 
+	nanoid "github.com/matoous/go-nanoid/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -16,7 +17,7 @@ import (
 
 func main() {
 
-	log.SetLevel(log.InfoLevel)
+	log.SetLevel(log.DebugLevel)
 
 	var err error
 	os.Setenv("IPFS_API_HOST", "localhost:45005")
@@ -24,7 +25,8 @@ func main() {
 	// shell := internal.GetShell()
 
 	// Create a new person, object - an entity
-	me, err := entity.New("space", "me")
+	id, _ := nanoid.New()
+	me, err := entity.New("space", id)
 	if err != nil {
 		fmt.Printf("Error creating new identity in space: %v", err)
 	}
@@ -32,7 +34,7 @@ func main() {
 	fmt.Printf("My DID: %s\n", me.DID.Identifier)
 
 	// Create a new DID Document for the entity
-	ddoc, err := doc.New(me.DID.Id)
+	ddoc, err := doc.New(me.DID.String())
 	if err != nil {
 		fmt.Printf("Error creating new DID Document: %v", err)
 	}
@@ -59,5 +61,14 @@ func main() {
 	}
 
 	fmt.Printf("Published DID Document: %s\n", res)
+
+	// Lets see if we can retrieve it again
+
+	retrieved_document, err := doc.Fetch(me.DID.String())
+	if err != nil {
+		fmt.Printf("Error retrieving DID Document: %v", err)
+	}
+
+	fmt.Printf("Retrieved DID Document: %s\n", retrieved_document)
 
 }

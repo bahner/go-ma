@@ -3,6 +3,7 @@ package doc
 import (
 	"fmt"
 
+	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
 	api "github.com/ipfs/go-ipfs-api"
 )
@@ -20,29 +21,34 @@ func (d *Document) Publish() (*api.PublishResponse, error) {
 
 	// First we need to publish the document to IPFS and get the cid.
 
-	// A document is not a DI :_) We need to parse the identifier out of the document.
-	// in order to find the fragment, which *MUST* the keyname.
+	// A document is not a DID :-) We need to parse the identifier out of the document.
+	// in order to find the fragment, which *MUST* be the keyname.
 
 	data, err := d.String()
 	if err != nil {
 		return &api.PublishResponse{},
-			internal.LogError(fmt.Sprintf("doc: failed to marshal document to JSON: %v", err))
+			internal.LogError(fmt.Sprintf("doc/publish: failed to marshal document to JSON: %v", err))
 	}
 
-	// Lookup short name of the key to publish to in IPFS.
-
-	name, err := internal.IPNSFindKeyName(d.ID)
-	if err != nil {
-		return &api.PublishResponse{},
-			internal.LogError(fmt.Sprintf("doc: failed to find key name: %v", err))
-	}
-
+	// Publish the document to IPFS first. We need the CID to publish to IPNS.
+	// So without that we ain't going nowhere.
 	cid, err := internal.IPFSPublishString(data)
 	if err != nil {
 		internal.LogError(fmt.Sprintf("doc: failed to publish document to IPFS: %v", err))
 		return &api.PublishResponse{}, err
 	}
 
-	return internal.IPNSPublishCID(cid, name, true)
+	// Lookup short name of the identifier, ie. the fragment
+	// The shortname is given to IPFS to lookup the actual key,
+	// but that is transparent to use.
+	// This gived us the possibility to change the key without
+	// having to change the entity name within a given context.
+	docdid, err := did.Parse(d.ID)
+	if err != nil {
+		return &api.PublishResponse{},
+			internal.LogError(fmt.Sprintf("doc/publish: failed to parse DID: %v", err))
+	}
+
+	return internal.IPNSPublishCID(cid, docdid.Fragment, true)
 
 }
