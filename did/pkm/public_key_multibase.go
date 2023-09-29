@@ -37,13 +37,13 @@ func New(key interface{}) (*PublicKeyMultibase, error) {
 		multicodecCode = multicodec.RsaPub
 		pubBytes, err = x509.MarshalPKIXPublicKey(k)
 		pubKey = k
-	case ed25519.PrivateKey:
+	case *ed25519.PrivateKey:
 		multicodecCode = multicodec.Ed25519Pub
 		pubBytes = k.Public().(ed25519.PublicKey)
 		pubKey = k.Public().(ed25519.PublicKey)
-	case ed25519.PublicKey:
+	case *ed25519.PublicKey:
 		multicodecCode = multicodec.Ed25519Pub
-		pubBytes = k
+		pubBytes = *k
 		pubKey = k
 	default:
 		return nil, fmt.Errorf("unsupported key type %T", k)

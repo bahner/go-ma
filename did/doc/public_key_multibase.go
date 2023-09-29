@@ -14,7 +14,7 @@ func (d *Document) VerificationMethodRSAPublicKeys() ([]*rsa.PublicKey, error) {
 
 	var pks []*rsa.PublicKey
 
-	methods, err := d.VerificationMethodsOfType("RsaVerificationKey2018")
+	methods, err := d.VerificationMethodsOfType("RsaVerificationKey2020")
 	if err != nil {
 		return pks, fmt.Errorf("doc: Error getting RSA verification methods: %s", err)
 	}

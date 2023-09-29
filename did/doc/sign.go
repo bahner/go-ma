@@ -1,28 +1,21 @@
 package doc
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
+	"crypto/ed25519"
 	"fmt"
 
 	"github.com/bahner/go-ma/internal"
-	"github.com/bahner/go-ma/key"
 	"github.com/multiformats/go-multibase"
 )
 
-func (doc *Document) Sign(signKey *key.Key) error {
+func (doc *Document) Sign(signKey *ed25519.PrivateKey) error {
 	p, err := doc.MarshalPayloadToJSON()
 	if err != nil {
 		return err
 	}
 
-	// Compute the hash of the payload
-	h := SIGNATURE_HASH.New()
-	h.Write(p)
-	hashed := h.Sum(nil)
-
-	// Sign the hash of the payload
-	signature, err := rsa.SignPKCS1v15(rand.Reader, signKey.RSAPrivateKey, SIGNATURE_HASH, hashed)
+	// Sign the payload with an ed25519 key
+	signature := ed25519.Sign(*signKey, p)
 	if err != nil {
 		return internal.LogError(fmt.Sprintf("doc sign: Error signing payload: %s", err))
 	}
