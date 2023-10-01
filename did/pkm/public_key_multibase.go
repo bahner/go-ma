@@ -22,12 +22,15 @@ type PublicKeyMultibase struct {
 }
 
 // New constructs a PublicKeyMultibase instance given a key (either public or private).
+// Multiencode the key and return it as a multibase encoded string.
 func New(key interface{}) (*PublicKeyMultibase, error) {
 	var pubBytes []byte
 	var err error
 	var multicodecCode multicodec.Code
 	var pubKey crypto.PublicKey
 
+	// So this is compact, but it's just the same over and over again.
+	// Set the codec depednfing on key type
 	switch k := key.(type) {
 	case *rsa.PrivateKey:
 		multicodecCode = multicodec.RsaPub
@@ -68,8 +71,8 @@ func New(key interface{}) (*PublicKeyMultibase, error) {
 
 	return &PublicKeyMultibase{
 		MulticodecCodeString: multicodecCode.String(),
+		PublicKey:            pubKey,
 		PublicKeyMultibase:   multibaseStr,
-		PublicKey:            pubKey, // Set PublicKey correctly here
 	}, nil
 }
 
@@ -118,4 +121,8 @@ func Parse(pkmb string) (*PublicKeyMultibase, error) {
 		PublicKey:            pub,
 		PublicKeyMultibase:   pkmb,
 	}, nil
+}
+
+func (pkmb *PublicKeyMultibase) String() string {
+	return "did:key:" + pkmb.PublicKeyMultibase
 }
