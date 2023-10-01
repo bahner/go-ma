@@ -3,13 +3,13 @@ package message
 import (
 	"time"
 
-	"github.com/multiformats/go-multibase"
+	"github.com/bahner/go-ma"
 )
 
 const (
 	// What we are working on. The name of the message type
 	// in MIME format to give parsers a hint.
-	MESSAGE_MIME_TYPE = "application/x-ma-message"
+	MESSAGE_MIME_TYPE = ma.MESSAGE_MIME_TYPE
 
 	// MESSAGE_VERSION of the message schema
 	MESSAGE_VERSION = "0.0.1"
@@ -21,5 +21,5 @@ const (
 	MESSAGE_ENCRYPTION_LABEL = MESSAGE_MIME_TYPE
 
 	// MESSAGE_ENCODER_ENCODING is the encoding used for all encoding in messages.
-	MESSAGE_ENCODER_ENCODING = multibase.Base58BTC
+	MESSAGE_ENCODER_ENCODING = ma.MULTIBASE_ENCODING
 )

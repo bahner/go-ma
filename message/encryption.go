@@ -19,7 +19,7 @@ var MESSAGE_HASHER = crypto.BLAKE2b_256.New()
 // Takes a Pointer to a RSA public key and a label string.
 // The label is a hint to the reciever that they should look for
 // a key with this fragment in the key name.
-func (m *Message) Encrypt(to_rsa_pubkey *rsa.PublicKey, label string) (*envelope.Envelope, error) {
+func (m *Message) RSAEncrypt(to_rsa_pubkey *rsa.PublicKey, label string) (*envelope.Envelope, error) {
 	msg, err := m.Pack()
 	if err != nil {
 		return nil,
