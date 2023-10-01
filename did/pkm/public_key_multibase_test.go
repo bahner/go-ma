@@ -27,7 +27,7 @@ func TestNewAndDecode(t *testing.T) {
 		},
 		{
 			name: "Ed25519 Public Key",
-			key:  generateEd25519PrivateKey(t).Public().(ed25519.PublicKey),
+			key:  pub(generateEd25519PrivateKey(t).Public().(ed25519.PublicKey)),
 		},
 	}
 
@@ -51,8 +51,25 @@ func TestNewAndDecode(t *testing.T) {
 				t.Errorf("MulticodecCodeString mismatch: got %v, want %v", decodedPKMB.MulticodecCodeString, pkmb.MulticodecCodeString)
 			}
 
-			if !reflect.DeepEqual(pkmb.PublicKey, decodedPKMB.PublicKey) {
-				t.Errorf("PublicKey mismatch: got %v, want %v", decodedPKMB.PublicKey, pkmb.PublicKey)
+			if reflect.TypeOf(pkmb.PublicKey) != reflect.TypeOf(decodedPKMB.PublicKey) {
+				t.Errorf("PublicKey type mismatch: got %T, want %T", decodedPKMB.PublicKey, pkmb.PublicKey)
+			}
+
+			switch pubKeyOriginal := pkmb.PublicKey.(type) {
+			case *rsa.PublicKey:
+				if pubKeyDecoded, ok := decodedPKMB.PublicKey.(*rsa.PublicKey); ok {
+					if !reflect.DeepEqual(pubKeyOriginal, pubKeyDecoded) {
+						t.Errorf("PublicKey mismatch: got %v, want %v", pubKeyDecoded, pubKeyOriginal)
+					}
+				}
+			case ed25519.PublicKey:
+				if pubKeyDecoded, ok := decodedPKMB.PublicKey.(ed25519.PublicKey); ok {
+					if !reflect.DeepEqual(pubKeyOriginal, pubKeyDecoded) {
+						t.Errorf("PublicKey mismatch: got %v, want %v", pubKeyDecoded, pubKeyOriginal)
+					}
+				}
+			default:
+				t.Errorf("Unsupported PublicKey type %T", pkmb.PublicKey)
 			}
 		})
 	}
@@ -66,10 +83,17 @@ func generateRSAPrivateKey(t *testing.T) *rsa.PrivateKey {
 	return key
 }
 
-func generateEd25519PrivateKey(t *testing.T) ed25519.PrivateKey {
+func generateEd25519PrivateKey(t *testing.T) *ed25519.PrivateKey {
+	key := &ed25519.PrivateKey{}
 	_, priv, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		t.Fatalf("failed to generate Ed25519 private key: %v", err)
 	}
-	return priv
+	key = &priv
+	return key
+}
+func pub(pub ed25519.PublicKey) *ed25519.PublicKey {
+	key := &ed25519.PublicKey{}
+	key = &pub
+	return key
 }

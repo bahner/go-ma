@@ -1,11 +1,15 @@
 package vm
 
 import (
-	"fmt"
-
 	"github.com/bahner/go-ma/did/pkm"
 	"github.com/bahner/go-ma/internal"
 )
+
+// We only use multikeys, even for RSA keys.
+// This is because we want to support multiple key types.
+// But this is a moving target and should be ready for change.
+// Ref. https://w3c-ccg.github.io/did-method-key/#rsa-repr
+const VerificationMethodType = "Multikey"
 
 // VerificationMethod defines the structure of a Verification Method
 type VerificationMethod struct {
@@ -27,21 +31,9 @@ func New(
 		return VerificationMethod{}, internal.ErrInvalidFragment
 	}
 
-	// Check if we have a valid method for the given multicodec code
-	// For given key
-	vmType, err := getVerificationMethodForKeyType(publicKeyMultibase.MulticodecCodeString)
-	if err != nil {
-		return VerificationMethod{}, fmt.Errorf("no verification matches key type: %s", publicKeyMultibase.MulticodecCodeString)
-	}
-
 	return VerificationMethod{
 		ID:                 id + fragment, // A DID.String() and a "#fragment(Of Some Sort)"
-		Type:               vmType,
+		Type:               VerificationMethodType,
 		PublicKeyMultibase: publicKeyMultibase.PublicKeyMultibase,
 	}, nil
-}
-
-func VerificationMethodTypeFromPKM(pkmb *pkm.PublicKeyMultibase) string {
-	// Convert string to multicodec.Code
-	return VerificationPubkeyMethodMapping[pkmb.MulticodecCodeString]
 }
