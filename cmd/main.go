@@ -5,11 +5,9 @@ import (
 	"os"
 
 	"github.com/bahner/go-ma/did/doc"
-	"github.com/bahner/go-ma/did/pkm"
 	"github.com/bahner/go-ma/did/vm"
+	"github.com/bahner/go-ma/key"
 	"github.com/bahner/go-ma/message/entity"
-
-	nanoid "github.com/matoous/go-nanoid/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -19,66 +17,68 @@ func main() {
 
 	log.SetLevel(log.DebugLevel)
 
-	var err error
 	os.Setenv("IPFS_API_HOST", "localhost:45005")
 
 	// shell := internal.GetShell()
 
 	// Create a new person, object - an entity
-	id, _ := nanoid.New()
-	me, err := entity.New("space", id)
+	// id, _ := nanoid.New()
+	my, err := entity.New("space", "bahner")
 	if err != nil {
 		fmt.Printf("Error creating new identity in space: %v", err)
 	}
 
-	fmt.Printf("My DID: %s\n", me.DID.Identifier)
+	fmt.Printf("I am: %s\n", my.DID.String())
 
-	// Create a new DID Document for the entity
-	ddoc, err := doc.New(me.DID.String())
+	// Create a new document
+
+	myDoc, err := doc.New(my.DID.String())
 	if err != nil {
-		fmt.Printf("Error creating new DID Document: %v", err)
+		fmt.Printf("Error creating new document: %v", err)
 	}
 
-	// This is a little overengineering,
-	// Put it's also not bad. We can add sugar functions
-	// for verification methods, that will make it easier
-	rsaPKM, err := pkm.New(me.Key.RSAPublicKey)
+	env_key, err := key.GenerateEncryptionKey("x25519", "enc-1")
 	if err != nil {
-		fmt.Printf("Error parsing public key multibase: %v", err)
+		fmt.Printf("Error getting encryption key: %v", err)
 	}
 
-	rsaVM, err := vm.New(me.DID.Id, "#rsa", rsaPKM)
+	encVM, err := vm.New(my.DID.Id, env_key.Name(), env_key.PublicKeyMultibase())
 	if err != nil {
-		fmt.Printf("Error creating new Verification Method: %v", err)
+		fmt.Printf("Error creating encryption verification method: %v", err)
+	}
+	err = myDoc.AddVerificationMethod(encVM)
+	if err != nil {
+		fmt.Printf("Error adding encryption verification method: %v", err)
 	}
 
-	signKey, err := pkm.New(me.Key.Ed25519PrivateKey)
+	env_key, err = key.GenerateEncryptionKey("x448", "enc-1")
 	if err != nil {
-		fmt.Printf("Error parsing public key multibase: %v", err)
+		fmt.Printf("Error getting encryption key: %v", err)
 	}
 
-	signVM, err := vm.New(me.DID.Id, "#sign", signKey)
+	encVM, err = vm.New(my.DID.Id, env_key.Name(), env_key.PublicKeyMultibase())
 	if err != nil {
-		fmt.Printf("Error creating new Verification Method: %v", err)
+		fmt.Printf("Error creating encryption verification method: %v", err)
 	}
-	ddoc.AddVerificationMethod(rsaVM)
-	ddoc.AddVerificationMethod(signVM)
-	ddoc.Sign(me.Key.Ed25519PrivateKey)
-
-	res, err := ddoc.Publish()
+	err = myDoc.AddVerificationMethod(encVM)
 	if err != nil {
-		fmt.Printf("Error publishing DID Document: %v", err)
+		fmt.Printf("Error adding encryption verification method: %v", err)
 	}
 
-	fmt.Printf("Published DID Document: %s\n", res)
-
-	// Lets see if we can retrieve it again
-
-	retrieved_document, err := doc.Fetch(me.DID.String())
+	sigKey, err := key.GenerateSignatureKey("ed25519", "sig1")
 	if err != nil {
-		fmt.Printf("Error retrieving DID Document: %v", err)
+		fmt.Printf("Error getting signature key: %v", err)
 	}
 
-	fmt.Printf("Retrieved DID Document: %s\n", retrieved_document)
+	sigVM, err := vm.New(my.DID.Id, sigKey.Name(), sigKey.PublicKeyMultibase())
+	if err != nil {
+		fmt.Printf("Error creating signature verification method: %v", err)
+	}
+	err = myDoc.AddVerificationMethod(sigVM)
+	if err != nil {
+		fmt.Printf("Error adding signature verification method: %v", err)
+	}
+
+	myDoc.Publish()
 
 }

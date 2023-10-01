@@ -1,7 +1,6 @@
 package vm
 
 import (
-	"github.com/bahner/go-ma/did/pkm"
 	"github.com/bahner/go-ma/internal"
 )
 
@@ -20,20 +19,28 @@ type VerificationMethod struct {
 
 func New(
 	id string,
-	fragment string,
-	publicKeyMultibase *pkm.PublicKeyMultibase) (VerificationMethod, error) {
+	name string,
+	publicKeyMultibase string) (VerificationMethod, error) {
 
 	if !internal.IsAlnum(id) {
 		return VerificationMethod{}, internal.ErrInvalidID
 	}
 
-	if !internal.IsValidFragment(fragment) {
+	if !internal.IsValidNanoID(name) {
 		return VerificationMethod{}, internal.ErrInvalidFragment
 	}
 
 	return VerificationMethod{
-		ID:                 id + fragment, // A DID.String() and a "#fragment(Of Some Sort)"
+		ID:                 id + "#" + name,
 		Type:               VerificationMethodType,
-		PublicKeyMultibase: publicKeyMultibase.PublicKeyMultibase,
+		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
+}
+
+func (vm VerificationMethod) GetID() string {
+	return vm.ID
+}
+
+func (vm VerificationMethod) Fragment() string {
+	return internal.GetFragmentFromDID(vm.ID)
 }

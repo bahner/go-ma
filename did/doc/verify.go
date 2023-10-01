@@ -1,10 +1,12 @@
 package doc
 
 import (
-	"crypto/rsa"
+	"crypto"
+	"crypto/ed25519"
 	"fmt"
 
 	"github.com/multiformats/go-multibase"
+	"lukechampine.com/blake3"
 )
 
 func (doc *Document) Verify() error {
@@ -13,28 +15,39 @@ func (doc *Document) Verify() error {
 		return fmt.Errorf("doc verify: Error marshalling payload to JSON: %s", err)
 	}
 
-	// Compute the hash of the payload
-	h := SIGNATURE_HASH.New()
-	h.Write(p)
-	hashed := h.Sum(nil)
+	hashed := blake3.Sum256(p)
 
 	// Decode the multibase-encoded signature
 	_, signature, err := multibase.Decode(doc.Signature)
 	if err != nil {
-		return fmt.Errorf("doc verify: Error decoding signature: %s", err)
+		return fmt.Errorf("doc/verify: Error decoding signature: %s", err)
 	}
 
-	rsaKeys, err := doc.VerificationMethodRSAPublicKeys()
+	pubKey, err := doc.SigningKey()
 	if err != nil {
-		return fmt.Errorf("doc verify: Error getting RSA public keys: %s", err)
+		return fmt.Errorf("doc/verify: Error getting signing key: %s", err)
 	}
-	for _, rsaKey := range rsaKeys {
 
-		err = rsa.VerifyPKCS1v15(rsaKey, SIGNATURE_HASH, hashed, signature)
-		if err == nil { // If the key verifies successfully, return nil immediately
-			return nil
-		}
+	// Verify the signature
+	err = verifyData(pubKey, hashed[:], signature)
+	if err == nil {
+		return nil
 	}
 
 	return fmt.Errorf("doc verify: Verification failed for all keys")
+}
+
+// VerifyData verifies a signature against a message and public key.
+func verifyData(publicKey crypto.PublicKey, message, signature []byte) error {
+	// Type assertion
+	switch pk := publicKey.(type) {
+	case ed25519.PublicKey:
+		if !ed25519.Verify(pk, message, signature) {
+			return fmt.Errorf("verification failed")
+		}
+	default:
+		return fmt.Errorf("unsupported public key type %T", pk)
+	}
+
+	return nil
 }

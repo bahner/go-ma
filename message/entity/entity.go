@@ -5,7 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
-	"github.com/bahner/go-ma/keyset"
+	keyset "github.com/bahner/go-ma/key"
 	shell "github.com/ipfs/go-ipfs-api"
 )
 
@@ -18,7 +18,7 @@ import (
 // you can use to publish your DID Document with.
 type Entity struct {
 	DID    *did.DID
-	Keyset *keyset.Keyset
+	Keyset keyset.Keyset
 }
 
 // This creates a new Entity from a method and an identifier.
@@ -32,7 +32,7 @@ func New(method string, name string) (*Entity, error) {
 
 	ipfsKey, err := internal.IPNSGetOrCreateKey(name)
 	if err != nil {
-		return nil, fmt.Errorf("entity: failed to get or create key: %v", err)
+		return nil, fmt.Errorf("entity: failed to get or create key in IPFS: %v", err)
 	}
 
 	entityDID := did.NewFromIPNSKey(method, ipfsKey)
@@ -40,49 +40,23 @@ func New(method string, name string) (*Entity, error) {
 		return nil, fmt.Errorf("entity: failed to create DID from ipnsKey: %s", err)
 	}
 
-	maKey, err := keyset.New(ipfsKey)
+	myKeyset, err := keyset.NewFromIPFSKey(ipfsKey)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create key from ipnsKey: %s", err)
 	}
 
 	return &Entity{
 		DID:    entityDID,
-		Keyset: maKey,
+		Keyset: myKeyset,
 	}, nil
 }
 
 func NewFromDID(d *did.DID) (*Entity, error) {
 
-	ipfsKey, err := internal.IPNSGetOrCreateKey(d.Fragment)
-	if err != nil {
-		return nil, fmt.Errorf("entity: failed to get or create key: %v", err)
-	}
-
-	maKey, err := keyset.New(ipfsKey)
-	if err != nil {
-		return nil, fmt.Errorf("entity: failed to create key from ipnsKey: %s", err)
-	}
-
-	return &Entity{
-		DID:    d,
-		Keyset: maKey,
-	}, nil
+	return New(d.Method, d.Fragment)
 }
 
-func NewFromKey(method string, a *shell.Key) (*Entity, error) {
+func NewFromKey(method string, ipfsKey *shell.Key) (*Entity, error) {
 
-	k, err := keyset.New(a)
-	if err != nil {
-		return nil, fmt.Errorf("entity: failed to create key from ipnsKey: %s", err)
-	}
-
-	d := did.NewFromIPNSKey(method, a)
-	if err != nil {
-		return nil, fmt.Errorf("entity: failed to create DID from ipnsKey: %s", err)
-	}
-
-	return &Entity{
-		DID:    d,
-		Keyset: k,
-	}, nil
+	return New(method, ipfsKey.Name)
 }
