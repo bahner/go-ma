@@ -29,8 +29,8 @@ const (
 	// if, how, when where and how.
 
 	// X25519 encryption codec
-	ECDHX25519ChaCha20Poly1305BLAKE3 = 0x300010
+	ECDHX25519ChaCha20Poly1305BLAKE3 = 0x300100
 
 	// X448 encryption codec
-	ECDHX448ChaCha20Poly1305BLAKE3 = 0x300020
+	ECDHX448ChaCha20Poly1305BLAKE3 = 0x300200
 )
