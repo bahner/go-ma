@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver"
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
 )
@@ -35,7 +36,7 @@ func (m *Message) IsValid() error {
 		return errors.New("nil Message provided")
 	}
 
-	if m.Type != MESSAGE_MIME_TYPE {
+	if m.MimeType != ma.MESSAGE_MIME_TYPE {
 		return errors.New("invalid Message type")
 	}
 
@@ -79,7 +80,7 @@ func (m *Message) VerifyMessageVersion() error {
 		return err
 	}
 
-	supportedSemver, err := semver.NewVersion(MESSAGE_VERSION)
+	supportedSemver, err := semver.NewVersion(ma.VERSION)
 	if err != nil {
 		return fmt.Errorf("error parsing version constant: %s", err)
 	}
