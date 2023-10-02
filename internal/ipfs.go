@@ -49,7 +49,7 @@ func IPFSPublishString(data string) (string, error) {
 
 	cid, err := ipfsAPI.Add(strings.NewReader(data))
 	if err != nil {
-		log.Printf("ipfs: failed to add data to IPFS: %v", err)
+		log.Printf("ipfs: failed to add data to IPFS: %v\n", err)
 		return "", err
 	}
 
@@ -63,7 +63,7 @@ func IPLDPutDag(data string) (string, error) {
 	cid, err := ipfsAPI.DagPut([]byte(data), "json", "cbor")
 
 	if err != nil {
-		log.Printf("ipld: failed to add data IPLD linked data: %v", err)
+		log.Printf("ipld: failed to add data IPLD linked data: %v\n", err)
 		return "", err
 	}
 
@@ -128,7 +128,7 @@ func IPNSLookupKeyName(keyName string) (*shell.Key, error) {
 
 	keys, err := IPNSListKeys()
 	if err != nil {
-		return lookedupKey, LogError(fmt.Sprintf("ipfs: failed to list : %v", err))
+		return lookedupKey, LogError(fmt.Sprintf("ipfs: failed to list : %v\n", err))
 	}
 
 	// A little deeper than I usually like to nest, but hey, it's a one off.

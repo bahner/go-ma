@@ -13,8 +13,8 @@ func validMessageWithSignature() *message.Message {
 	return &message.Message{
 		ID:          "validNanoID",
 		Type:        message.MESSAGE_MIME_TYPE,
-		From:        "did:space:from",
-		To:          "did:space:to",
+		From:        "did:ma:from",
+		To:          "did:ma:to",
 		CreatedTime: "2023-01-01T01:01:01Z",
 		ExpiresTime: "2023-01-02T01:01:01Z",
 		Body:        "Hello",

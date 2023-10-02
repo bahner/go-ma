@@ -14,8 +14,8 @@ func ValidExampleMessage() *Message {
 	msg := &Message{
 		ID:          "CT6EklGVDpQpaYrth_O80",
 		Type:        MESSAGE_MIME_TYPE,
-		From:        "did:space:k51qzi5uqu5djy7ca9encml5bqicdz47khiww4dvcvso4iqg3z7xy0amwnwcwd",
-		To:          "did:space:k51qzi5uqu5dk3pkcowsu2jqmnby0ry551xud502v000dzftwf4bj68384j84l",
+		From:        "did:ma:k51qzi5uqu5djy7ca9encml5bqicdz47khiww4dvcvso4iqg3z7xy0amwnwcwd",
+		To:          "did:ma:k51qzi5uqu5dk3pkcowsu2jqmnby0ry551xud502v000dzftwf4bj68384j84l",
 		CreatedTime: "2023-01-01T01:01:01Z",
 		ExpiresTime: "2023-01-02T01:01:01Z",
 		MimeType:    "text/plain",

@@ -2,8 +2,10 @@ package did
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
 	shell "github.com/ipfs/go-ipfs-api"
 	"github.com/libp2p/go-libp2p/core/crypto"
@@ -20,13 +22,13 @@ type DID struct {
 
 // This creates a new DID from a method and an identifier.
 // This is the base function for all the rest.
-func New(method string, identifier string) *DID {
+func New(identifier string) *DID {
 
 	id, fragment, _ := parseIdentifier(identifier)
 
 	return &DID{
-		Scheme:     PREFIX,
-		Method:     method,
+		Scheme:     ma.DID_SCHEME,
+		Method:     ma.DID_METHOD,
 		Id:         id,
 		Identifier: identifier,
 		Fragment:   fragment,
@@ -34,11 +36,11 @@ func New(method string, identifier string) *DID {
 }
 
 // If you already have a key, you can use this to create a DID.
-func NewFromIPNSKey(method string, keyName *shell.Key) *DID {
+func NewFromIPNSKey(keyName *shell.Key) *DID {
 
 	new_id := keyName.Id + "#" + keyName.Name
 
-	return New(method, new_id)
+	return New(new_id)
 
 }
 
@@ -56,16 +58,16 @@ func Parse(didStr string) (*DID, error) {
 	identifier := parts[2]
 
 	// Verify scheme
-	if scheme != PREFIX {
-		return &DID{}, errors.New("invalid DID format, missing 'did' scheme prefix")
+	if scheme != ma.DID_SCHEME {
+		return &DID{}, fmt.Errorf("invalid DID format, scheme must be %s", ma.DID_SCHEME)
 	}
 
 	// Check the method is alphanumeric and 'ma'
 	if !internal.IsAlnum(method) {
-		return &DID{}, errors.New("invalid DID format, method must be alphanumeric")
+		return &DID{}, fmt.Errorf("invalid DID format, method must be alphanumeric: %s", method)
 	}
 
-	return New(method, identifier), nil
+	return New(identifier), nil
 }
 
 func parseIdentifier(identifier string) (string, string, error) {

@@ -2,6 +2,7 @@ package vm
 
 import (
 	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/key"
 )
 
 // We only use multikeys, even for RSA keys.
@@ -31,7 +32,7 @@ func New(
 	}
 
 	return VerificationMethod{
-		ID:                 id + "#" + name,
+		ID:                 key.KEY_PREFIX + id + "#" + name,
 		Type:               VerificationMethodType,
 		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
