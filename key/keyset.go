@@ -13,8 +13,8 @@ const SignatureKeyType = "ed25519"
 
 type Keyset interface {
 	IPFSKey() *shell.Key
-	EncryptionKey() *EncryptionKey
-	SignatureKey() *SignatureKey
+	EncryptionKey() EncryptionKey
+	SignatureKey() SignatureKey
 }
 
 type keysetImpl struct {
@@ -27,12 +27,12 @@ func (k *keysetImpl) IPFSKey() *shell.Key {
 	return k.ipfsKey
 }
 
-func (k *keysetImpl) EncryptionKey() *EncryptionKey {
-	return k.encryptionKey
+func (k *keysetImpl) EncryptionKey() EncryptionKey {
+	return *k.encryptionKey
 }
 
-func (k *keysetImpl) SignatureKey() *SignatureKey {
-	return k.signatureKey
+func (k *keysetImpl) SignatureKey() SignatureKey {
+	return *k.signatureKey
 }
 func New(name string, enc_type string, sig_type string) (Keyset, error) {
 	encryptionKey, err := GenerateEncryptionKey(enc_type, name)

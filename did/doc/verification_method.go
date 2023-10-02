@@ -15,6 +15,10 @@ var encryptionKeyTypes = []string{"x25519-pub", "x448-pub"}
 var signingKeyType = "ed25519-pub"
 
 func (d *Document) AddVerificationMethod(method vm.VerificationMethod) error {
+	// Before appending the method, check if id or publicKeyMultibase is unique
+	if err := d.isUniqueVerificationMethod(method); err != nil {
+		return err // Return error if duplicate found
+	}
 
 	d.VerificationMethod = append(d.VerificationMethod, method)
 
@@ -63,4 +67,16 @@ func (d *Document) SigningKey() (crypto.PublicKey, error) {
 		return nil, errors.New("no signing key found")
 	}
 	return keys[0], nil
+}
+
+func (d *Document) isUniqueVerificationMethod(newMethod vm.VerificationMethod) error {
+	for _, existingMethod := range d.VerificationMethod {
+		if existingMethod.ID == newMethod.ID {
+			return errors.New("duplicate id found in Verification Methods")
+		}
+		if existingMethod.PublicKeyMultibase == newMethod.PublicKeyMultibase {
+			return errors.New("duplicate publicKeyMultibase found in Verification Methods")
+		}
+	}
+	return nil // Return nil if no duplicate found
 }
