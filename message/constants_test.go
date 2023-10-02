@@ -4,16 +4,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/message"
 )
 
 func TestConstants(t *testing.T) {
-	if message.MESSAGE_VERSION != "0.0.1" {
-		t.Errorf("Expected version to be '0.0.1', got %s", message.MESSAGE_VERSION)
+	if ma.VERSION != "0.0.1" {
+		t.Errorf("Expected version to be '0.0.1', got %s", ma.VERSION)
 	}
 
-	if message.MESSAGE_MIME_TYPE != "application/x-ma-message" {
-		t.Errorf("Expected type to be 'ma/message', got %s", message.MESSAGE_MIME_TYPE)
+	if ma.MESSAGE_MIME_TYPE != "application/x-ma-message" {
+		t.Errorf("Expected type to be 'ma/message', got %s", ma.MESSAGE_MIME_TYPE)
 	}
 
 	if message.MESSAGE_TTL != time.Hour*24 {

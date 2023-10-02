@@ -3,6 +3,7 @@ package message
 import (
 	"mime"
 
+	"github.com/bahner/go-ma"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,7 +16,7 @@ var CommonMimeTypes = map[string]string{
 	"ipld":        "application/vnd.ipld.raw",
 	"ipns-record": "application/vnd.ipfs.ipns-record",
 	"json":        "application/json",
-	"message":     MESSAGE_MIME_TYPE,
+	"message":     ma.MESSAGE_MIME_TYPE,
 	"text":        "text/plain",
 }
 

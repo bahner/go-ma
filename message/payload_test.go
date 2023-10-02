@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/message"
 )
 
@@ -12,13 +13,13 @@ import (
 func validMessageWithSignature() *message.Message {
 	return &message.Message{
 		ID:          "validNanoID",
-		Type:        message.MESSAGE_MIME_TYPE,
+		MimeType:    ma.MESSAGE_MIME_TYPE,
 		From:        "did:ma:from",
 		To:          "did:ma:to",
 		CreatedTime: "2023-01-01T01:01:01Z",
 		ExpiresTime: "2023-01-02T01:01:01Z",
 		Body:        "Hello",
-		Version:     message.MESSAGE_VERSION,
+		Version:     ma.VERSION,
 		Signature:   "signature",
 	}
 }

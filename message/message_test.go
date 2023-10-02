@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver"
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/message"
 
@@ -108,9 +109,9 @@ func TestMessageExpires(t *testing.T) {
 }
 
 func TestMessageSemVersion(t *testing.T) {
-	msg := &message.Message{Version: message.MESSAGE_VERSION}
+	msg := &message.Message{Version: ma.VERSION}
 
-	expectedVersion, _ := semver.NewVersion(message.MESSAGE_VERSION)
+	expectedVersion, _ := semver.NewVersion(ma.VERSION)
 	parsedVersion, err := msg.SemVersion()
 	if err != nil {
 		t.Fatalf("Failed to parse semver: %v", err)
