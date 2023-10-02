@@ -21,13 +21,13 @@ func New(identifier string) (*Document, error) {
 
 	_, err := did.Parse(identifier)
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("doc/new: failed to parse DID: %v", err))
+		return nil, internal.LogError(fmt.Sprintf("doc/new: failed to parse DID: %v\n", err))
 	}
 
 	ctrller := []string{identifier}
 
 	doc := Document{
-		Context:    Context,
+		Context:    DID_CONTEXT,
 		ID:         identifier,
 		Controller: ctrller,
 	}

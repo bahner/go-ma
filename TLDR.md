@@ -13,7 +13,7 @@ import (
   "github.com/bahner/ma-go/did"
 )
 
-subEthaDID = did.New("space", subEthaKey.IPNSName.String())
+subEthaDID = did.New("ma", subEthaKey.IPNSName.String())
   fmt.Println(subEthaDID)
 
 ```

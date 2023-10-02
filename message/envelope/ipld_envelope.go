@@ -32,7 +32,7 @@ func NewIPLD(encodedMsg string, encodedEncryptedSymKey string) (*IPLDEnvelope, e
 	// we need the CID to return from this function.
 	msgCID, err := internal.IPLDPutDag(encodedMsg)
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("envelope: error publishing message DAG: %s", err))
+		return nil, internal.LogError(fmt.Sprintf("envelope: error publishing message DAG: %s\n", err))
 	}
 	return &IPLDEnvelope{
 		MIMEType:     MIMEType,
@@ -51,7 +51,7 @@ func UnmarshalIPLDFromJSON(data []byte) (*IPLDEnvelope, error) {
 
 	err := json.Unmarshal(data, e)
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("envelope: error unmarshalling envelope: %s", err))
+		return nil, internal.LogError(fmt.Sprintf("envelope: error unmarshalling envelope: %s\n", err))
 	}
 
 	return e, nil
@@ -88,7 +88,7 @@ func (e *IPLDEnvelope) GetEncryptedMsg() error {
 
 	err := shell.DagGet(e.GetCID(), &ie)
 	if err != nil {
-		return internal.LogError(fmt.Sprintf("envelope: error opening Envelope message: %s", err))
+		return internal.LogError(fmt.Sprintf("envelope: error opening Envelope message: %s\n", err))
 	}
 
 	return err

@@ -23,7 +23,7 @@ func (m *Message) RSAEncrypt(to_rsa_pubkey *rsa.PublicKey, label string) (*envel
 	msg, err := m.Pack()
 	if err != nil {
 		return nil,
-			internal.LogError(fmt.Sprintf("message_encrypt: error packing message: %s", err))
+			internal.LogError(fmt.Sprintf("message_encrypt: error packing message: %s\n", err))
 	}
 
 	// Generate a random symmetric (AES) key
@@ -31,46 +31,46 @@ func (m *Message) RSAEncrypt(to_rsa_pubkey *rsa.PublicKey, label string) (*envel
 	_, err = rand.Read(symmetricKey)
 	if err != nil {
 		return nil,
-			internal.LogError(fmt.Sprintf("message_encrypt: error generating symmetric key: %s", err))
+			internal.LogError(fmt.Sprintf("message_encrypt: error generating symmetric key: %s\n", err))
 	}
 
 	// Encrypt the actual message with the symmetric key
 	block, err := aes.NewCipher(symmetricKey)
 	if err != nil {
 		return nil,
-			internal.LogError(fmt.Sprintf("message_encrypt: error creating cipher: %s", err))
+			internal.LogError(fmt.Sprintf("message_encrypt: error creating cipher: %s\n", err))
 	}
 
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil,
-			internal.LogError(fmt.Sprintf("message_encrypt: error creating GCM: %s", err))
+			internal.LogError(fmt.Sprintf("message_encrypt: error creating GCM: %s\n", err))
 	}
 
 	nonce := make([]byte, gcm.NonceSize())
 	_, err = rand.Read(nonce)
 	if err != nil {
 		return nil,
-			internal.LogError(fmt.Sprintf("message_encrypt: error generating nonce: %s", err))
+			internal.LogError(fmt.Sprintf("message_encrypt: error generating nonce: %s\n", err))
 	}
 
 	cipherText := gcm.Seal(nonce, nonce, []byte(msg), nil)
 	encodedCipherText, err := MessageEncoder(cipherText)
 	if err != nil {
 		return nil,
-			internal.LogError(fmt.Sprintf("message_encrypt: error encoding cipher text: %s", err))
+			internal.LogError(fmt.Sprintf("message_encrypt: error encoding cipher text: %s\n", err))
 	}
 
 	// Encrypt the symmetric key with the RSA public key
 	encryptedSymmetricKey, err := rsa.EncryptOAEP(MESSAGE_HASHER, rand.Reader, to_rsa_pubkey, symmetricKey, []byte(label))
 	if err != nil {
 		return nil,
-			internal.LogError(fmt.Sprintf("message_encrypt: error encrypting symmetric key: %s", err))
+			internal.LogError(fmt.Sprintf("message_encrypt: error encrypting symmetric key: %s\n", err))
 	}
 	encodedEncryptedSymKey, err := MessageEncoder(encryptedSymmetricKey)
 	if err != nil {
 		return nil,
-			internal.LogError(fmt.Sprintf("message_encrypt: error encoding encrypted symmetric key: %s", err))
+			internal.LogError(fmt.Sprintf("message_encrypt: error encoding encrypted symmetric key: %s\n", err))
 	}
 
 	return envelope.New(encodedCipherText, encodedEncryptedSymKey)

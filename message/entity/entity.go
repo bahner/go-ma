@@ -5,7 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
-	keyset "github.com/bahner/go-ma/key"
+	"github.com/bahner/go-ma/key"
 	shell "github.com/ipfs/go-ipfs-api"
 )
 
@@ -18,13 +18,13 @@ import (
 // you can use to publish your DID Document with.
 type Entity struct {
 	DID    *did.DID
-	Keyset keyset.Keyset
+	Keyset key.Keyset
 }
 
-// This creates a new Entity from a method and an identifier.
+// This creates a new Entity from an identifier.
 // This is the base function for all the rest.
 
-func New(method string, name string) (*Entity, error) {
+func New(name string) (*Entity, error) {
 
 	if !internal.IsValidNanoID(name) {
 		return nil, fmt.Errorf("entity: invalid name Try nanonid.New(): %s", name)
@@ -35,12 +35,12 @@ func New(method string, name string) (*Entity, error) {
 		return nil, fmt.Errorf("entity: failed to get or create key in IPFS: %v", err)
 	}
 
-	entityDID := did.NewFromIPNSKey(method, ipfsKey)
+	entityDID := did.NewFromIPNSKey(ipfsKey)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create DID from ipnsKey: %s", err)
 	}
 
-	myKeyset, err := keyset.NewFromIPFSKey(ipfsKey)
+	myKeyset, err := key.NewFromIPFSKey(ipfsKey)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create key from ipnsKey: %s", err)
 	}
@@ -53,10 +53,10 @@ func New(method string, name string) (*Entity, error) {
 
 func NewFromDID(d *did.DID) (*Entity, error) {
 
-	return New(d.Method, d.Fragment)
+	return New(d.Fragment)
 }
 
 func NewFromKey(method string, ipfsKey *shell.Key) (*Entity, error) {
 
-	return New(method, ipfsKey.Name)
+	return New(ipfsKey.Name)
 }

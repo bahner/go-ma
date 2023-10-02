@@ -9,6 +9,11 @@ const (
 	// Ma version
 	VERSION = "0.0.1"
 
+	// The did prefix to use
+	DID_SCHEME = "did"
+	DID_METHOD = "ma"
+	DID_PREFIX = DID_SCHEME + ":" + DID_METHOD + ":"
+
 	// A MIME type for a message. Just to implement it for future proofing.
 	MESSAGE_MIME_TYPE = "application/x-ma-message; version=" + VERSION
 

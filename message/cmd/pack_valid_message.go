@@ -12,7 +12,7 @@ func main() {
 	m := message.ValidExampleMessage()
 	packed, err := m.Pack()
 	if err != nil {
-		fmt.Printf("Error packing message: %s", err)
+		fmt.Printf("Error packing message: %s\n", err)
 		os.Exit(70) // EX_SOFTWARE
 	}
 

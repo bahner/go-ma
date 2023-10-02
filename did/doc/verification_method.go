@@ -17,7 +17,7 @@ var signingKeyType = "ed25519-pub"
 func (d *Document) AddVerificationMethod(method vm.VerificationMethod) error {
 	// Before appending the method, check if id or publicKeyMultibase is unique
 	if err := d.isUniqueVerificationMethod(method); err != nil {
-		return err // Return error if duplicate found
+		return fmt.Errorf("doc/vm: error adding verification method: %s", err)
 	}
 
 	d.VerificationMethod = append(d.VerificationMethod, method)

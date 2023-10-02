@@ -35,7 +35,7 @@ func Fetch(identifier string) (*Document, error) {
 	// Start by getting an IO.Reader
 	data, err := shell.Cat("/ipns/" + docdid.Id)
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("doc/fetch: failed to fetch document from IPFS: %v", err))
+		return nil, internal.LogError(fmt.Sprintf("doc/fetch: failed to fetch document from IPFS: %v\n", err))
 	}
 	defer data.Close() // Ensure the reader is closed once done
 	log.Debugf("doc/fetch: data: %v", data)
@@ -44,7 +44,7 @@ func Fetch(identifier string) (*Document, error) {
 	// so we can read it all into memory.
 	content, err := io.ReadAll(data)
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("doc/fetch: failed to read contents from: %v", err))
+		return nil, internal.LogError(fmt.Sprintf("doc/fetch: failed to read contents from: %v\n", err))
 	}
 	log.Debugf("doc/fetch: content: %s", content)
 	// Unmarshal the document
@@ -57,7 +57,7 @@ func Fetch(identifier string) (*Document, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Document: %s", retrieved_document)
+	fmt.Printf("Document: %s\n", retrieved_document)
 
 	return document, nil
 }

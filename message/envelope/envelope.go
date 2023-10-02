@@ -35,7 +35,7 @@ func UnmarshalFromJSON(data []byte) (*Envelope, error) {
 
 	err := json.Unmarshal(data, e)
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("envelope: error unmarshalling envelope: %s", err))
+		return nil, internal.LogError(fmt.Sprintf("envelope: error unmarshalling envelope: %s\n", err))
 	}
 
 	return e, nil

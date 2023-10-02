@@ -18,12 +18,12 @@ func (doc *Document) Sign(signKey key.SignatureKey) error {
 	// Sign the payload with an ed25519 key
 	signature, err := signKey.Sign(p)
 	if err != nil {
-		return internal.LogError(fmt.Sprintf("doc sign: Error signing payload: %s", err))
+		return internal.LogError(fmt.Sprintf("doc sign: Error signing payload: %s\n", err))
 	}
 
 	multibaseEncodedSignature, err := multibase.Encode(ma.MULTIBASE_ENCODING, signature)
 	if err != nil {
-		return internal.LogError(fmt.Sprintf("doc sign: Error encoding signature: %s", err))
+		return internal.LogError(fmt.Sprintf("doc sign: Error encoding signature: %s\n", err))
 	}
 
 	doc.Signature = multibaseEncodedSignature

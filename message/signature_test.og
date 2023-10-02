@@ -15,7 +15,7 @@ func TestSign(t *testing.T) {
 	}
 
 	myIdentifier := myKey.IPNSName.String() + "#footerFragment"
-	myDID := did.New("space", myIdentifier)
+	myDID := did.New("ma", myIdentifier)
 
 	myMessage, err := message.New(
 		myDID.String(),
@@ -71,7 +71,7 @@ func TestPublicKey(t *testing.T) {
 	}
 
 	myIdentifier := myKey.IPNSName.String() + "#footerFragment"
-	myDID := did.New("space", myIdentifier)
+	myDID := did.New("ma", myIdentifier)
 
 	publicKey, err := message.PublicKey(myDID)
 	if err != nil {

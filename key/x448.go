@@ -41,7 +41,7 @@ func (k *x448PrivateKey) PublicKeyMultibase() string {
 
 func (k *x448PrivateKey) DID() string {
 
-	return prefix + k.publicKeyMultibase + "#" + k.name
+	return KEY_PREFIX + k.publicKeyMultibase + "#" + k.name
 }
 
 func (k *x448PrivateKey) Name() string {

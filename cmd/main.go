@@ -14,7 +14,7 @@ import (
 
 func main() {
 
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.InfoLevel)
 
 	os.Setenv("IPFS_API_HOST", "localhost:45005")
 
@@ -22,9 +22,9 @@ func main() {
 
 	// Create a new person, object - an entity
 	// id, _ := nanoid.New()
-	my, err := entity.New("space", "bahner")
+	my, err := entity.New("bahner")
 	if err != nil {
-		fmt.Printf("Error creating new identity in space: %v", err)
+		fmt.Printf("Error creating new identity in ma: %v\n", err)
 	}
 
 	fmt.Printf("I am: %s\n", my.DID.String())
@@ -33,43 +33,28 @@ func main() {
 
 	myDoc, err := doc.New(my.DID.String())
 	if err != nil {
-		fmt.Printf("Error creating new document: %v", err)
+		fmt.Printf("Error creating new document: %v\n", err)
 	}
+
+	fmt.Printf("Id: %s\n", myDoc.ID)
+	fmt.Printf("Identifier: %s\n", my.DID.Identifier)
 
 	encVM, err := vm.New(my.DID.Id, "enc-1", my.Keyset.EncryptionKey().PublicKeyMultibase())
 	if err != nil {
-		fmt.Printf("Error creating encryption verification method: %v", err)
+		fmt.Printf("Error creating encryption verification method: %v\n", err)
 	}
 	err = myDoc.AddVerificationMethod(encVM)
 	if err != nil {
-		fmt.Printf("Error adding encryption verification method: %v", err)
+		fmt.Printf("Error adding encryption verification method: %v\n", err)
 	}
 
 	sigVM, err := vm.New(my.DID.Id, "sig-1", my.Keyset.SignatureKey().PublicKeyMultibase())
 	if err != nil {
-		fmt.Printf("Error creating signature verification method: %v", err)
+		fmt.Printf("Error creating signature verification method: %v\n", err)
 	}
 	err = myDoc.AddVerificationMethod(sigVM)
 	if err != nil {
-		fmt.Printf("Error adding signature verification method: %v", err)
-	}
-
-	encVM, err = vm.New(my.DID.Id, "enc-1", my.Keyset.EncryptionKey().PublicKeyMultibase())
-	if err != nil {
-		fmt.Printf("Error creating encryption verification method: %v", err)
-	}
-	err = myDoc.AddVerificationMethod(encVM)
-	if err != nil {
-		fmt.Printf("Error adding encryption verification method: %v", err)
-	}
-
-	encVM, err = vm.New(my.DID.Id, "enc-2", my.Keyset.EncryptionKey().PublicKeyMultibase())
-	if err != nil {
-		fmt.Printf("Error creating encryption verification method: %v", err)
-	}
-	err = myDoc.AddVerificationMethod(encVM)
-	if err != nil {
-		fmt.Printf("Error adding encryption verification method: %v", err)
+		fmt.Printf("Error adding signature verification method: %v\n", err)
 	}
 
 	myDoc.Publish()

@@ -11,7 +11,7 @@ func ExtractID(didStr string) (string, error) {
 
 	did, err := Parse(didStr)
 	if err != nil {
-		return "", internal.LogError(fmt.Sprintf("did: not a valid identifier: %v", err))
+		return "", internal.LogError(fmt.Sprintf("did: not a valid identifier: %v\n", err))
 	}
 
 	return did.Id, nil
