@@ -4,5 +4,3 @@ TODO
 # Verify that I'm using multikey correctly.
 # Probably need to register with w3 did registry, I suspect
 https://w3c-ccg.github.io/did-method-key/#rsa-repr
-
-Filter existing keys, as verificationmethods must be unique.
