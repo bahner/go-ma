@@ -40,7 +40,7 @@ func New(name string) (*Entity, error) {
 		return nil, fmt.Errorf("entity: failed to create DID from ipnsKey: %s", err)
 	}
 
-	myKeyset, err := key.NewFromIPFSKey(ipfsKey)
+	myKeyset, err := key.NewKeysetFromIPFSKey(ipfsKey)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create key from ipnsKey: %s", err)
 	}

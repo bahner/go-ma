@@ -3,6 +3,7 @@ package message
 import (
 	"encoding/json"
 
+	"github.com/bahner/go-ma/internal"
 	"github.com/multiformats/go-multibase"
 )
 
@@ -18,7 +19,7 @@ func (m *Message) Pack() (string, error) {
 		return "", err
 	}
 
-	encoded_data, err := MessageEncoder(data)
+	encoded_data, err := internal.MultibaseEncode(data)
 	if err != nil {
 		return "", err
 	}

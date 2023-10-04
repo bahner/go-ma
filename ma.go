@@ -15,10 +15,11 @@ const (
 	DID_PREFIX = DID_SCHEME + ":" + DID_METHOD + ":"
 
 	// A MIME type for a message. Just to implement it for future proofing.
-	MESSAGE_MIME_TYPE = "application/x-ma-message"
+	MESSAGE_ENVELOPE_MIME_TYPE = "application/x-ma-envelope"
+	MESSAGE_MIME_TYPE          = "application/x-ma-message"
 
 	// The rendesvous string used for peer discovery in libp2p.
-	MESSAGE_RENDEZVOUS = "/ma/" + VERSION
+	RENDEZVOUS = "/ma/" + VERSION
 
 	// Use the same multicodec everywhere.
 	MULTIBASE_ENCODING = multibase.Base58BTC

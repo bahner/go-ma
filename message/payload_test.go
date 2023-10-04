@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/bahner/go-ma"
+	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/message"
 )
 
@@ -62,7 +63,7 @@ func TestPayloadPack(t *testing.T) {
 	}
 
 	jsonData, _ := msg.MarshalPayloadToJSON()
-	expected, _ := message.MessageEncoder(jsonData) // Assuming `Encode` works correctly
+	expected, _ := internal.MultibaseEncode(jsonData) // Assuming `Encode` works correctly
 
 	if PayloadPack != expected {
 		t.Errorf("Expected %s, got %s", expected, PayloadPack)

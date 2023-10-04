@@ -5,8 +5,7 @@ import (
 	"crypto/rand"
 	"fmt"
 
-	"github.com/bahner/go-ma"
-	"github.com/multiformats/go-multibase"
+	"github.com/bahner/go-ma/internal"
 	"maze.io/x/crypto/x25519"
 )
 
@@ -50,11 +49,9 @@ func GenerateX25519PrivateKey(name string) (EncryptionKey, error) {
 	}
 	pubKey := privKey.Public().(*x25519.PublicKey)
 
-	publicKeyMultibase, err := multibase.Encode(
-		ma.MULTIBASE_ENCODING,
-		pubKey.Bytes())
+	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(pubKey.Bytes(), "x25519-pub")
 	if err != nil {
-		return nil, fmt.Errorf("keyset/x25519: error multibase encoding public key: %s", err)
+		return nil, fmt.Errorf("key_generate: error encoding public key multibase: %w", err)
 	}
 
 	return &X25519PrivateKey{

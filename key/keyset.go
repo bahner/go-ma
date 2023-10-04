@@ -34,7 +34,7 @@ func (k *keysetImpl) EncryptionKey() EncryptionKey {
 func (k *keysetImpl) SignatureKey() SignatureKey {
 	return *k.signatureKey
 }
-func New(name string, enc_type string, sig_type string) (Keyset, error) {
+func NewKeyset(name string, enc_type string, sig_type string) (Keyset, error) {
 	encryptionKey, err := GenerateEncryptionKey(enc_type, name)
 	if err != nil {
 		return nil, fmt.Errorf("keyset/new: failed to generate encryption key: %w", err)
@@ -57,13 +57,13 @@ func New(name string, enc_type string, sig_type string) (Keyset, error) {
 	}, nil
 }
 
-func NewFromDID(DID *did.DID) (Keyset, error) {
+func NewKeysetFromDID(DID *did.DID) (Keyset, error) {
 
-	return New(DID.Fragment, EncryptionKeyType, SignatureKeyType)
+	return NewKeyset(DID.Fragment, EncryptionKeyType, SignatureKeyType)
 
 }
 
-func NewFromIPFSKey(ipfsKey *shell.Key) (Keyset, error) {
+func NewKeysetFromIPFSKey(ipfsKey *shell.Key) (Keyset, error) {
 
-	return New(ipfsKey.Name, EncryptionKeyType, SignatureKeyType)
+	return NewKeyset(ipfsKey.Name, EncryptionKeyType, SignatureKeyType)
 }

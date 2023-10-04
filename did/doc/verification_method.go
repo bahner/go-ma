@@ -7,7 +7,7 @@ import (
 
 	"github.com/bahner/go-ma/did/vm"
 	"github.com/bahner/go-ma/internal"
-	"github.com/multiformats/go-multibase"
+	log "github.com/sirupsen/logrus"
 )
 
 // Specification of encryption and signing key types
@@ -30,12 +30,9 @@ func (d *Document) VerificationMethodsOfType(multicodec string) ([]crypto.Public
 
 	for _, method := range d.VerificationMethod {
 
-		_, data, err := multibase.Decode(method.PublicKeyMultibase)
-		if err != nil {
-			return nil, fmt.Errorf("doc/vm: error decoding public key multibase: %s", err)
-		}
-
-		codec, decoded, err := internal.MulticodecDecode(data)
+		// codec, decoded, err := internal.MulticodecDecode([]byte(method.PublicKeyMultibase))
+		codec, decoded, err := internal.DecodePublicKeyMultibase(method.PublicKeyMultibase)
+		log.Debugf("doc/vm: VerificationMethodsOfType: codec: %s", codec)
 		if err != nil {
 			return nil, fmt.Errorf("doc/vm: error decoding public key: %s", err)
 		}
