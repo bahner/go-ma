@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/message"
 )
 
@@ -26,7 +27,7 @@ func TestMarshalToJSON(t *testing.T) {
 func TestPack(t *testing.T) {
 
 	jsonData, _ := input_message.MarshalToJSON()
-	expected, _ := message.MessageEncoder(jsonData) // Assuming `Encode` works correctly
+	expected, _ := internal.MultibaseEncode(jsonData) // Assuming `Encode` works correctly
 	actual, err := input_message.Pack()
 	if err != nil {
 		t.Fatalf("Pack failed: %v", err)

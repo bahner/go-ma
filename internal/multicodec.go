@@ -6,6 +6,7 @@ import (
 	"github.com/bahner/go-ma"
 	"github.com/multiformats/go-multicodec"
 	"github.com/multiformats/go-varint"
+	log "github.com/sirupsen/logrus"
 )
 
 func MulticodecEncode(codecName string, payload []byte) ([]byte, error) {
@@ -25,10 +26,14 @@ func MulticodecEncode(codecName string, payload []byte) ([]byte, error) {
 	encoded := append(codecBytes, payload...)
 	return encoded, nil
 }
+
+// Returns the codec name, payload and error of a multicodec encoded byte array
 func MulticodecDecode(encoded []byte) (string, []byte, error) {
 	if len(encoded) < 1 {
 		return "", nil, fmt.Errorf("error decoding: insufficient data")
 	}
+
+	log.Debugf("mutlticodecdecode: encoded: %x", encoded)
 
 	code, n, err := varint.FromUvarint(encoded)
 	if err != nil {
@@ -37,17 +42,19 @@ func MulticodecDecode(encoded []byte) (string, []byte, error) {
 	if n < 1 || n >= len(encoded) {
 		return "", nil, fmt.Errorf("error decoding: invalid varint size")
 	}
+	log.Debugf("mutlticodecdecode: code %d", code)
 
 	var codecName string
 	codecName, err = GetPrivateCodecName(code)
 	if err != nil {
 		// It's not a private multicodec, try to get as an official multicodec
-		codec := multicodec.Code(code)
-		codecName = codec.String()
+		log.Debugf("mutlticodecdecode: not a private multicodec")
+		codecName = multicodec.Code(code).String()
 		if codecName == "" {
 			return "", nil, fmt.Errorf("error obtaining codec name: unknown codec")
 		}
 	}
+	log.Debugf("mutlticodecdecode: codecName: %s", codecName)
 	return codecName, encoded[n:], nil
 }
 

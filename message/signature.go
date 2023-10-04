@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma/did"
+	"github.com/bahner/go-ma/internal"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/peer"
 )
@@ -22,7 +23,7 @@ func (m *Message) Sign(privKey crypto.PrivKey) error {
 		return fmt.Errorf("failed to sign Message: %v", err)
 	}
 
-	encoded_sig, err := MessageEncoder(sig)
+	encoded_sig, err := internal.MultibaseEncode(sig)
 	if err != nil {
 		return fmt.Errorf("failed to encode signature: %v", err)
 	}

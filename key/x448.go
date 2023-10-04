@@ -5,10 +5,8 @@ import (
 	"crypto/rand"
 	"fmt"
 
-	"github.com/bahner/go-ma"
+	"github.com/bahner/go-ma/internal"
 	"github.com/cloudflare/circl/dh/x448"
-
-	"github.com/multiformats/go-multibase"
 )
 
 type x448PrivateKey struct {
@@ -59,11 +57,11 @@ func GenerateX448PrivateKey(name string) (EncryptionKey, error) {
 	var publicKey x448.Key
 	x448.KeyGen(&publicKey, &secretKey)
 
-	publicKeyMultibase, err := multibase.Encode(
-		ma.MULTIBASE_ENCODING,
-		publicKey[:])
+	publicKeyBytes := []byte(publicKey[:])
+
+	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKeyBytes, "x448-pub")
 	if err != nil {
-		return nil, fmt.Errorf("keyset/x448: error multibase encoding public key: %s", err)
+		return nil, fmt.Errorf("key_generate: error encoding public key multibase: %w", err)
 	}
 
 	return &x448PrivateKey{

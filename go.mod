@@ -13,6 +13,7 @@ require (
 	github.com/multiformats/go-varint v0.0.7
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
+	golang.org/x/crypto v0.13.0
 	lukechampine.com/blake3 v1.2.1
 	maze.io/x/crypto v0.0.0-20190131090603-9b94c9afe066
 )
@@ -40,7 +41,6 @@ require (
 	github.com/multiformats/go-multistream v0.5.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
-	golang.org/x/crypto v0.13.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/sys v0.12.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect

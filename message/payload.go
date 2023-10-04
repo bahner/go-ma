@@ -2,6 +2,8 @@ package message
 
 import (
 	"encoding/json"
+
+	"github.com/bahner/go-ma/internal"
 )
 
 // Returns a copy of the Message payload
@@ -38,7 +40,7 @@ func (m *Message) PayloadPack() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	encoded_payload, err := MessageEncoder(marshalled_payload)
+	encoded_payload, err := internal.MultibaseEncode(marshalled_payload)
 	if err != nil {
 		return "", err
 	}

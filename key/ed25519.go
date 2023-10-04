@@ -6,8 +6,7 @@ import (
 
 	"crypto/ed25519"
 
-	"github.com/bahner/go-ma"
-	"github.com/multiformats/go-multibase"
+	"github.com/bahner/go-ma/internal"
 )
 
 type Ed25519PrivateKey struct {
@@ -45,17 +44,16 @@ func GenerateEd25519PrivateKey(name string) (SignatureKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	multibasePublickey, err := multibase.Encode(
-		ma.MULTIBASE_ENCODING,
-		publicKey)
+
+	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, "ed25519-pub")
 	if err != nil {
-		return nil, fmt.Errorf("keyset/ed25519: error multibase encoding public key: %s", err)
+		return nil, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
 	}
 
 	return &Ed25519PrivateKey{
 		privKey:            &privKey,
 		pubKey:             &publicKey,
-		publicKeyMultibase: multibasePublickey,
+		publicKeyMultibase: publicKeyMultibase,
 		name:               name}, nil
 }
 
