@@ -34,4 +34,7 @@ const (
 
 	// X448 encryption codec
 	ECDHX448ChaCha20Poly1305BLAKE3 = 0x300200
+
+	// Kyber Ed25519 encrtyption codec
+	ECDHKyberEd25519ChaCha20Poly1305BLAKE3 = 0x300300
 )

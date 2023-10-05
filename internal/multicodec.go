@@ -69,7 +69,13 @@ func GetPrivateCodecName(code uint64) (string, error) {
 	// X448 encryption codecs
 	case ma.ECDHX448ChaCha20Poly1305BLAKE3:
 		return "ECDHX448ChaCha20Poly1305BLAKE3", nil
+
+		// Kyber Ed25519 encrtyption codec
+	case ma.ECDHKyberEd25519ChaCha20Poly1305BLAKE3:
+		return "ECDHKyberEd25519ChaCha20Poly1305BLAKE3", nil
+
 	}
+
 	return "", fmt.Errorf("unknown private multicodec value: %d", code)
 }
 
@@ -85,6 +91,9 @@ func GetPrivateCodecValue(name string) (uint64, error) {
 	case "ECDHX448ChaCha20Poly1305BLAKE3":
 		return ma.ECDHX448ChaCha20Poly1305BLAKE3, nil
 
+	// Kyber Ed25519 encryption codec
+	case "ECDHKyberEd25519ChaCha20Poly1305BLAKE3":
+		return ma.ECDHKyberEd25519ChaCha20Poly1305BLAKE3, nil
 	}
 	return 0, fmt.Errorf("unknown private multicodec name: %s", name)
 }

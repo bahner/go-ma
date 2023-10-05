@@ -11,7 +11,7 @@ import (
 )
 
 // Specification of encryption and signing key types
-var encryptionKeyTypes = []string{"x25519-pub", "x448-pub"}
+var encryptionKeyTypes = []string{"x25519-pub", "x448-pub", "ECDHKyberEd25519ChaCha20Poly1305BLAKE3"}
 var signingKeyType = "ed25519-pub"
 
 func (d *Document) AddVerificationMethod(method vm.VerificationMethod) error {
