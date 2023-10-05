@@ -15,8 +15,9 @@ type EncryptionKey interface {
 }
 
 var encryptionKeyTypes = map[string]func(name string) (EncryptionKey, error){
-	"x25519": GenerateX25519PrivateKey,
-	"x448":   GenerateX448PrivateKey,
+	"x25519":        GenerateX25519PrivateKey,
+	"x448":          GenerateX448PrivateKey,
+	"kyber-ed25519": GenerateKyberEd25519PrivateKey,
 }
 
 func GenerateEncryptionKey(encryptionKeyType string, name string) (EncryptionKey, error) {

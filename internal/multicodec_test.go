@@ -65,7 +65,7 @@ func TestPrivateCodecMapping(t *testing.T) {
 		{
 			name:      "Test with valid private codec",
 			codecName: "ECDHX25519ChaCha20Poly1305BLAKE3",
-			codecCode: 0x300100, // Replace with the actual code
+			codecCode: 0x345100,
 		},
 		{
 			name:      "Test with invalid private codec",

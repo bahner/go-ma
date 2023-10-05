@@ -62,6 +62,9 @@ func MulticodecDecode(encoded []byte) (string, []byte, error) {
 func GetPrivateCodecName(code uint64) (string, error) {
 	switch code {
 
+	case ma.KyberEd25519Pub:
+		return "kyber-ed25519-pub", nil
+
 	// X25519 encryption codecs
 	case ma.ECDHX25519ChaCha20Poly1305BLAKE3:
 		return "ECDHX25519ChaCha20Poly1305BLAKE3", nil
@@ -82,6 +85,9 @@ func GetPrivateCodecName(code uint64) (string, error) {
 // GetPrivateCodecValue maps a private multicodec name to its corresponding value
 func GetPrivateCodecValue(name string) (uint64, error) {
 	switch name {
+
+	case "kyber-ed25519-pub":
+		return ma.KyberEd25519Pub, nil
 
 	// X25519 encryption codecs
 	case "ECDHX25519ChaCha20Poly1305BLAKE3":
