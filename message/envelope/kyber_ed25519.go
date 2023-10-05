@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/message"
@@ -28,7 +29,7 @@ func kyberEd25519Encrypt(m *message.Message) (*Envelope, error) {
 		return nil, fmt.Errorf("kyber_ed25519: error getting recipient public key: %w", err)
 	}
 
-	suite := suites.MustFind("ed25519")
+	suite := suites.MustFind(ma.KYBER_SUITE)
 	ephemeralPrivate := suite.Scalar().Pick(suite.RandomStream())
 	ephemeralPublic := suite.Point().Mul(ephemeralPrivate, nil)
 
@@ -85,7 +86,7 @@ func kyberEd25519Encrypt(m *message.Message) (*Envelope, error) {
 }
 
 func kyberEd25519Decrypt(envelope *Envelope, recipientPrivateKey interface{}) (*message.Message, error) {
-	suite := suites.MustFind("ed25519")
+	suite := suites.MustFind(ma.KYBER_SUITE)
 
 	// Decode the ephemeral public key
 	ephemeralPublicBytes, err := internal.MultibaseDecode(envelope.EphemeralKey)

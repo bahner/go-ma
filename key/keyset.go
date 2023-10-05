@@ -8,7 +8,9 @@ import (
 	shell "github.com/ipfs/go-ipfs-api"
 )
 
-const EncryptionKeyType = "x25519"
+// const EncryptionKeyType = "x25519"
+// const SignatureKeyType = "ed25519"
+const EncryptionKeyType = "kyber-ed25519"
 const SignatureKeyType = "ed25519"
 
 type Keyset interface {
