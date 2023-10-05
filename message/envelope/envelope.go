@@ -13,7 +13,7 @@ const MIMEType = "application/x-ma-envelope"
 type Envelope struct {
 	MIMEType     string `json:"mime_type"`
 	EphemeralKey string `json:"ephemeral_key"`
-	EncryptedMsg string `json:"encrypted_msg"`
+	Message      string `json:"message"`
 }
 
 // Use a pointer here, this might be arbitrarily big.
@@ -21,7 +21,7 @@ func New(encodedCipherText string, encodedEphemeralKey string) (*Envelope, error
 	return &Envelope{
 		MIMEType:     MIMEType,
 		EphemeralKey: encodedEphemeralKey,
-		EncryptedMsg: encodedCipherText,
+		Message:      encodedCipherText,
 	}, nil
 }
 
@@ -54,7 +54,7 @@ func (e *Envelope) GetEncryptedKey() string {
 }
 
 func (e *Envelope) GetEncryptedMsg() string {
-	return e.EncryptedMsg
+	return e.Message
 }
 
 func (e *Envelope) GetMIMEType() string {
