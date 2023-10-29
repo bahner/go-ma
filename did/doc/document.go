@@ -10,12 +10,13 @@ import (
 )
 
 type Document struct {
-	Context         []string           `json:"@context"`
-	ID              string             `json:"id"`
-	Controller      []string           `json:"controller"`
-	AssertionMethod VerificationMethod `json:"assertionMethod,omitempty"`
-	KeyAgreement    VerificationMethod `json:"keyAgreement,omitempty"`
-	Proof           Proof              `json:"proof,omitempty"`
+	Context            []string             `json:"@context"`
+	ID                 string               `json:"id"`
+	Controller         []string             `json:"controller"`
+	VerificationMethod []VerificationMethod `json:"verificationMethod"`
+	AssertionMethod    string               `json:"assertionMethod,omitempty"`
+	KeyAgreement       string               `json:"keyAgreement,omitempty"`
+	Proof              Proof                `json:"proof,omitempty"`
 }
 
 func New(identifier string, controller string) (*Document, error) {
