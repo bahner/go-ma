@@ -13,10 +13,6 @@ import (
 )
 
 type DID struct {
-	// The scheme is always "did"
-	Scheme string
-	// The method is always "ma"
-	Method string
 	// The identifier is the IPNS name and the fragment, as
 	// provided as input to this function.
 	Identifier string
