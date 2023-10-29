@@ -13,3 +13,8 @@ func CreateTimeFromIsoString(timestring string) (time.Time, error) {
 
 	return _time, nil
 }
+
+// Returns the current time in ISO 8601 format, fit for use in a DID document.
+func NowIsoString() string {
+	return time.Now().UTC().Format(time.RFC3339)
+}

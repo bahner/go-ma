@@ -6,12 +6,11 @@ import (
 
 	"crypto/ed25519"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
 )
 
-const SIGNATURE_KEY_TYPE = "Ed25519VerificationKey2020"
-
-type SignatureKey struct {
+type SigningKey struct {
 	DID                string
 	Name               string
 	Type               string
@@ -20,7 +19,7 @@ type SignatureKey struct {
 	PublicKeyMultibase string
 }
 
-func (k *SignatureKey) Sign(data []byte) ([]byte, error) {
+func (k *SigningKey) Sign(data []byte) ([]byte, error) {
 	if !isValidEd25519PrivateKey(k.PrivKey) {
 		return nil, fmt.Errorf("keyset/ed25519: invalid private key")
 	}
@@ -28,21 +27,21 @@ func (k *SignatureKey) Sign(data []byte) ([]byte, error) {
 	return ed25519.Sign(*k.PrivKey, data), nil
 }
 
-func GenerateSignatureKey(name string) (SignatureKey, error) {
+func GenerateSigningKey(name string) (SigningKey, error) {
 	publicKey, privKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
-		return SignatureKey{}, err
+		return SigningKey{}, err
 	}
 
 	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, "ed25519-pub")
 	if err != nil {
-		return SignatureKey{}, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
+		return SigningKey{}, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
 	}
 
-	return SignatureKey{
+	return SigningKey{
 		DID:                DID_KEY_PREFIX + publicKeyMultibase + "#" + name,
+		Type:               ma.ASSERTION_METHOD_MULTICODEC_STRING,
 		Name:               name,
-		Type:               SIGNATURE_KEY_TYPE,
 		PrivKey:            &privKey,
 		PubKey:             &publicKey,
 		PublicKeyMultibase: publicKeyMultibase,

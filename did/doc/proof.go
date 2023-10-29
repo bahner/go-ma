@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	proofType    = "Ed25519Signature2020"
+	proofType    = "MultiformatSignature2023"
 	proofPurpose = "assertionMethod"
 )
 
@@ -22,38 +22,43 @@ type Proof struct {
 	ProofValue         string `json:"proofValue"`
 }
 
-// "type": "Ed25519Signature2020",
-// "created": "2023-10-26T12:00:00Z",
-// "verificationMethod": "did:key:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#signature",
-// "signatureValue": "Base64-encoded-signature-value"
+func (d *Document) Sign(signKey key.SigningKey, vm VerificationMethod) error {
 
-func (d *Document) Sign(signKey key.SignatureKey, vm VerificationMethod) error {
-	p, err := d.MarshalPayloadToJSON()
-	if err != nil {
-		return err
+	if signKey.PublicKeyMultibase != vm.PublicKeyMultibase {
+		return fmt.Errorf("doc sign: signKey.PublicKeyMultibase != vm.PublicKeyMultibase")
 	}
 
-	// Sign the payload with an ed25519 key
-	signature, err := signKey.Sign(p)
+	multicodecHashed, err := d.MulticodecHashedPayload()
+	if err != nil {
+		return internal.LogError(fmt.Sprintf("doc sign: Error hashing payload: %s\n", err))
+	}
+
+	// Sign the hashed payload with an ed25519 key
+	signature, err := signKey.Sign(multicodecHashed)
 	if err != nil {
 		return internal.LogError(fmt.Sprintf("doc sign: Error signing payload: %s\n", err))
 	}
 
+	// Multibase encode the signed data for public consumption
 	proofValue, err := multibase.Encode(ma.MULTIBASE_ENCODING, signature)
 	if err != nil {
 		return internal.LogError(fmt.Sprintf("doc sign: Error encoding signature: %s\n", err))
 	}
 
+	d.Proof = NewProof(proofValue, vm.ID)
+
 	return nil
 }
 
-func NewProof(signKey key.SignatureKey, vm VerificationMethod) (Proof, error) {
+func NewProof(proofValue string, vm string) Proof {
 
-	proof := Proof{
+	created := internal.NowIsoString()
+
+	return Proof{
+		Created:            created,
 		Type:               proofType,
 		ProofPurpose:       proofPurpose,
-		VerificationMethod: signKey.VerificationMethod,
+		ProofValue:         proofValue,
+		VerificationMethod: vm,
 	}
-
-	return proof, nil
 }

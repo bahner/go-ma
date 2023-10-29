@@ -1,88 +1,22 @@
 package doc
 
 import (
-	"crypto"
-	"errors"
-	"fmt"
-
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
-	log "github.com/sirupsen/logrus"
 )
-
-const (
-	encryptionKeyType = "x25519-pub"
-	signingKeyType    = "ed25519-pub"
-)
-
-var verificationMethodTypes = []string{"MultiKey", "Ed25519VerificationKey2020"}
-
-func (d *Document) AddVerificationMethod(method VerificationMethod) error {
-	// Before appending the method, check if id or publicKeyMultibase is unique
-	if err := d.isUniqueVerificationMethod(method); err != nil {
-		return fmt.Errorf("doc/vm: error adding verification method: %s", err)
-	}
-
-	d.VerificationMethod = append(d.VerificationMethod, method)
-
-	return nil
-}
-
-func (d *Document) VerificationMethodsOfType(multicodec string) ([]crypto.PublicKey, error) {
-	var keys []crypto.PublicKey
-
-	for _, method := range d.VerificationMethod {
-
-		codec, decoded, err := internal.DecodePublicKeyMultibase(method.PublicKeyMultibase)
-		log.Debugf("doc/vm: VerificationMethodsOfType: codec: %s", codec)
-		if err != nil {
-			return nil, fmt.Errorf("doc/vm: error decoding public key: %s", err)
-		}
-
-		if codec == multicodec {
-			keys = append(keys, decoded)
-		}
-
-	}
-
-	return keys, nil
-}
-
-// EncryptionKey returns the encryption key from the document's VerificationMethod.
-func (d *Document) EncryptionKey() (crypto.PublicKey, error) {
-	keys, err := d.VerificationMethodsOfType(encryptionKeyType)
-	if err == nil && len(keys) > 0 { // if there is no error and we found a key
-		return keys[0], nil
-	}
-	return nil, errors.New("no encryption key found")
-}
-
-// SigningKey returns the signing key from the document's VerificationMethod.
-func (d *Document) SigningKey() (crypto.PublicKey, error) {
-	keys, err := d.VerificationMethodsOfType(signingKeyType)
-	if err != nil || len(keys) == 0 {
-		return nil, errors.New("no signing key found")
-	}
-	return keys[0], nil
-}
-
-func (d *Document) isUniqueVerificationMethod(newMethod VerificationMethod) error {
-	for _, existingMethod := range d.VerificationMethod {
-		if existingMethod.ID == newMethod.ID {
-			return errors.New("duplicate id found in Verification Methods")
-		}
-		if existingMethod.PublicKeyMultibase == newMethod.PublicKeyMultibase {
-			return errors.New("duplicate publicKeyMultibase found in Verification Methods")
-		}
-	}
-	return nil // Return nil if no duplicate found
-}
 
 // VerificationMethod defines the structure of a Verification Method
 type VerificationMethod struct {
-	ID                 string `json:"id"`
-	Type               string `json:"type"`
-	Controller         string `json:"controller"`
+	// The full name of the verification method, eg. did:key:123456789abcdefghi#signature
+	ID string `json:"id"`
+	// The type of verification method. We only use MultiKey. It's unofficial, but it works.
+	// https://w3c-ccg.github.io/did-method-key/
+	Type string `json:"type"`
+	// The controller of the verification method. This is the DID of the entity that controls the key.
+	// Should probably always be the DID itself, but maybe the DID controller.
+	Controller string `json:"controller"`
+	// The public key of the verification method, encoded in multibase, as
+	// per the did core spec.
 	PublicKeyMultibase string `json:"publicKeyMultibase"`
 }
 
@@ -90,11 +24,11 @@ type VerificationMethod struct {
 // id is the identifier of the verification method, eg.
 // k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#signature
 // id must be a valid IPNS name
-// vmType must be one of MultiKey or Ed25519VerificationKey2020
+// vmType must be of type MultiKey, so that the format never changes -
+// even if the underlying key type changes.
 func NewVerificationMethod(
 	id string,
 	controller string,
-	vmType string,
 	publicKeyMultibase string) (VerificationMethod, error) {
 
 	if !internal.IsValidIdentifier(id) {
@@ -103,15 +37,52 @@ func NewVerificationMethod(
 
 	return VerificationMethod{
 		ID:                 key.DID_KEY_PREFIX + id,
-		Type:               vmType,
+		Controller:         controller,
+		Type:               verificationMethodType,
 		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
 }
 
-func (vm VerificationMethod) GetID() string {
-	return vm.ID
-}
+// func (d *Document) AddVerificationMethod(method VerificationMethod) error {
+// 	// Before appending the method, check if id or publicKeyMultibase is unique
+// 	if err := d.isUniqueVerificationMethod(method); err != nil {
+// 		return fmt.Errorf("doc/vm: error adding verification method: %s", err)
+// 	}
 
-func (vm VerificationMethod) Fragment() string {
-	return internal.GetFragmentFromDID(vm.ID)
-}
+// 	d.VerificationMethod = append(d.VerificationMethod, method)
+
+// 	return nil
+// }
+
+// func (d *Document) GetVerificationMethodbyID(vmid string) (VerificationMethod, error) {
+
+// 	for _, method := range d.VerificationMethod {
+
+// 		if method.ID == vmid {
+// 			return method, nil
+// 		}
+// 	}
+
+// 	return VerificationMethod{}, fmt.Errorf("doc/vm: no verification method found with id: %s", vmid)
+// }
+
+// func (d *Document) isUniqueVerificationMethod(newMethod VerificationMethod) error {
+
+// 	for _, existingMethod := range d.VerificationMethod {
+// 		if existingMethod.ID == newMethod.ID {
+// 			return errors.New("duplicate id found in Verification Methods")
+// 		}
+// 		if existingMethod.PublicKeyMultibase == newMethod.PublicKeyMultibase {
+// 			return errors.New("duplicate publicKeyMultibase found in Verification Methods")
+// 		}
+// 	}
+// 	return nil // Return nil if no duplicate found
+// }
+
+// func (vm VerificationMethod) GetID() string {
+// 	return vm.ID
+// }
+
+// func (vm VerificationMethod) Fragment() string {
+// 	return internal.GetFragmentFromDID(vm.ID)
+// }
