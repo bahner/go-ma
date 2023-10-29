@@ -13,15 +13,15 @@ import (
 // Helper function to create a valid Message instance for testing.
 func validMessageWithSignature() *message.Message {
 	return &message.Message{
-		ID:          "validNanoID",
-		MimeType:    ma.MESSAGE_MIME_TYPE,
-		From:        "did:ma:from",
-		To:          "did:ma:to",
-		CreatedTime: "2023-01-01T01:01:01Z",
-		ExpiresTime: "2023-01-02T01:01:01Z",
-		Body:        "Hello",
-		Version:     ma.VERSION,
-		Signature:   "signature",
+		ID:        "validNanoID",
+		MimeType:  ma.MESSAGE_MIME_TYPE,
+		From:      "did:ma:from",
+		To:        "did:ma:to",
+		Created:   "2023-01-01T01:01:01Z",
+		Expires:   "2023-01-02T01:01:01Z",
+		Body:      "Hello",
+		Version:   ma.VERSION,
+		Signature: "signature",
 	}
 }
 

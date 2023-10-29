@@ -13,30 +13,36 @@ import (
 )
 
 type DID struct {
-	Scheme     string
-	Method     string
-	Id         string
+	// The scheme is always "did"
+	Scheme string
+	// The method is always "ma"
+	Method string
+	// The identifier is the IPNS name and the fragment, as
+	// provided as input to this function.
 	Identifier string
-	Fragment   string
+	// The Fragment is the key shortname and internal name for the key
+	Fragment string
 }
 
 // This creates a new DID from a method and an identifier.
 // This is the base function for all the rest.
-func New(identifier string) *DID {
+// The identitifier is the IPNS name and the fragment is the key shortname, eg
+// k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#bahner
+func New(name string) (*DID, error) {
 
-	id, fragment, _ := parseIdentifier(identifier)
+	identifier, fragment, err := parseName(name)
+	if err != nil {
+		return &DID{}, fmt.Errorf("did/new: failed to parse identifier: %w", err)
+	}
 
 	return &DID{
-		Scheme:     ma.DID_SCHEME,
-		Method:     ma.DID_METHOD,
-		Id:         id,
 		Identifier: identifier,
 		Fragment:   fragment,
-	}
+	}, nil
 }
 
 // If you already have a key, you can use this to create a DID.
-func NewFromIPNSKey(keyName *shell.Key) *DID {
+func NewFromIPNSKey(keyName *shell.Key) (*DID, error) {
 
 	new_id := keyName.Id + "#" + keyName.Name
 
@@ -55,7 +61,7 @@ func Parse(didStr string) (*DID, error) {
 
 	scheme := parts[0]
 	method := parts[1]
-	identifier := parts[2]
+	name := parts[2]
 
 	// Verify scheme
 	if scheme != ma.DID_SCHEME {
@@ -67,10 +73,10 @@ func Parse(didStr string) (*DID, error) {
 		return &DID{}, fmt.Errorf("invalid DID format, method must be alphanumeric: %s", method)
 	}
 
-	return New(identifier), nil
+	return New(name)
 }
 
-func parseIdentifier(identifier string) (string, string, error) {
+func parseName(identifier string) (string, string, error) {
 	// Check if the identifier contains a fragment
 	parts := strings.Split(identifier, "#")
 	if len(parts) > 2 {
@@ -87,14 +93,16 @@ func parseIdentifier(identifier string) (string, string, error) {
 		fragment = parts[1]
 	}
 
-	// We could add fragment rules here. They're supposed to be a NanoID.
+	if !internal.IsValidNanoID(fragment) {
+		return "", "", errors.New("invalid DID format, fragment is not a valid fragment")
+	}
 
 	return id, fragment, nil
 }
 
 func (d *DID) String() string {
 
-	return d.Scheme + ":" + d.Method + ":" + d.Identifier
+	return ma.DID_PREFIX + d.Identifier + "#" + d.Fragment
 
 }
 
@@ -106,7 +114,7 @@ func (d *DID) IsValid() bool {
 func (d *DID) PublicKey() (crypto.PubKey, error) {
 
 	// Decode the PeerID from the ID which is the IPNS name
-	pid, err := peer.Decode(d.Id)
+	pid, err := peer.Decode(d.Identifier)
 	if err != nil {
 		return nil, err
 	}
@@ -117,5 +125,5 @@ func (d *DID) PublicKey() (crypto.PubKey, error) {
 
 func (d *DID) IsIdenticalTo(did DID) bool {
 
-	return d.Id == did.Id
+	return AreIdentical(d, &did)
 }

@@ -108,15 +108,16 @@ func (m *Message) VerifyTimestamps() error {
 	// Time-based checks
 	now := time.Now()
 
-	created_time, err := m.Created()
+	created_time, err := m.CreatedTime()
 	if err != nil {
 		return fmt.Errorf("invalid CreatedTime: %v", err)
 	}
+
 	if created_time.After(now) {
 		return errors.New("CreatedTime must be in the past")
 	}
 
-	expires_time, err := m.Created()
+	expires_time, err := m.ExpiresTime()
 	if err != nil {
 		return fmt.Errorf("invalid CreatedTime: %v", err)
 	}

@@ -16,7 +16,6 @@ require (
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/crypto v0.13.0
 	lukechampine.com/blake3 v1.2.1
-	maze.io/x/crypto v0.0.0-20190131090603-9b94c9afe066
 )
 
 require (

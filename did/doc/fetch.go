@@ -33,7 +33,7 @@ func Fetch(identifier string) (*Document, error) {
 
 	// Fetch the document from IPFS
 	// Start by getting an IO.Reader
-	data, err := shell.Cat("/ipns/" + docdid.Id)
+	data, err := shell.Cat("/ipns/" + docdid.Identifier)
 	if err != nil {
 		return nil, internal.LogError(fmt.Sprintf("doc/fetch: failed to fetch document from IPFS: %v\n", err))
 	}

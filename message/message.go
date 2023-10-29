@@ -15,12 +15,12 @@ import (
 // It should enable using Message later, if that's a good idea.
 type Message struct {
 	ID           string `json:"id"`
-	MimeType     string `json:"type"`
+	MimeType     string `json:"mime_type"`
 	From         string `json:"from"`
 	To           string `json:"to"`
-	CreatedTime  string `json:"created_time"`
-	ExpiresTime  string `json:"expires_time"`
-	BodyMimeType string `json:"mime_type"`
+	Created      string `json:"created"`
+	Expires      string `json:"expires"`
+	BodyMimeType string `json:"body_mime_type"`
 	Body         string `json:"body"`
 	Version      string `json:"version"`
 	Signature    string `json:"signature"`
@@ -40,8 +40,8 @@ func New(
 	}
 
 	now := time.Now().UTC()
-	created_time := now.Format(time.RFC3339)
-	expires_time := now.Add(MESSAGE_TTL).Format(time.RFC3339)
+	created := now.Format(time.RFC3339)
+	expires := now.Add(MESSAGE_TTL).Format(time.RFC3339)
 
 	return &Message{
 		ID:           id,
@@ -49,8 +49,8 @@ func New(
 		Version:      ma.VERSION,
 		From:         from,
 		To:           to,
-		CreatedTime:  created_time,
-		ExpiresTime:  expires_time,
+		Created:      created,
+		Expires:      expires,
 		BodyMimeType: mime_type,
 		Body:         body,
 		Signature:    "",
@@ -75,20 +75,20 @@ func Signed(
 
 }
 
+func (m *Message) CreatedTime() (time.Time, error) {
+	return internal.CreateTimeFromIsoString(m.Created)
+}
+
+func (m *Message) ExpiresTime() (time.Time, error) {
+	return internal.CreateTimeFromIsoString(m.Expires)
+}
+
 func (m *Message) Sender() (*did.DID, error) {
 	return did.Parse(m.From)
 }
 
 func (m *Message) Recipient() (*did.DID, error) {
 	return did.Parse(m.To)
-}
-
-func (m *Message) Created() (time.Time, error) {
-	return internal.CreateTimeFromIsoString(m.CreatedTime)
-}
-
-func (m *Message) Expires() (time.Time, error) {
-	return internal.CreateTimeFromIsoString(m.ExpiresTime)
 }
 
 func (m *Message) SemVersion() (*semver.Version, error) {

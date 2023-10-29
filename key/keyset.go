@@ -11,7 +11,7 @@ import (
 type Keyset struct {
 	IPNSKey       *shell.Key
 	EncryptionKey EncryptionKey
-	SignatureKey  SignatureKey
+	SigningKey    SigningKey
 }
 
 func NewKeyset(name string) (Keyset, error) {
@@ -20,7 +20,7 @@ func NewKeyset(name string) (Keyset, error) {
 		return Keyset{}, fmt.Errorf("keyset/new: failed to generate encryption key: %w", err)
 	}
 
-	signatureKey, err := GenerateSignatureKey(name)
+	signatureKey, err := GenerateSigningKey(name)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
 	}
@@ -33,7 +33,7 @@ func NewKeyset(name string) (Keyset, error) {
 	return Keyset{
 		IPNSKey:       ipfsKey,
 		EncryptionKey: encryptionKey,
-		SignatureKey:  signatureKey,
+		SigningKey:    signatureKey,
 	}, nil
 }
 

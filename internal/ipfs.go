@@ -12,7 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const defaultIPFSAPISocket = "localhost:5001"
+const defaultIPFSAPISocket = "localhost:45005" // Default to Brave browser, Kubo is localhost:5001
 
 // FIXME: This is taken completely out of the blue. They must be properly researched.
 
@@ -33,7 +33,7 @@ var (
 
 // initializeApi sets up the ipfsAPI and ipfsAPISocket.
 func initializeApi() {
-	ipfsAPISocket, exists = os.LookupEnv("IPFS_API_HOST")
+	ipfsAPISocket, exists = os.LookupEnv("IPFS_API_SOCKET")
 	if !exists {
 		ipfsAPISocket = defaultIPFSAPISocket
 	}

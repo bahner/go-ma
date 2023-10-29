@@ -13,6 +13,9 @@ import (
 )
 
 func Seal(m *message.Message) (*Envelope, error) {
+
+	// First check the stuff we don't have control over.
+	// Fail fast.
 	msg, err := m.Pack()
 	if err != nil {
 		return nil, internal.LogError(fmt.Sprintf("message_encrypt: error packing message: %s\n", err))
@@ -23,13 +26,13 @@ func Seal(m *message.Message) (*Envelope, error) {
 		return nil, internal.LogError(fmt.Sprintf("message_encrypt: error fetching recipient document: %s\n", err))
 	}
 
-	recipientPublicKey, err := to.EncryptionKey()
+	recipientPublicKeyBytes, err := to.KeyAgreementPublicKeyBytes()
 	if err != nil {
 		return nil, fmt.Errorf("message_encrypt: error getting recipient public key: %w", err)
 	}
 
-	// 1. Generate ephemeral x25519 key pair
-	var ephemeralPrivate [32]byte
+	// Generate an ephemeral key pair
+	var ephemeralPrivate [curve25519.ScalarSize]byte
 	_, err = rand.Read(ephemeralPrivate[:])
 	if err != nil {
 		return nil, fmt.Errorf("message_encrypt: error generating ephemeral private key: %w", err)
@@ -39,13 +42,13 @@ func Seal(m *message.Message) (*Envelope, error) {
 		return nil, fmt.Errorf("message_encrypt: error deriving ephemeral public key: %w", err)
 	}
 
-	recipientPublicKeyBytes := recipientPublicKey.([]byte)
-	// 2. Derive shared secret
+	// Derive shared secret
 	shared, err := curve25519.X25519(ephemeralPrivate[:], recipientPublicKeyBytes)
 	if err != nil {
 		return nil, fmt.Errorf("message_encrypt: error deriving shared secret: %w", err)
 	}
 
+	// Generate a symmetric key from the shared secret using blake3
 	symmetricKey := internal.GenerateSymmetricKey(shared, ma.BLAKE3_SUM_SIZE)
 
 	// Encrypt the actual message with ChaCha20-Poly1305
@@ -54,15 +57,18 @@ func Seal(m *message.Message) (*Envelope, error) {
 		return nil, fmt.Errorf("message_encrypt: error creating AEAD: %w", err)
 	}
 
+	// Create a random nonce to make the encryption probabilistically unique
 	nonce := make([]byte, chacha20poly1305.NonceSizeX)
 	_, err = rand.Read(nonce)
 	if err != nil {
 		return nil, fmt.Errorf("message_encrypt: error generating nonce: %w", err)
 	}
 
+	// Seal the generated cipher text
 	cipherText := aead.Seal(nil, nonce, []byte(msg), nil)
 	cipherTextWithNonce := append(nonce, cipherText...)
 
+	// Encode the cipher text to multibase for safe transport as text
 	encodedCipherTextWithNonce, err := internal.MultibaseEncode(cipherTextWithNonce)
 	if err != nil {
 		return nil, internal.LogError(fmt.Sprintf("message_encrypt: error encoding cipher text: %s", err))

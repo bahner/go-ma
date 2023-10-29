@@ -16,6 +16,8 @@ func main() {
 		os.Exit(70) // EX_SOFTWARE
 	}
 
-	fmt.Println(packed)
+	json_message, _ := m.MarshalToJSON()
+	json_message_string := string(json_message)
+	fmt.Println(json_message_string)
 
 }

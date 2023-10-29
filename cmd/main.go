@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
-	"github.com/bahner/go-ma/did/vm"
 	"github.com/bahner/go-ma/entity"
+	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/message"
 	"github.com/bahner/go-ma/message/envelope"
 	log "github.com/sirupsen/logrus"
@@ -18,7 +19,7 @@ func main() {
 
 	log.SetLevel(log.DebugLevel)
 
-	os.Setenv("IPFS_API_HOST", "localhost:45005")
+	os.Setenv("IPFS_API_SOCKET", "localhost:45005")
 
 	// shell := internal.GetShell()
 
@@ -62,40 +63,45 @@ func main() {
 func createSubject(name string) (*entity.Entity, error) {
 	// Create a new person, object - an entity
 	// id, _ := nanoid.New()
-	subject, err := entity.New(name)
+
+	ipnsKey, err := internal.IPNSGetOrCreateKey(name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get or create key in IPFS: %v", err)
+	}
+
+	subject, err := entity.NewFromKey(ipnsKey)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new identity in ma: %v", err)
 	}
 	log.Debugf("Created new entity: %s", subject.DID.String())
-	DIDDoc, err := doc.New(subject.DID.String())
+	DIDDoc, err := doc.New(subject.DID.String(), subject.DID.String())
 	if err != nil {
 		return nil, fmt.Errorf("error creating new identity in ma: %v", err)
 	}
 
-	encVM, err := vm.New(subject.DID.Id, "enc1", subject.Keyset.EncryptionKey.PublicKeyMultibase)
+	encVM, err := doc.NewVerificationMethod(
+		subject.DID.Identifier,
+		subject.DID.String(),
+		subject.Keyset.EncryptionKey.PublicKeyMultibase,
+		ma.VERIFICATION_METHOD_DEFAULT_TTL)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
-	log.Debugf("Created new verification method: %s", encVM.ID)
+	DIDDoc.KeyAgreement = encVM.ID
+	log.Debugf("Added keyAgreement verification method: %s", DIDDoc.KeyAgreement)
 
-	err = DIDDoc.AddVerificationMethod(encVM)
-	if err != nil {
-		return nil, fmt.Errorf("error adding verification method: %v", err)
-	}
-	log.Debugf("Added verification method: %s", encVM.ID)
-	signVM, err := vm.New(subject.DID.Id, "sign1", subject.Keyset.SignatureKey.PublicKeyMultibase)
+	signvm, err := doc.NewVerificationMethod(
+		subject.DID.Identifier,
+		subject.DID.String(),
+		subject.Keyset.SigningKey.PublicKeyMultibase,
+		ma.VERIFICATION_METHOD_DEFAULT_TTL)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
-	log.Debugf("Created new verification method: %s", signVM.ID)
+	DIDDoc.AssertionMethod = signvm.ID
+	log.Debugf("Created new assertion method: %s", DIDDoc.AssertionMethod)
 
-	err = DIDDoc.AddVerificationMethod(signVM)
-	if err != nil {
-		return nil, fmt.Errorf("error adding verification method: %v", err)
-	}
-	log.Debugf("Added verification method: %s", signVM.ID)
-
-	err = DIDDoc.Sign(subject.Keyset.SignatureKey)
+	err = DIDDoc.Sign(subject.Keyset.SigningKey, signvm)
 	if err != nil {
 		return nil, fmt.Errorf("error signing new identity in ma: %v", err)
 	}
