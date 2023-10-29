@@ -5,18 +5,17 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/did/doc/proof"
-	"github.com/bahner/go-ma/did/doc/vm"
 	"github.com/bahner/go-ma/internal"
 	log "github.com/sirupsen/logrus"
 )
 
 type Document struct {
-	Context            []string                `json:"@context"`
-	ID                 string                  `json:"id"`
-	Controller         []string                `json:"controller"`
-	VerificationMethod []vm.VerificationMethod `json:"verificationMethod"`
-	Proof              proof.Proof             `json:"proof,omitempty"`
+	Context         []string           `json:"@context"`
+	ID              string             `json:"id"`
+	Controller      []string           `json:"controller"`
+	AssertionMethod VerificationMethod `json:"assertionMethod,omitempty"`
+	KeyAgreement    VerificationMethod `json:"keyAgreement,omitempty"`
+	Proof           Proof              `json:"proof,omitempty"`
 }
 
 func New(identifier string, controller string) (*Document, error) {

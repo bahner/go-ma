@@ -5,7 +5,6 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/did/doc"
-	"github.com/bahner/go-ma/did/doc/vm"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
 	shell "github.com/ipfs/go-ipfs-api"
@@ -48,7 +47,7 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	}
 	log.Debugf("entity: myDoc: %v", myDoc)
 
-	myEncVM, err := vm.New(id.Id, "encryption", myKeyset.EncryptionKey.PublicKeyMultibase)
+	myEncVM, err := doc.NewVerificationMethod(id.Id, "encryption", myKeyset.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create encryption verification method: %s", err)
 	}
@@ -59,7 +58,7 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 		return nil, fmt.Errorf("entity: failed to add encryption verification method to document: %s", err)
 	}
 
-	mySigVM, err := vm.New(id.Id, "signature", myKeyset.SignatureKey.PublicKeyMultibase)
+	mySigVM, err := doc.NewVerificationMethod(id.Id, "signature", myKeyset.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create signature verification method: %s", err)
 	}

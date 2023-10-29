@@ -28,6 +28,12 @@ const (
 	MULTIBASE_ENCODING = multibase.Base58BTC
 
 	// BLAKE3 label for symmetric key generation.
-	BLAKE3_LABEL    = "ma"
-	BLAKE3_SUM_SIZE = 32 // 256 bits
+	HASH_ALGORITHM_MULTICODEC_STRING = "blake3"
+	BLAKE3_LABEL                     = "ma"
+	BLAKE3_SUM_SIZE                  = 32 // 256 bits
+
+	// Keytype labels
+	VERIFICATION_METHOD_KEY_TYPE       = "MultiKey"
+	KEY_AGREEMENT_MULTICODEC_STRING    = "x25519-pub"
+	ASSERTION_METHOD_MULTICODEC_STRING = "ed25519-pub"
 )

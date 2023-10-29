@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/bahner/go-ma/did/doc"
-	"github.com/bahner/go-ma/did/doc/vm"
 	"github.com/bahner/go-ma/entity"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/message"
@@ -79,7 +78,7 @@ func createSubject(name string) (*entity.Entity, error) {
 		return nil, fmt.Errorf("error creating new identity in ma: %v", err)
 	}
 
-	encVM, err := vm.New(subject.DID.Id, "enc1", subject.Keyset.EncryptionKey.PublicKeyMultibase)
+	encVM, err := doc.NewVerificationMethod(subject.DID.Id, "enc1", subject.Keyset.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
@@ -90,7 +89,7 @@ func createSubject(name string) (*entity.Entity, error) {
 		return nil, fmt.Errorf("error adding verification method: %v", err)
 	}
 	log.Debugf("Added verification method: %s", encVM.ID)
-	signVM, err := vm.New(subject.DID.Id, "sign1", subject.Keyset.SignatureKey.PublicKeyMultibase)
+	signVM, err := doc.NewVerificationMethod(subject.DID.Id, "sign1", subject.Keyset.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
@@ -102,7 +101,7 @@ func createSubject(name string) (*entity.Entity, error) {
 	}
 	log.Debugf("Added verification method: %s", signVM.ID)
 
-	err = DIDDoc.Sign(subject.Keyset.SignatureKey)
+	err = DIDDoc.Sign(subject.Keyset.SigningKey, signVM)
 	if err != nil {
 		return nil, fmt.Errorf("error signing new identity in ma: %v", err)
 	}
