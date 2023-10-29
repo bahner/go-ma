@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.ErrorLevel)
 
 	ipnsKey, err := internal.IPNSGetOrCreateKey("bahner")
 	if err != nil {
@@ -28,6 +28,11 @@ func main() {
 		fmt.Printf("Error creating new identity in ma: %v\n", err)
 	}
 
-	fmt.Println(i.Doc.String())
+	docstring, err := i.Doc.String()
+	if err != nil {
+		fmt.Printf("failed to get doc string from document, %v", err)
+	}
+
+	fmt.Println(docstring)
 
 }

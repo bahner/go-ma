@@ -2,6 +2,8 @@ package doc
 
 import (
 	"encoding/json"
+
+	"github.com/bahner/go-ma/did/doc/proof"
 )
 
 // Payload generates the unsigned DID,
@@ -10,7 +12,7 @@ import (
 // struct in the function. We just need to change the signature.
 func Payload(d Document) (Document, error) {
 
-	d.Signature = ""
+	d.Proof = []proof.Proof{}
 
 	return d, nil
 }

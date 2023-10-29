@@ -5,7 +5,8 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/did/vm"
+	"github.com/bahner/go-ma/did/doc/proof"
+	"github.com/bahner/go-ma/did/doc/vm"
 	"github.com/bahner/go-ma/internal"
 	log "github.com/sirupsen/logrus"
 )
@@ -15,7 +16,7 @@ type Document struct {
 	ID                 string                  `json:"id"`
 	Controller         []string                `json:"controller"`
 	VerificationMethod []vm.VerificationMethod `json:"verificationMethod"`
-	Signature          string                  `json:"signature,omitempty"`
+	Proof              proof.Proof             `json:"proof,omitempty"`
 }
 
 func New(identifier string, controller string) (*Document, error) {
