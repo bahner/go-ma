@@ -20,19 +20,15 @@ func (d *Document) Verify() error {
 		return fmt.Errorf("doc/verify: Error decoding signature: %s", err)
 	}
 
-	pubKey, err := d.KeyAgreement.PublicKeyMultibase.Decode()
+	pubKey, err := d.AssertionMethodPublicKey()
 	if err != nil {
 		return fmt.Errorf("doc/verify: Error getting signing key: %s", err)
 	}
 
 	// Verify the signature
-	if !ed25519.Verify(pubKey.(ed25519.PublicKey), hashed[:], signature) {
+	if !ed25519.Verify(pubKey, hashed[:], signature) {
 		return fmt.Errorf("verification failed")
 	}
 
-	if err == nil {
-		return nil
-	}
-
-	return fmt.Errorf("doc verify: Verification failed for all keys")
+	return nil
 }

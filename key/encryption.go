@@ -6,25 +6,31 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
-	"maze.io/x/crypto/x25519"
+	"golang.org/x/crypto/curve25519"
 )
 
 type EncryptionKey struct {
 	DID                string
 	Name               string
-	PrivKey            *x25519.PrivateKey
-	PubKey             *x25519.PublicKey
+	PrivKey            [32]byte // Private key
+	PubKey             [32]byte // Public key
 	PublicKeyMultibase string
 }
 
 func GenerateEncryptionKey(name string) (EncryptionKey, error) {
-	privKey, err := x25519.GenerateKey(rand.Reader)
+	// Generate a random private key
+	var privKey [curve25519.ScalarSize]byte
+	_, err := rand.Read(privKey[:])
 	if err != nil {
 		return EncryptionKey{}, err
 	}
-	pubKey := privKey.Public().(*x25519.PublicKey)
 
-	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(pubKey.Bytes(), ma.KEY_AGREEMENT_MULTICODEC_STRING)
+	// Calculate the corresponding public key
+	var pubKey [curve25519.PointSize]byte
+	curve25519.ScalarBaseMult(&pubKey, &privKey)
+
+	// Encode the public key to multibase
+	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(pubKey[:], ma.KEY_AGREEMENT_MULTICODEC_STRING)
 	if err != nil {
 		return EncryptionKey{}, fmt.Errorf("key_generate: error encoding public key multibase: %w", err)
 	}

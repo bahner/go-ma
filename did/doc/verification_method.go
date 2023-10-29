@@ -1,6 +1,7 @@
 package doc
 
 import (
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
 )
@@ -38,7 +39,7 @@ func NewVerificationMethod(
 	return VerificationMethod{
 		ID:                 key.DID_KEY_PREFIX + id,
 		Controller:         controller,
-		Type:               verificationMethodType,
+		Type:               ma.VERIFICATION_METHOD_KEY_TYPE,
 		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
 }

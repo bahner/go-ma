@@ -20,7 +20,7 @@ type SigningKey struct {
 }
 
 func (k *SigningKey) Sign(data []byte) ([]byte, error) {
-	if !isValidEd25519PrivateKey(k.PrivKey) {
+	if !internal.IsValidEd25519PrivateKey(k.PrivKey) {
 		return nil, fmt.Errorf("keyset/ed25519: invalid private key")
 	}
 
@@ -33,24 +33,17 @@ func GenerateSigningKey(name string) (SigningKey, error) {
 		return SigningKey{}, err
 	}
 
-	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, "ed25519-pub")
+	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, ma.ASSERTION_METHOD_MULTICODEC_STRING)
 	if err != nil {
 		return SigningKey{}, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
 	}
 
 	return SigningKey{
 		DID:                DID_KEY_PREFIX + publicKeyMultibase + "#" + name,
-		Type:               ma.ASSERTION_METHOD_MULTICODEC_STRING,
+		Type:               ma.VERIFICATION_METHOD_KEY_TYPE,
 		Name:               name,
 		PrivKey:            &privKey,
 		PubKey:             &publicKey,
 		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
-}
-
-func isValidEd25519PrivateKey(privKey *ed25519.PrivateKey) bool {
-	if privKey == nil || len(*privKey) != ed25519.PrivateKeySize {
-		return false
-	}
-	return true
 }
