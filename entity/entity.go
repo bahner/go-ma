@@ -77,7 +77,7 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	}, nil
 }
 
-func NewFromKey(method string, ipfsKey *shell.Key) (*Entity, error) {
+func NewFromKey(ipfsKey *shell.Key) (*Entity, error) {
 
 	id, err := did.NewFromIPNSKey(ipfsKey)
 	if err != nil {

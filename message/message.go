@@ -6,6 +6,7 @@ import (
 	"github.com/Masterminds/semver"
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
+	"github.com/bahner/go-ma/internal"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
@@ -72,6 +73,14 @@ func Signed(
 
 	return msg, nil
 
+}
+
+func (m *Message) CreatedTime() (time.Time, error) {
+	return internal.CreateTimeFromIsoString(m.Created)
+}
+
+func (m *Message) ExpiresTime() (time.Time, error) {
+	return internal.CreateTimeFromIsoString(m.Expires)
 }
 
 func (m *Message) Sender() (*did.DID, error) {
