@@ -11,17 +11,17 @@ const MIMEType = "application/x-ma-envelope"
 
 // Bask the encrypted message and the encrypted symmetric key in a JSON envelope.
 type Envelope struct {
-	MIMEType     string `json:"mime_type"`
-	EphemeralKey string `json:"ephemeral_key"`
-	Message      string `json:"message"`
+	MIMEType string `json:"mime_type"`
+	Seal     string `json:"seal"`
+	Message  string `json:"message"`
 }
 
 // Use a pointer here, this might be arbitrarily big.
 func New(encodedCipherText string, encodedEphemeralKey string) (*Envelope, error) {
 	return &Envelope{
-		MIMEType:     MIMEType,
-		EphemeralKey: encodedEphemeralKey,
-		Message:      encodedCipherText,
+		MIMEType: MIMEType,
+		Seal:     encodedEphemeralKey,
+		Message:  encodedCipherText,
 	}, nil
 }
 
@@ -50,7 +50,7 @@ func (e *Envelope) String() string {
 }
 
 func (e *Envelope) GetEncryptedKey() string {
-	return e.EphemeralKey
+	return e.Seal
 }
 
 func (e *Envelope) GetEncryptedMsg() string {

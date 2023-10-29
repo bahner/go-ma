@@ -1,3 +1,3 @@
 package key
 
-const KEY_PREFIX = "did:key:"
+const DID_KEY_PREFIX = "did:key:"

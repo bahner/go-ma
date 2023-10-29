@@ -32,7 +32,7 @@ func New(
 	}
 
 	return VerificationMethod{
-		ID:                 key.KEY_PREFIX + id + "#" + name,
+		ID:                 key.DID_KEY_PREFIX + id + "#" + name,
 		Type:               VerificationMethodType,
 		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
