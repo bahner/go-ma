@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/bahner/go-ma/did/doc"
-	"github.com/bahner/go-ma/did/vm"
+	"github.com/bahner/go-ma/did/doc/vm"
 	"github.com/bahner/go-ma/entity"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/message"

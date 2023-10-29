@@ -3,7 +3,9 @@ package internal
 import (
 	"errors"
 	"regexp"
+	"strings"
 
+	"github.com/ipfs/boxo/ipns"
 	"github.com/multiformats/go-multibase"
 )
 
@@ -38,4 +40,23 @@ func IsValidNanoID(str string) bool {
 // prefixed with a "#".
 func IsValidFragment(str string) bool {
 	return fragment.MatchString(str)
+}
+
+func IsValidIdentifier(identifier string) bool {
+
+	parts := strings.Split(identifier, "#")
+	if len(parts) != 2 {
+		return false
+	}
+
+	// Check that the identifier has a valid fragment
+	if !IsValidFragment(parts[1]) {
+		return false
+	}
+
+	// Check that the id is a valid IPNS name
+	_, err := ipns.NameFromString(identifier)
+
+	// Last check so check that it has not errors
+	return err == nil
 }
