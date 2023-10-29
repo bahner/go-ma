@@ -1,6 +1,9 @@
 package doc
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
@@ -23,8 +26,9 @@ type VerificationMethod struct {
 
 // NewVerificationMethod creates a new VerificationMethod
 // id is the identifier of the verification method, eg.
-// k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#signature
-// id must be a valid IPNS name
+// k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr
+// id must be a valid IPNS name.
+// A random fragment will be added to the id
 // vmType must be of type MultiKey, so that the format never changes -
 // even if the underlying key type changes.
 func NewVerificationMethod(
@@ -32,58 +36,58 @@ func NewVerificationMethod(
 	controller string,
 	publicKeyMultibase string) (VerificationMethod, error) {
 
-	if !internal.IsValidIdentifier(id) {
+	if !internal.IsValidIPNSName(id) {
 		return VerificationMethod{}, internal.ErrInvalidID
 	}
 
 	return VerificationMethod{
-		ID:                 key.DID_KEY_PREFIX + id,
+		ID:                 key.DID_KEY_PREFIX + id + internal.GenerateFragment(),
 		Controller:         controller,
 		Type:               ma.VERIFICATION_METHOD_KEY_TYPE,
 		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
 }
 
-// func (d *Document) AddVerificationMethod(method VerificationMethod) error {
-// 	// Before appending the method, check if id or publicKeyMultibase is unique
-// 	if err := d.isUniqueVerificationMethod(method); err != nil {
-// 		return fmt.Errorf("doc/vm: error adding verification method: %s", err)
-// 	}
+func (d *Document) AddVerificationMethod(method VerificationMethod) error {
+	// Before appending the method, check if id or publicKeyMultibase is unique
+	if err := d.isUniqueVerificationMethod(method); err != nil {
+		return fmt.Errorf("doc/vm: error adding verification method: %s", err)
+	}
 
-// 	d.VerificationMethod = append(d.VerificationMethod, method)
+	d.VerificationMethod = append(d.VerificationMethod, method)
 
-// 	return nil
-// }
+	return nil
+}
 
-// func (d *Document) GetVerificationMethodbyID(vmid string) (VerificationMethod, error) {
+func (d *Document) GetVerificationMethodbyID(vmid string) (VerificationMethod, error) {
 
-// 	for _, method := range d.VerificationMethod {
+	for _, method := range d.VerificationMethod {
 
-// 		if method.ID == vmid {
-// 			return method, nil
-// 		}
-// 	}
+		if method.ID == vmid {
+			return method, nil
+		}
+	}
 
-// 	return VerificationMethod{}, fmt.Errorf("doc/vm: no verification method found with id: %s", vmid)
-// }
+	return VerificationMethod{}, fmt.Errorf("doc/vm: no verification method found with id: %s", vmid)
+}
 
-// func (d *Document) isUniqueVerificationMethod(newMethod VerificationMethod) error {
+func (d *Document) isUniqueVerificationMethod(newMethod VerificationMethod) error {
 
-// 	for _, existingMethod := range d.VerificationMethod {
-// 		if existingMethod.ID == newMethod.ID {
-// 			return errors.New("duplicate id found in Verification Methods")
-// 		}
-// 		if existingMethod.PublicKeyMultibase == newMethod.PublicKeyMultibase {
-// 			return errors.New("duplicate publicKeyMultibase found in Verification Methods")
-// 		}
-// 	}
-// 	return nil // Return nil if no duplicate found
-// }
+	for _, existingMethod := range d.VerificationMethod {
+		if existingMethod.ID == newMethod.ID {
+			return errors.New("duplicate id found in Verification Methods")
+		}
+		if existingMethod.PublicKeyMultibase == newMethod.PublicKeyMultibase {
+			return errors.New("duplicate publicKeyMultibase found in Verification Methods")
+		}
+	}
+	return nil // Return nil if no duplicate found
+}
 
-// func (vm VerificationMethod) GetID() string {
-// 	return vm.ID
-// }
+func (vm VerificationMethod) GetID() string {
+	return vm.ID
+}
 
-// func (vm VerificationMethod) Fragment() string {
-// 	return internal.GetFragmentFromDID(vm.ID)
-// }
+func (vm VerificationMethod) Fragment() string {
+	return internal.GetFragmentFromDID(vm.ID)
+}

@@ -13,7 +13,7 @@ import (
 var (
 	ascii              = regexp.MustCompile("^[a-z]*$")
 	alphanumeric       = regexp.MustCompile("^[a-z0-9]*$")
-	nanoid             = regexp.MustCompile("^[a-zA-Z0-9_-]*$")
+	nanoId             = regexp.MustCompile("^[a-zA-Z0-9_-]*$")
 	fragment           = regexp.MustCompile("^#[a-zA-Z0-9_-]*$")
 	ErrInvalidID       = errors.New("invalid ID")
 	ErrInvalidFragment = errors.New("invalid fragment")
@@ -34,7 +34,7 @@ func IsValidMultibase(input string) bool {
 
 // ValidateNanoID checks if a string only contains valid NanoID characters.
 func IsValidNanoID(str string) bool {
-	return nanoid.MatchString(str)
+	return nanoId.MatchString(str)
 }
 
 // This simply checks that the string is a valid nanoID,
@@ -67,4 +67,9 @@ func IsValidEd25519PrivateKey(privKey *ed25519.PrivateKey) bool {
 		return false
 	}
 	return true
+}
+
+func IsValidIPNSName(name string) bool {
+	_, err := ipns.NameFromString(name)
+	return err == nil
 }

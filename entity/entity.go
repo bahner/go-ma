@@ -47,17 +47,19 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	}
 	log.Debugf("entity: myDoc: %v", myDoc)
 
-	myDoc.KeyAgreement, err = doc.NewVerificationMethod(id.Id, "encryption", myKeyset.EncryptionKey.PublicKeyMultibase)
+	myDoc.KeyAgreement, err = doc.NewVerificationMethod(id.Id, id.Id, myKeyset.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create encryption verification method: %s", err)
 	}
 	log.Debugf("entity: myEncVM: %v", myDoc.KeyAgreement)
 
-	myDoc.AssertionMethod, err = doc.NewVerificationMethod(id.Id, "signature", myKeyset.SigningKey.PublicKeyMultibase)
+	myDoc.AssertionMethod, err = doc.NewVerificationMethod(id.Id, id.Id, myKeyset.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create signature verification method: %s", err)
 	}
 	log.Debugf("entity: mySigVM: %v", myDoc.AssertionMethod)
+
+	myDoc.Sign(myKeyset.SigningKey, myDoc.AssertionMethod)
 
 	return &Entity{
 		DID:    id,
