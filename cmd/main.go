@@ -47,7 +47,7 @@ func main() {
 
 	fmt.Println(myMessage)
 
-	letter, err := envelope.Enclose(myMessage)
+	letter, err := envelope.Seal(myMessage)
 	if err != nil {
 		fmt.Printf("Error creating new envelope: %v\n", err)
 	}
@@ -72,7 +72,7 @@ func createSubject(name string) (*entity.Entity, error) {
 		return nil, fmt.Errorf("error creating new identity in ma: %v", err)
 	}
 
-	encVM, err := vm.New(subject.DID.Id, "enc1", subject.Keyset.EncryptionKey().PublicKeyMultibase())
+	encVM, err := vm.New(subject.DID.Id, "enc1", subject.Keyset.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
@@ -83,7 +83,7 @@ func createSubject(name string) (*entity.Entity, error) {
 		return nil, fmt.Errorf("error adding verification method: %v", err)
 	}
 	log.Debugf("Added verification method: %s", encVM.ID)
-	signVM, err := vm.New(subject.DID.Id, "sign1", subject.Keyset.SignatureKey().PublicKeyMultibase())
+	signVM, err := vm.New(subject.DID.Id, "sign1", subject.Keyset.SignatureKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
@@ -95,7 +95,7 @@ func createSubject(name string) (*entity.Entity, error) {
 	}
 	log.Debugf("Added verification method: %s", signVM.ID)
 
-	err = DIDDoc.Sign(subject.Keyset.SignatureKey())
+	err = DIDDoc.Sign(subject.Keyset.SignatureKey)
 	if err != nil {
 		return nil, fmt.Errorf("error signing new identity in ma: %v", err)
 	}
