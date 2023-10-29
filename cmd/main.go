@@ -7,6 +7,7 @@ import (
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/did/vm"
 	"github.com/bahner/go-ma/entity"
+	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/message"
 	"github.com/bahner/go-ma/message/envelope"
 	log "github.com/sirupsen/logrus"
@@ -62,12 +63,18 @@ func main() {
 func createSubject(name string) (*entity.Entity, error) {
 	// Create a new person, object - an entity
 	// id, _ := nanoid.New()
-	subject, err := entity.New(name)
+
+	ipnsKey, err := internal.IPNSGetOrCreateKey(name)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get or create key in IPFS: %v", err)
+	}
+
+	subject, err := entity.NewFromKey(ipnsKey)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new identity in ma: %v", err)
 	}
 	log.Debugf("Created new entity: %s", subject.DID.String())
-	DIDDoc, err := doc.New(subject.DID.String())
+	DIDDoc, err := doc.New(subject.DID.String(), subject.DID.String())
 	if err != nil {
 		return nil, fmt.Errorf("error creating new identity in ma: %v", err)
 	}
