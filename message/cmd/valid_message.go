@@ -19,6 +19,5 @@ func main() {
 	json_message, _ := m.MarshalToJSON()
 	json_message_string := string(json_message)
 	fmt.Println(json_message_string)
-	fmt.Println(packed)
 
 }

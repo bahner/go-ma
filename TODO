@@ -1,6 +1,9 @@
-TODO
-===
+# TODO
 
-# Verify that I'm using multikey correctly.
-# Probably need to register with w3 did registry, I suspect
+## Verify that I'm using multikey correctly.
+Probably need to register with w3 did registry, I suspect
 https://w3c-ccg.github.io/did-method-key/#rsa-repr
+
+## Create a useful README
+The code is approaching useful state, but needs to have the documentation
+leveraged significantly.
