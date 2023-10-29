@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"crypto/ed25519"
 	"errors"
 	"regexp"
 	"strings"
@@ -59,4 +60,11 @@ func IsValidIdentifier(identifier string) bool {
 
 	// Last check so check that it has not errors
 	return err == nil
+}
+
+func IsValidEd25519PrivateKey(privKey *ed25519.PrivateKey) bool {
+	if privKey == nil || len(*privKey) != ed25519.PrivateKeySize {
+		return false
+	}
+	return true
 }

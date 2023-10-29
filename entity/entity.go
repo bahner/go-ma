@@ -47,27 +47,17 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	}
 	log.Debugf("entity: myDoc: %v", myDoc)
 
-	myEncVM, err := doc.NewVerificationMethod(id.Id, "encryption", myKeyset.EncryptionKey.PublicKeyMultibase)
+	myDoc.KeyAgreement, err = doc.NewVerificationMethod(id.Id, "encryption", myKeyset.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create encryption verification method: %s", err)
 	}
-	log.Debugf("entity: myEncVM: %v", myEncVM)
+	log.Debugf("entity: myEncVM: %v", myDoc.KeyAgreement)
 
-	err = myDoc.AddVerificationMethod(myEncVM)
-	if err != nil {
-		return nil, fmt.Errorf("entity: failed to add encryption verification method to document: %s", err)
-	}
-
-	mySigVM, err := doc.NewVerificationMethod(id.Id, "signature", myKeyset.SigningKey.PublicKeyMultibase)
+	myDoc.AssertionMethod, err = doc.NewVerificationMethod(id.Id, "signature", myKeyset.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create signature verification method: %s", err)
 	}
-	log.Debugf("entity: mySigVM: %v", mySigVM)
-
-	err = myDoc.AddVerificationMethod(mySigVM)
-	if err != nil {
-		return nil, fmt.Errorf("entity: failed to add signature verification method to document: %s", err)
-	}
+	log.Debugf("entity: mySigVM: %v", myDoc.AssertionMethod)
 
 	return &Entity{
 		DID:    id,

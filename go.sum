@@ -195,5 +195,3 @@ gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 lukechampine.com/blake3 v1.2.1 h1:YuqqRuaqsGV71BV/nm9xlI0MKUv4QC54jQnBChWbGnI=
 lukechampine.com/blake3 v1.2.1/go.mod h1:0OFRp7fBtAylGVCO40o87sbupkyIGgbpv1+M1k1LM6k=
-maze.io/x/crypto v0.0.0-20190131090603-9b94c9afe066 h1:UrD21H1Ue5Nl8f2x/NQJBRdc49YGmla3mRStinH8CCE=
-maze.io/x/crypto v0.0.0-20190131090603-9b94c9afe066/go.mod h1:DEvumi+swYmlKxSlnsvPwS15tRjoypCCeJFXswU5FfQ=

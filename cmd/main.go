@@ -78,30 +78,19 @@ func createSubject(name string) (*entity.Entity, error) {
 		return nil, fmt.Errorf("error creating new identity in ma: %v", err)
 	}
 
-	encVM, err := doc.NewVerificationMethod(subject.DID.Id, "enc1", subject.Keyset.EncryptionKey.PublicKeyMultibase)
+	DIDDoc.KeyAgreement, err = doc.NewVerificationMethod(subject.DID.Id, "enc1", subject.Keyset.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
-	log.Debugf("Created new verification method: %s", encVM.ID)
+	log.Debugf("Added keyAgreement verification method: %s", DIDDoc.KeyAgreement.ID)
 
-	err = DIDDoc.AddVerificationMethod(encVM)
-	if err != nil {
-		return nil, fmt.Errorf("error adding verification method: %v", err)
-	}
-	log.Debugf("Added verification method: %s", encVM.ID)
-	signVM, err := doc.NewVerificationMethod(subject.DID.Id, "sign1", subject.Keyset.SigningKey.PublicKeyMultibase)
+	DIDDoc.AssertionMethod, err = doc.NewVerificationMethod(subject.DID.Id, "sign1", subject.Keyset.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
-	log.Debugf("Created new verification method: %s", signVM.ID)
+	log.Debugf("Created new assertion method: %s", DIDDoc.AssertionMethod.ID)
 
-	err = DIDDoc.AddVerificationMethod(signVM)
-	if err != nil {
-		return nil, fmt.Errorf("error adding verification method: %v", err)
-	}
-	log.Debugf("Added verification method: %s", signVM.ID)
-
-	err = DIDDoc.Sign(subject.Keyset.SigningKey, signVM)
+	err = DIDDoc.Sign(subject.Keyset.SigningKey, DIDDoc.AssertionMethod)
 	if err != nil {
 		return nil, fmt.Errorf("error signing new identity in ma: %v", err)
 	}
