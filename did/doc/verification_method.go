@@ -3,6 +3,7 @@ package doc
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
@@ -19,6 +20,12 @@ type VerificationMethod struct {
 	// The controller of the verification method. This is the DID of the entity that controls the key.
 	// Should probably always be the DID itself, but maybe the DID controller.
 	Controller string `json:"controller"`
+	// Created is the time the verification method was created
+	Created string `json:"created"`
+	// Updated is the time the verification method was last updated
+	Updated string `json:"updated"`
+	// Expires is the time the verification method expires
+	Expires string `json:"expires"`
 	// The public key of the verification method, encoded in multibase, as
 	// per the did core spec.
 	PublicKeyMultibase string `json:"publicKeyMultibase"`
@@ -32,18 +39,31 @@ type VerificationMethod struct {
 // vmType must be of type MultiKey, so that the format never changes -
 // even if the underlying key type changes.
 func NewVerificationMethod(
+	// Id of the subject to create a verification method for
 	id string,
+	// Controller of the verification method
 	controller string,
-	publicKeyMultibase string) (VerificationMethod, error) {
+	// The public key of the verification method, encoded in multibase
+	publicKeyMultibase string,
+	// The number of hours the verification method is valid for.
+	ttl time.Duration,
+) (VerificationMethod, error) {
 
 	if !internal.IsValidIPNSName(id) {
 		return VerificationMethod{}, internal.ErrInvalidID
 	}
 
+	created := internal.Now()
+	updated := created
+	expires := updated.Add(ttl)
+
 	return VerificationMethod{
 		ID:                 key.DID_KEY_PREFIX + id + internal.GenerateFragment(),
 		Controller:         controller,
 		Type:               ma.VERIFICATION_METHOD_KEY_TYPE,
+		Created:            internal.TimeIsoString(created),
+		Updated:            internal.TimeIsoString(updated),
+		Expires:            internal.TimeIsoString(expires),
 		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
 }

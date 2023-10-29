@@ -1,6 +1,8 @@
 package ma
 
 import (
+	"time"
+
 	"github.com/multiformats/go-multibase"
 )
 
@@ -36,4 +38,8 @@ const (
 	VERIFICATION_METHOD_KEY_TYPE       = "MultiKey"
 	KEY_AGREEMENT_MULTICODEC_STRING    = "x25519-pub"
 	ASSERTION_METHOD_MULTICODEC_STRING = "ed25519-pub"
+
+	// Timing
+	// Let the keys last a month by default. That gives ample time to rotate keys.
+	VERIFICATION_METHOD_DEFAULT_TTL = time.Duration(30) * time.Hour * 24
 )

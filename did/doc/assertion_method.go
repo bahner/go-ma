@@ -12,7 +12,11 @@ import (
 func (d *Document) AssertionMethodPublicKey() (ed25519.PublicKey, error) {
 
 	// Decode the multibase-encoded public key
-	codec, pubKeyBytes, err := internal.DecodePublicKeyMultibase(d.KeyAgreement.PublicKeyMultibase)
+	vm, err := d.GetVerificationMethodbyID(d.AssertionMethod)
+	if err != nil {
+		return nil, fmt.Errorf("doc/key_agreement_public_key: Error getting verification method by ID: %s", err)
+	}
+	codec, pubKeyBytes, err := internal.DecodePublicKeyMultibase(vm.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("doc/key_agreement_public_key: Error decoding publicKeyMultibase: %s", err)
 	}
