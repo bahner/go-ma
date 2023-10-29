@@ -22,9 +22,14 @@ type DID struct {
 
 // This creates a new DID from a method and an identifier.
 // This is the base function for all the rest.
-func New(identifier string) *DID {
+// The identifier is the IPNS name and the fragment is the key shortname, eg
+// k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#bahner
+func New(identifier string) (*DID, error) {
 
-	id, fragment, _ := parseIdentifier(identifier)
+	id, fragment, err := parseIdentifier(identifier)
+	if err != nil {
+		return &DID{}, fmt.Errorf("did/new: failed to parse identifier: %w", err)
+	}
 
 	return &DID{
 		Scheme:     ma.DID_SCHEME,
@@ -32,11 +37,11 @@ func New(identifier string) *DID {
 		Id:         id,
 		Identifier: identifier,
 		Fragment:   fragment,
-	}
+	}, nil
 }
 
 // If you already have a key, you can use this to create a DID.
-func NewFromIPNSKey(keyName *shell.Key) *DID {
+func NewFromIPNSKey(keyName *shell.Key) (*DID, error) {
 
 	new_id := keyName.Id + "#" + keyName.Name
 
@@ -67,7 +72,7 @@ func Parse(didStr string) (*DID, error) {
 		return &DID{}, fmt.Errorf("invalid DID format, method must be alphanumeric: %s", method)
 	}
 
-	return New(identifier), nil
+	return New(identifier)
 }
 
 func parseIdentifier(identifier string) (string, string, error) {
@@ -87,7 +92,9 @@ func parseIdentifier(identifier string) (string, string, error) {
 		fragment = parts[1]
 	}
 
-	// We could add fragment rules here. They're supposed to be a NanoID.
+	if !internal.IsValidNanoID(fragment) {
+		return "", "", errors.New("invalid DID format, fragment is not a valid fragment")
+	}
 
 	return id, fragment, nil
 }

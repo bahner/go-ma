@@ -6,7 +6,6 @@ import (
 	"github.com/Masterminds/semver"
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/internal"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
@@ -15,12 +14,12 @@ import (
 // It should enable using Message later, if that's a good idea.
 type Message struct {
 	ID           string `json:"id"`
-	MimeType     string `json:"type"`
+	MimeType     string `json:"mime_type"`
 	From         string `json:"from"`
 	To           string `json:"to"`
-	CreatedTime  string `json:"created_time"`
-	ExpiresTime  string `json:"expires_time"`
-	BodyMimeType string `json:"mime_type"`
+	Created      string `json:"created"`
+	Expires      string `json:"expires"`
+	BodyMimeType string `json:"body_mime_type"`
 	Body         string `json:"body"`
 	Version      string `json:"version"`
 	Signature    string `json:"signature"`
@@ -49,8 +48,8 @@ func New(
 		Version:      ma.VERSION,
 		From:         from,
 		To:           to,
-		CreatedTime:  created_time,
-		ExpiresTime:  expires_time,
+		Created:      created_time,
+		Expires:      expires_time,
 		BodyMimeType: mime_type,
 		Body:         body,
 		Signature:    "",
@@ -81,14 +80,6 @@ func (m *Message) Sender() (*did.DID, error) {
 
 func (m *Message) Recipient() (*did.DID, error) {
 	return did.Parse(m.To)
-}
-
-func (m *Message) Created() (time.Time, error) {
-	return internal.CreateTimeFromIsoString(m.CreatedTime)
-}
-
-func (m *Message) Expires() (time.Time, error) {
-	return internal.CreateTimeFromIsoString(m.ExpiresTime)
 }
 
 func (m *Message) SemVersion() (*semver.Version, error) {

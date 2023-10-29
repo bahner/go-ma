@@ -18,7 +18,7 @@ func main() {
 
 	log.SetLevel(log.DebugLevel)
 
-	os.Setenv("IPFS_API_HOST", "localhost:45005")
+	os.Setenv("IPFS_API_SOCKET", "localhost:45005")
 
 	// shell := internal.GetShell()
 

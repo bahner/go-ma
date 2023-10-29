@@ -5,7 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
-	api "github.com/ipfs/go-ipfs-api"
+	shell "github.com/ipfs/go-ipfs-api"
 )
 
 // Publish the document using a named key. The name is the name of the key in the IPFS node.
@@ -17,7 +17,7 @@ import (
 // The function also takes a string, which is the port the IPFS node is listening on.
 // This is because Kubo listens on 5001, but Brave listens on 45005.
 
-func (d *Document) Publish() (*api.PublishResponse, error) {
+func (d *Document) Publish() (*shell.PublishResponse, error) {
 
 	// First we need to publish the document to IPFS and get the cid.
 
@@ -26,7 +26,7 @@ func (d *Document) Publish() (*api.PublishResponse, error) {
 
 	data, err := d.String()
 	if err != nil {
-		return &api.PublishResponse{},
+		return &shell.PublishResponse{},
 			internal.LogError(fmt.Sprintf("doc/publish: failed to marshal document to JSON: %v\n", err))
 	}
 
@@ -35,7 +35,7 @@ func (d *Document) Publish() (*api.PublishResponse, error) {
 	cid, err := internal.IPFSPublishString(data)
 	if err != nil {
 		internal.LogError(fmt.Sprintf("doc: failed to publish document to IPFS: %v\n", err))
-		return &api.PublishResponse{}, err
+		return &shell.PublishResponse{}, err
 	}
 
 	// Lookup short name of the identifier, ie. the fragment
@@ -45,7 +45,7 @@ func (d *Document) Publish() (*api.PublishResponse, error) {
 	// having to change the entity name within a given context.
 	docdid, err := did.Parse(d.ID)
 	if err != nil {
-		return &api.PublishResponse{},
+		return &shell.PublishResponse{},
 			internal.LogError(fmt.Sprintf("doc/publish: failed to parse DID: %v\n", err))
 	}
 

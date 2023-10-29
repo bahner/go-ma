@@ -9,9 +9,12 @@ import (
 	"github.com/bahner/go-ma/internal"
 )
 
+const SIGNATURE_KEY_TYPE = "Ed25519VerificationKey2020"
+
 type SignatureKey struct {
 	DID                string
 	Name               string
+	Type               string
 	PrivKey            *ed25519.PrivateKey
 	PubKey             *ed25519.PublicKey
 	PublicKeyMultibase string
@@ -39,6 +42,7 @@ func GenerateSignatureKey(name string) (SignatureKey, error) {
 	return SignatureKey{
 		DID:                DID_KEY_PREFIX + publicKeyMultibase + "#" + name,
 		Name:               name,
+		Type:               SIGNATURE_KEY_TYPE,
 		PrivKey:            &privKey,
 		PubKey:             &publicKey,
 		PublicKeyMultibase: publicKeyMultibase,
