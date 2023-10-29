@@ -40,8 +40,8 @@ func New(
 	}
 
 	now := time.Now().UTC()
-	created_time := now.Format(time.RFC3339)
-	expires_time := now.Add(MESSAGE_TTL).Format(time.RFC3339)
+	created := now.Format(time.RFC3339)
+	expires := now.Add(MESSAGE_TTL).Format(time.RFC3339)
 
 	return &Message{
 		ID:           id,
@@ -49,8 +49,8 @@ func New(
 		Version:      ma.VERSION,
 		From:         from,
 		To:           to,
-		Created:      created_time,
-		Expires:      expires_time,
+		Created:      created,
+		Expires:      expires,
 		BodyMimeType: mime_type,
 		Body:         body,
 		Signature:    "",

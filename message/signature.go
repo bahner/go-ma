@@ -55,7 +55,7 @@ func (m *Message) Verify() (bool, error) {
 }
 
 func PublicKey(d *did.DID) (crypto.PubKey, error) {
-	pid, err := peer.Decode(d.Id)
+	pid, err := peer.Decode(d.Identifier)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode Peer: %v", err)
 	}

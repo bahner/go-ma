@@ -3,6 +3,7 @@ package entity
 import (
 	"fmt"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/internal"
@@ -29,37 +30,51 @@ type Entity struct {
 
 func New(id *did.DID, controller *did.DID) (*Entity, error) {
 
+	// First of all we must have an IPNS key to publish our DID Document with.
 	ipfsKey, err := internal.IPNSGetOrCreateKey(id.Fragment) // The fragment is the key shortname
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to get or create key in IPFS: %v", err)
 	}
 	log.Debugf("entity: ipfsKey: %v", ipfsKey)
 
+	// Now we can create a new keyset from the IPNS key.
+	// The keyset will contain the IPNS key and keys for signing and encryption.
 	myKeyset, err := key.NewKeysetFromIPFSKey(ipfsKey)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create key from ipnsKey: %s", err)
 	}
 	log.Debugf("entity: myKeyset: %v", myKeyset)
 
+	// Initialize a new DID Document
 	myDoc, err := doc.New(id.String(), id.String())
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create document: %s", err)
 	}
 	log.Debugf("entity: myDoc: %v", myDoc)
 
-	myDoc.KeyAgreement, err = doc.NewVerificationMethod(id.Id, id.Id, myKeyset.EncryptionKey.PublicKeyMultibase)
+	// Add the encryption key to the document,
+	// and set it as the key agreement key.
+	myEncVM, err := doc.NewVerificationMethod(id.Identifier,
+		id.String(),
+		myKeyset.EncryptionKey.PublicKeyMultibase,
+		ma.VERIFICATION_METHOD_DEFAULT_TTL)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create encryption verification method: %s", err)
 	}
+	myDoc.AddVerificationMethod(myEncVM)
+	myDoc.KeyAgreement = myEncVM.ID
 	log.Debugf("entity: myEncVM: %v", myDoc.KeyAgreement)
 
-	myDoc.AssertionMethod, err = doc.NewVerificationMethod(id.Id, id.Id, myKeyset.SigningKey.PublicKeyMultibase)
+	// Add the signing key to the document and set it as the assertion method.
+	mySignVM, err := doc.NewVerificationMethod(id.Identifier, id.String(), myKeyset.SigningKey.PublicKeyMultibase, ma.VERIFICATION_METHOD_DEFAULT_TTL)
 	if err != nil {
-		return nil, fmt.Errorf("entity: failed to create signature verification method: %s", err)
+		return nil, fmt.Errorf("entity: failed to create signing verification method: %s", err)
 	}
+	myDoc.AssertionMethod = mySignVM.ID
 	log.Debugf("entity: mySigVM: %v", myDoc.AssertionMethod)
 
-	myDoc.Sign(myKeyset.SigningKey, myDoc.AssertionMethod)
+	// Finally the document with the signing key.
+	myDoc.Sign(myKeyset.SigningKey, mySignVM)
 
 	return &Entity{
 		DID:    id,

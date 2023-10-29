@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/entity"
 	"github.com/bahner/go-ma/internal"
@@ -78,19 +79,29 @@ func createSubject(name string) (*entity.Entity, error) {
 		return nil, fmt.Errorf("error creating new identity in ma: %v", err)
 	}
 
-	DIDDoc.KeyAgreement, err = doc.NewVerificationMethod(subject.DID.Id, "enc1", subject.Keyset.EncryptionKey.PublicKeyMultibase)
+	encVM, err := doc.NewVerificationMethod(
+		subject.DID.Identifier,
+		subject.DID.String(),
+		subject.Keyset.EncryptionKey.PublicKeyMultibase,
+		ma.VERIFICATION_METHOD_DEFAULT_TTL)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
-	log.Debugf("Added keyAgreement verification method: %s", DIDDoc.KeyAgreement.ID)
+	DIDDoc.KeyAgreement = encVM.ID
+	log.Debugf("Added keyAgreement verification method: %s", DIDDoc.KeyAgreement)
 
-	DIDDoc.AssertionMethod, err = doc.NewVerificationMethod(subject.DID.Id, "sign1", subject.Keyset.SigningKey.PublicKeyMultibase)
+	signvm, err := doc.NewVerificationMethod(
+		subject.DID.Identifier,
+		subject.DID.String(),
+		subject.Keyset.SigningKey.PublicKeyMultibase,
+		ma.VERIFICATION_METHOD_DEFAULT_TTL)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
-	log.Debugf("Created new assertion method: %s", DIDDoc.AssertionMethod.ID)
+	DIDDoc.AssertionMethod = signvm.ID
+	log.Debugf("Created new assertion method: %s", DIDDoc.AssertionMethod)
 
-	err = DIDDoc.Sign(subject.Keyset.SigningKey, DIDDoc.AssertionMethod)
+	err = DIDDoc.Sign(subject.Keyset.SigningKey, signvm)
 	if err != nil {
 		return nil, fmt.Errorf("error signing new identity in ma: %v", err)
 	}
