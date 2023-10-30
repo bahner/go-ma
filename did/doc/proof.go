@@ -29,7 +29,7 @@ func (d *Document) Sign(signKey key.SigningKey, vm VerificationMethod) error {
 		return fmt.Errorf("doc sign: signKey.PublicKeyMultibase != vm.PublicKeyMultibase")
 	}
 
-	multicodecHashed, err := d.MulticodecHashedPayload()
+	multicodecHashed, err := d.PayloadHash()
 	if err != nil {
 		return internal.LogError(fmt.Sprintf("doc sign: Error hashing payload: %s\n", err))
 	}
