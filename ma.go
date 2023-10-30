@@ -1,8 +1,6 @@
 package ma
 
 import (
-	"time"
-
 	"github.com/multiformats/go-multibase"
 )
 
@@ -35,11 +33,8 @@ const (
 	BLAKE3_SUM_SIZE                  = 32 // 256 bits
 
 	// Keytype labels
-	VERIFICATION_METHOD_KEY_TYPE       = "MultiKey"
 	KEY_AGREEMENT_MULTICODEC_STRING    = "x25519-pub"
-	ASSERTION_METHOD_MULTICODEC_STRING = "ed25519-pub"
-
-	// Timing
-	// Let the keys last a month by default. That gives ample time to rotate keys.
-	VERIFICATION_METHOD_DEFAULT_TTL = time.Duration(30) * time.Hour * 24
+	KEY_AGREEMENT_KEY_TYPE             = "X25519KeyAgreementKey2020"
+	VERIFICATION_KEY_MULTICODEC_STRING = "ed25519-pub"
+	VERIFICATION_KEY_TYPE              = "Ed25519VerificationKey2020"
 )

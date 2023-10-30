@@ -140,7 +140,7 @@ func IPNSLookupKeyName(keyName string) (*shell.Key, error) {
 
 	return lookedupKey, fmt.Errorf("ipfs: key %s not found", keyName)
 }
-func IPNSGetOrCreateKey(keyName string) (*shell.Key, error) {
+func GetOrCreateIPNSKey(keyName string) (*shell.Key, error) {
 	once.Do(initializeApi)
 
 	var key *shell.Key

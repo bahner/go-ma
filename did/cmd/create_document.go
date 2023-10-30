@@ -13,7 +13,7 @@ func main() {
 
 	log.SetLevel(log.ErrorLevel)
 
-	ipnsKey, err := internal.IPNSGetOrCreateKey("bahner")
+	ipnsKey, err := internal.GetOrCreateIPNSKey("bahner")
 	if err != nil {
 		fmt.Printf("failed to get or create key in IPFS: %v\n", err)
 	}

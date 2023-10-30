@@ -8,6 +8,7 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
+	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
 type SigningKey struct {
@@ -27,20 +28,31 @@ func (k *SigningKey) Sign(data []byte) ([]byte, error) {
 	return ed25519.Sign(*k.PrivKey, data), nil
 }
 
-func GenerateSigningKey(name string) (SigningKey, error) {
+// Generates a signing key for the given identifier, ie. IPNS name
+func GenerateSigningKey(identifier string) (SigningKey, error) {
+
+	if !internal.IsValidIPNSName(identifier) {
+		return SigningKey{}, fmt.Errorf("key/ed25519: invalid identifier: %s", identifier)
+	}
+
 	publicKey, privKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
 		return SigningKey{}, err
 	}
 
-	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, ma.ASSERTION_METHOD_MULTICODEC_STRING)
+	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, ma.VERIFICATION_KEY_MULTICODEC_STRING)
 	if err != nil {
 		return SigningKey{}, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
 	}
 
+	name, err := nanoid.New()
+	if err != nil {
+		return SigningKey{}, fmt.Errorf("key/ed25519: error generating nanoid: %w", err)
+	}
+
 	return SigningKey{
-		DID:                DID_KEY_PREFIX + publicKeyMultibase + "#" + name,
-		Type:               ma.VERIFICATION_METHOD_KEY_TYPE,
+		DID:                ma.DID_PREFIX + identifier + "#" + name,
+		Type:               ma.VERIFICATION_KEY_TYPE,
 		Name:               name,
 		PrivKey:            &privKey,
 		PubKey:             &publicKey,
