@@ -10,7 +10,7 @@ import (
 
 // VerificationMethod defines the structure of a Verification Method
 type VerificationMethod struct {
-	// The full name of the verification method, eg. did:key:123456789abcdefghi#signature
+	// The full name of the verification method, eg. did:ma:123456789abcdefghi#signature-key-id
 	ID string `json:"id"`
 	// The type of verification method. We only use MultiKey. It's unofficial, but it works.
 	// https://w3c-ccg.github.io/did-method-key/
