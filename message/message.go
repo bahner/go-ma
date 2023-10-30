@@ -14,16 +14,16 @@ import (
 // It should enable using Message later, if that's a good idea.
 type Message struct {
 	_            struct{} `cbor:",toarray"`
-	ID           string   `cbor:"id"`
-	MimeType     string   `cbor:"type"`
-	From         string   `cbor:"from"`
-	To           string   `cbor:"to"`
-	Created      int64    `cbor:"created_time,keyasint64"`
-	Expires      int64    `cbor:"expires_time,keyasint64"`
-	BodyMimeType string   `cbor:"body_mime_type"`
-	Body         string   `cbor:"body"`
-	Version      string   `cbor:"version"`
-	Signature    string   `cbor:"signature"`
+	ID           string   `cbor:"id" json:"id"`
+	MimeType     string   `cbor:"type" json:"type"`
+	From         string   `cbor:"from" json:"from"`
+	To           string   `cbor:"to" json:"to"`
+	Created      int64    `cbor:"created_time,keyasint64" json:"created_time"`
+	Expires      int64    `cbor:"expires_time,keyasint64" json:"expires_time"`
+	BodyMimeType string   `cbor:"body_mime_type" json:"body_mime_type"`
+	Body         string   `cbor:"body" json:"body"`
+	Version      string   `cbor:"version" json:"version"`
+	Signature    string   `cbor:"signature" json:"signature"`
 }
 
 // New creates a new Message instance

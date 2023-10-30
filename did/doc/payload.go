@@ -1,6 +1,7 @@
 package doc
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/bahner/go-ma"
@@ -20,7 +21,7 @@ func Payload(d Document) (Document, error) {
 	return d, nil
 }
 
-// ToJSON converts the DID to JSON format
+// Marshals the payload to CBOR for publication
 func (d *Document) MarshalPayloadToCBOR() ([]byte, error) {
 	p, err := Payload(*d)
 	if err != nil {
@@ -28,6 +29,16 @@ func (d *Document) MarshalPayloadToCBOR() ([]byte, error) {
 	}
 
 	return cbor.Marshal(p)
+}
+
+// Marshals the payload to JSON for inspection.
+func (d *Document) MarshalPayloadToJSON() ([]byte, error) {
+	p, err := Payload(*d)
+	if err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(p)
 }
 
 func (d *Document) PayloadHash() ([]byte, error) {
