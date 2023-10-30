@@ -3,9 +3,9 @@ package message
 import (
 	"time"
 
-	"github.com/Masterminds/semver"
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
+	semver "github.com/blang/semver/v4"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
@@ -91,6 +91,6 @@ func (m *Message) Recipient() (*did.DID, error) {
 	return did.Parse(m.To)
 }
 
-func (m *Message) SemVersion() (*semver.Version, error) {
-	return semver.NewVersion(m.Version)
+func (m *Message) SemVersion() (semver.Version, error) {
+	return semver.Make(m.Version)
 }
