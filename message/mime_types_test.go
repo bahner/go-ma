@@ -23,7 +23,7 @@ func TestMimeTypes(t *testing.T) {
 		"application/vnd.ipld.raw",
 		"application/vnd.ipfs.ipns-record",
 		"application/json",
-		"application/x-ma-message",
+		"application/x-ma-message; version=0.0.1",
 		"text/plain",
 	}
 	types := message.MimeTypes()
@@ -38,7 +38,7 @@ func TestMimeTypeTuples(t *testing.T) {
 		{"ipld", "application/vnd.ipld.raw"},
 		{"ipns-record", "application/vnd.ipfs.ipns-record"},
 		{"json", "application/json"},
-		{"message", "application/x-ma-message"},
+		{"message", "application/x-ma-message; version=0.0.1"},
 		{"text", "text/plain"},
 	}
 	tuples := message.MimeTypeTuples()
@@ -53,7 +53,7 @@ func TestMimeType(t *testing.T) {
 		"ipld":        "application/vnd.ipld.raw",
 		"ipns-record": "application/vnd.ipfs.ipns-record",
 		"json":        "application/json",
-		"message":     "application/x-ma-message",
+		"message":     "application/x-ma-message; version=0.0.1",
 		"text":        "text/plain",
 	}
 
