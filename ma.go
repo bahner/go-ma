@@ -32,9 +32,14 @@ const (
 	BLAKE3_LABEL                     = "ma"
 	BLAKE3_SUM_SIZE                  = 32 // 256 bits
 
-	// Keytype labels
+	// Verification Method types
 	KEY_AGREEMENT_MULTICODEC_STRING    = "x25519-pub"
-	KEY_AGREEMENT_KEY_TYPE             = "X25519KeyAgreementKey2020"
 	VERIFICATION_KEY_MULTICODEC_STRING = "ed25519-pub"
-	VERIFICATION_KEY_TYPE              = "Ed25519VerificationKey2020"
+	// We don't use these, but it's here for reference. If a
+	// more modern suite is created, we should ise them.
+	// These 2 requires SHA-256, but we use blake3.
+	// KEY_AGREEMENT_KEY_TYPE = "X25519KeyAgreementKey2020"
+	// VERIFICATION_KEY_TYPE  = "Ed25519VerificationKey2020"
+	KEY_AGREEMENT_KEY_TYPE = "MultiKey"
+	VERIFICATION_KEY_TYPE  = "MultiKey"
 )
