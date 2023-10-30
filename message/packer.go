@@ -1,6 +1,8 @@
 package message
 
 import (
+	"encoding/json"
+
 	"github.com/bahner/go-ma/internal"
 	cbor "github.com/fxamacker/cbor/v2"
 	"github.com/multiformats/go-multibase"
@@ -9,6 +11,11 @@ import (
 func (m *Message) MarshalToCBOR() ([]byte, error) {
 
 	return cbor.Marshal(m)
+}
+
+func (m *Message) MarshalToJSON() ([]byte, error) {
+
+	return json.Marshal(m)
 }
 
 func (m *Message) Pack() (string, error) {

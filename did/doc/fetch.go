@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
 	cbor "github.com/fxamacker/cbor/v2"
+	"github.com/multiformats/go-multibase"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -42,22 +44,32 @@ func Fetch(identifier string) (*Document, error) {
 
 	// The DIDDocuments aren't supposed to be that big,
 	// so we can read it all into memory.
-	content, err := io.ReadAll(data)
+	encodedContent, err := io.ReadAll(data)
 	if err != nil {
 		return nil, internal.LogError(fmt.Sprintf("doc/fetch: failed to read contents from: %v\n", err))
 	}
-	log.Debugf("doc/fetch: content: %s", content)
+	log.Debugf("doc/fetch: content: %s", encodedContent)
+
+	codec, content, err := multibase.Decode(string(encodedContent))
+	if err != nil {
+		return nil, internal.LogError(fmt.Sprintf("doc/fetch: failed to decode contents from: %v\n", err))
+	}
+
+	if codec != ma.MULTIBASE_ENCODING {
+		return nil, fmt.Errorf("doc/fetch: unsupported codec: %v", codec)
+	}
+
 	// Unmarshal the document
 	err = cbor.Unmarshal(content, document)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("doc/fetch: failed to unmarshal document: %w", err)
 	}
 
-	retrieved_document, err := document.String()
+	retrieved_document, err := document.JSON()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("doc/fetch: failed to fetch JSON version of document: %w", err)
 	}
-	fmt.Printf("Document: %s\n", retrieved_document)
+	log.Debugf("Retrieved document: %s\n", retrieved_document)
 
 	return document, nil
 }

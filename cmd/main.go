@@ -48,16 +48,24 @@ func main() {
 
 	fmt.Println(myMessage)
 
-	letter, err := envelope.Seal(myMessage)
+	msgEnvelope, err := envelope.Seal(myMessage)
 	if err != nil {
 		fmt.Printf("Error creating new envelope: %v\n", err)
 	}
-	messageJSON, err := letter.MarshalToCBOR()
+	messageJSON, err := msgEnvelope.MarshalToJSON()
 	if err != nil {
 		fmt.Printf("Error marshalling message to JSON: %v\n", err)
 	}
 
 	fmt.Println(string(messageJSON))
+
+	letter, err := msgEnvelope.Open(job.Keyset.EncryptionKey.PrivKey)
+	if err != nil {
+		fmt.Printf("Error unsealing envelope: %v\n", err)
+	}
+
+	fmt.Println(letter)
+
 }
 
 func createSubject(name string) (*entity.Entity, error) {
@@ -87,6 +95,10 @@ func createSubject(name string) (*entity.Entity, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
+	err = DIDDoc.AddVerificationMethod(encVM)
+	if err != nil {
+		return nil, fmt.Errorf("error adding new verification method: %v", err)
+	}
 	DIDDoc.KeyAgreement = encVM.ID
 	log.Debugf("Added keyAgreement verification method: %s", DIDDoc.KeyAgreement)
 
@@ -97,6 +109,10 @@ func createSubject(name string) (*entity.Entity, error) {
 		subject.Keyset.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
+	}
+	err = DIDDoc.AddVerificationMethod(signvm)
+	if err != nil {
+		return nil, fmt.Errorf("error adding new verification method: %v", err)
 	}
 	DIDDoc.AssertionMethod = signvm.ID
 	log.Debugf("Created new assertion method: %s", DIDDoc.AssertionMethod)

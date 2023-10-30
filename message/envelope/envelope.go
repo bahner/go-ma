@@ -1,6 +1,7 @@
 package envelope
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/bahner/go-ma/internal"
@@ -27,6 +28,10 @@ func New(encodedCipherText string, encodedEphemeralKey string) (*Envelope, error
 
 func (e *Envelope) MarshalToCBOR() ([]byte, error) {
 	return cbor.Marshal(e)
+}
+
+func (e *Envelope) MarshalToJSON() ([]byte, error) {
+	return json.Marshal(e)
 }
 
 func UnmarshalFromCBOR(data []byte) (*Envelope, error) {
