@@ -1,6 +1,7 @@
 package doc
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/bahner/go-ma/did"
@@ -11,13 +12,13 @@ import (
 
 type Document struct {
 	_                  struct{}             `cbor:",toarray"`
-	Context            []string             `cbor:"@context,toarray"`
-	ID                 string               `cbor:"id"`
-	Controller         []string             `cbor:"controller,omitempty,toarray"`
-	VerificationMethod []VerificationMethod `cbor:"verificationMethod,omitempty,toarray"`
-	AssertionMethod    string               `cbor:"assertionMethod,omitempty"`
-	KeyAgreement       string               `cbor:"keyAgreement,omitempty"`
-	Proof              Proof                `cbor:"proof,omitempty"`
+	Context            []string             `cbor:"@context,toarray" json:"@context"`
+	ID                 string               `cbor:"id" json:"id"`
+	Controller         []string             `cbor:"controller,omitempty,toarray" json:"controller,omitempty"`
+	VerificationMethod []VerificationMethod `cbor:"verificationMethod,omitempty,toarray" json:"verificationMethod,omitempty"`
+	AssertionMethod    string               `cbor:"assertionMethod,omitempty" json:"assertionMethod,omitempty"`
+	KeyAgreement       string               `cbor:"keyAgreement,omitempty" json:"keyAgreement,omitempty"`
+	Proof              Proof                `cbor:"proof,omitempty" json:"proof,omitempty"`
 }
 
 func New(identifier string, controller string) (*Document, error) {
@@ -52,4 +53,13 @@ func (d *Document) String() (string, error) {
 	}
 
 	return doc, nil
+}
+
+func (d *Document) JSON() (string, error) {
+	bytes, err := json.Marshal(d)
+	if err != nil {
+		return "", fmt.Errorf("doc/string: failed to marshal document to JSON: %w", err)
+	}
+
+	return string(bytes), nil
 }

@@ -28,11 +28,11 @@ func main() {
 		fmt.Printf("Error creating new identity in ma: %v\n", err)
 	}
 
-	docstring, err := i.Doc.String()
+	docstring, err := i.Doc.MarshalPayloadToJSON()
 	if err != nil {
 		fmt.Printf("failed to get doc string from document, %v", err)
 	}
 
-	fmt.Println(docstring)
+	fmt.Println(string(docstring))
 
 }
