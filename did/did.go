@@ -58,6 +58,20 @@ func NewFromIdentifier(name string) (*DID, error) {
 	}, nil
 }
 
+func NewFromName(name string) (*DID, error) {
+
+	ipnsKey, err := internal.GetOrCreateIPNSKey(name)
+	if err != nil {
+		return &DID{}, fmt.Errorf("did/new: failed to parse identifier: %w", err)
+	}
+
+	return &DID{
+		Identifier: ipnsKey.Id,
+		Fragment:   name,
+		Name:       ipnsKey.Id + "#" + name,
+	}, nil
+}
+
 // If you already have a key, you can use this to create a DID.
 func NewFromIPNSKey(keyName *shell.Key) (*DID, error) {
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
+	cbor "github.com/fxamacker/cbor/v2"
 	shell "github.com/ipfs/go-ipfs-api"
 )
 
@@ -37,8 +38,35 @@ func NewKeyset(id *did.DID) (Keyset, error) {
 	}, nil
 }
 
-func NewKeysetFromDID(DID *did.DID) (Keyset, error) {
+func (k Keyset) MarshalToCBOR() ([]byte, error) {
+	return cbor.Marshal(k)
+}
 
-	return NewKeyset(DID)
+func UnmarshalKeysetFromCBOR(data []byte) (Keyset, error) {
+	var k Keyset
+	err := cbor.Unmarshal(data, &k)
+	if err != nil {
+		return Keyset{}, fmt.Errorf("keyset/unmarshal: failed to unmarshal keyset: %w", err)
+	}
+	return k, nil
+}
 
+func (k Keyset) Pack() (string, error) {
+
+	data, err := k.MarshalToCBOR()
+	if err != nil {
+		return "", fmt.Errorf("keyset/pack: failed to marshal keyset: %w", err)
+	}
+
+	return internal.MultibaseEncode(data)
+}
+
+func UnpackKeyset(data string) (Keyset, error) {
+
+	decoded, err := internal.MultibaseDecode(data)
+	if err != nil {
+		return Keyset{}, fmt.Errorf("keyset/unpack: failed to decode keyset: %w", err)
+	}
+
+	return UnmarshalKeysetFromCBOR(decoded)
 }
