@@ -22,7 +22,7 @@ type Message struct {
 	Expires      int64    `cbor:"expires_time,keyasint64" json:"expires_time"`
 	BodyMimeType string   `cbor:"body_mime_type" json:"body_mime_type"`
 	Body         string   `cbor:"body" json:"body"`
-	Version      string   `cbor:"version" json:"version"`
+	Version      string   `cbor:"versionId" json:"versionId"`
 	Signature    string   `cbor:"signature" json:"signature"`
 }
 
