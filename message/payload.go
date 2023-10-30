@@ -1,9 +1,8 @@
 package message
 
 import (
-	"encoding/json"
-
 	"github.com/bahner/go-ma/internal"
+	cbor "github.com/fxamacker/cbor/v2"
 )
 
 // Returns a copy of the Message payload
@@ -14,14 +13,14 @@ func Payload(m Message) (Message, error) {
 	return m, nil
 }
 
-func (m *Message) MarshalPayloadToJSON() ([]byte, error) {
+func (m *Message) MarshalPayloadToCBOR() ([]byte, error) {
 
 	payload, err := Payload(*m)
 	if err != nil {
 		return nil, err
 	}
 
-	marshalled_payload, err := json.Marshal(payload)
+	marshalled_payload, err := cbor.Marshal(payload)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +35,7 @@ func (m *Message) MarshalPayloadToJSON() ([]byte, error) {
 // This is what we will sign!
 func (m *Message) PayloadPack() (string, error) {
 
-	marshalled_payload, err := m.MarshalPayloadToJSON()
+	marshalled_payload, err := m.MarshalPayloadToCBOR()
 	if err != nil {
 		return "", err
 	}

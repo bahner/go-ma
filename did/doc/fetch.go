@@ -1,12 +1,12 @@
 package doc
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
+	cbor "github.com/fxamacker/cbor/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -48,7 +48,7 @@ func Fetch(identifier string) (*Document, error) {
 	}
 	log.Debugf("doc/fetch: content: %s", content)
 	// Unmarshal the document
-	err = json.Unmarshal(content, document)
+	err = cbor.Unmarshal(content, document)
 	if err != nil {
 		return nil, err
 	}

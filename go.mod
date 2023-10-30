@@ -4,6 +4,7 @@ go 1.21.3
 
 require (
 	github.com/Masterminds/semver v1.5.0
+	github.com/fxamacker/cbor/v2 v2.5.0
 	github.com/ipfs/boxo v0.13.1
 	github.com/ipfs/go-ipfs-api v0.7.0
 	github.com/libp2p/go-libp2p v0.32.0
@@ -43,6 +44,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/polydawn/refmt v0.89.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
+	github.com/x448/float16 v0.8.4 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect

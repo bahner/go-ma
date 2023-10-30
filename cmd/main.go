@@ -52,7 +52,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error creating new envelope: %v\n", err)
 	}
-	messageJSON, err := letter.MarshalToJSON()
+	messageJSON, err := letter.MarshalToCBOR()
 	if err != nil {
 		fmt.Printf("Error marshalling message to JSON: %v\n", err)
 	}

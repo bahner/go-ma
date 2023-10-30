@@ -1,22 +1,23 @@
 package doc
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
+	cbor "github.com/fxamacker/cbor/v2"
 	log "github.com/sirupsen/logrus"
 )
 
 type Document struct {
-	Context            []string             `json:"@context"`
-	ID                 string               `json:"id"`
-	Controller         []string             `json:"controller"`
-	VerificationMethod []VerificationMethod `json:"verificationMethod"`
-	AssertionMethod    string               `json:"assertionMethod,omitempty"`
-	KeyAgreement       string               `json:"keyAgreement,omitempty"`
-	Proof              Proof                `json:"proof,omitempty"`
+	_                  struct{}             `cbor:",toarray"`
+	Context            []string             `cbor:"@context,toarray"`
+	ID                 string               `cbor:"id"`
+	Controller         []string             `cbor:"controller,omitempty,toarray"`
+	VerificationMethod []VerificationMethod `cbor:"verificationMethod,omitempty,toarray"`
+	AssertionMethod    string               `cbor:"assertionMethod,omitempty"`
+	KeyAgreement       string               `cbor:"keyAgreement,omitempty"`
+	Proof              Proof                `cbor:"proof,omitempty"`
 }
 
 func New(identifier string, controller string) (*Document, error) {
@@ -40,7 +41,7 @@ func New(identifier string, controller string) (*Document, error) {
 }
 
 func (d *Document) String() (string, error) {
-	bytes, err := json.Marshal(d)
+	bytes, err := cbor.Marshal(d)
 	if err != nil {
 		return "", fmt.Errorf("doc/string: failed to marshal document to JSON: %w", err)
 	}
