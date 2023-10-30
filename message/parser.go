@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Masterminds/semver"
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
+	semver "github.com/blang/semver/v4"
 )
 
 // Parses a received message in form of a multibase encoded JSON string
@@ -80,24 +80,24 @@ func (m *Message) VerifyMessageVersion() error {
 		return err
 	}
 
-	supportedSemver, err := semver.NewVersion(ma.VERSION)
+	supportedSemver, err := semver.Make(ma.VERSION)
 	if err != nil {
 		return fmt.Errorf("error parsing version constant: %s", err)
 	}
 
 	// Compare versions
 	// If they are the same, we are good.
-	if messageSemver.Equal(supportedSemver) {
+	if messageSemver.Equals(supportedSemver) {
 		return nil
 	}
 
 	// If they are not the same, we need to check if the message version is greater or less than the supported verion.
 	// For know this is just for informational purposes.
-	if messageSemver.GreaterThan(supportedSemver) {
+	if messageSemver.GT(supportedSemver) {
 		return fmt.Errorf("Message version %s is greater than supported version %s", messageSemver, supportedSemver)
 	}
 
-	if messageSemver.LessThan(supportedSemver) {
+	if messageSemver.LT(supportedSemver) {
 		return fmt.Errorf("Message version %s is less than supported version %s", messageSemver, supportedSemver)
 	}
 
