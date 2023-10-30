@@ -1,20 +1,19 @@
 package message
 
 import (
-	"encoding/json"
-
 	"github.com/bahner/go-ma/internal"
+	cbor "github.com/fxamacker/cbor/v2"
 	"github.com/multiformats/go-multibase"
 )
 
-func (m *Message) MarshalToJSON() ([]byte, error) {
+func (m *Message) MarshalToCBOR() ([]byte, error) {
 
-	return json.Marshal(m)
+	return cbor.Marshal(m)
 }
 
 func (m *Message) Pack() (string, error) {
 
-	data, err := m.MarshalToJSON()
+	data, err := m.MarshalToCBOR()
 	if err != nil {
 		return "", err
 	}
@@ -36,7 +35,7 @@ func Unpack(data string) (*Message, error) {
 		return nil, err
 	}
 
-	err = json.Unmarshal(decoded_data, &p)
+	err = cbor.Unmarshal(decoded_data, &p)
 	if err != nil {
 		return nil, err
 	}

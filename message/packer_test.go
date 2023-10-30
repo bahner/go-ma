@@ -2,19 +2,19 @@ package message_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"testing"
 
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/message"
+	cbor "github.com/fxamacker/cbor/v2"
 )
 
 var input_message = message.ValidExampleMessage()
 
-func TestMarshalToJSON(t *testing.T) {
+func TestMarshalToCBOR(t *testing.T) {
 
-	expected, _ := json.Marshal(input_message)
-	actual, err := input_message.MarshalToJSON()
+	expected, _ := cbor.Marshal(input_message)
+	actual, err := input_message.MarshalToCBOR()
 	if err != nil {
 		t.Fatalf("MarshalToJSON failed: %v", err)
 	}
@@ -26,7 +26,7 @@ func TestMarshalToJSON(t *testing.T) {
 
 func TestPack(t *testing.T) {
 
-	jsonData, _ := input_message.MarshalToJSON()
+	jsonData, _ := input_message.MarshalToCBOR()
 	expected, _ := internal.MultibaseEncode(jsonData) // Assuming `Encode` works correctly
 	actual, err := input_message.Pack()
 	if err != nil {
@@ -47,8 +47,8 @@ func TestUnpack(t *testing.T) {
 		t.Fatalf("Unpack failed: %v", err)
 	}
 
-	expectedJSON, _ := json.Marshal(expected)
-	actualJSON, _ := json.Marshal(actual)
+	expectedJSON, _ := cbor.Marshal(expected)
+	actualJSON, _ := cbor.Marshal(actual)
 
 	if !bytes.Equal(expectedJSON, actualJSON) {
 		t.Errorf("Expected %s, got %s", string(expectedJSON), string(actualJSON))
