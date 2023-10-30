@@ -15,11 +15,12 @@ const (
 )
 
 type Proof struct {
-	Created            string `json:"created"`
-	Type               string `json:"type"`
-	VerificationMethod string `json:"verificationMethod"`
-	ProofPurpose       string `json:"proofPurpose"`
-	ProofValue         string `json:"proofValue"`
+	_                  struct{} `cbor:",toarray"`
+	Created            string   `cbor:"created" json:"created"`
+	Type               string   `cbor:"type" json:"type"`
+	VerificationMethod string   `cbor:"verificationMethod" json:"verificationMethod"`
+	ProofPurpose       string   `cbor:"proofPurpose" json:"proofPurpose"`
+	ProofValue         string   `cbor:"proofValue" json:"proofValue"`
 }
 
 func (d *Document) Sign(signKey key.SigningKey, vm VerificationMethod) error {
@@ -28,7 +29,7 @@ func (d *Document) Sign(signKey key.SigningKey, vm VerificationMethod) error {
 		return fmt.Errorf("doc sign: signKey.PublicKeyMultibase != vm.PublicKeyMultibase")
 	}
 
-	multicodecHashed, err := d.MulticodecHashedPayload()
+	multicodecHashed, err := d.PayloadHash()
 	if err != nil {
 		return internal.LogError(fmt.Sprintf("doc sign: Error hashing payload: %s\n", err))
 	}

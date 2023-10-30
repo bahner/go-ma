@@ -9,7 +9,7 @@ import (
 
 func (d *Document) Verify() error {
 
-	hashed, err := d.MulticodecHashedPayload()
+	hashed, err := d.PayloadHash()
 	if err != nil {
 		return fmt.Errorf("doc/verify: Error hashing payload: %s", err)
 	}

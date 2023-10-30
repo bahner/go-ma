@@ -2,12 +2,12 @@ package message_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"testing"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/message"
+	cbor "github.com/fxamacker/cbor/v2"
 )
 
 // Helper function to create a valid Message instance for testing.
@@ -17,8 +17,8 @@ func validMessageWithSignature() *message.Message {
 		MimeType:  ma.MESSAGE_MIME_TYPE,
 		From:      "did:ma:from",
 		To:        "did:ma:to",
-		Created:   "2023-01-01T01:01:01Z",
-		Expires:   "2023-01-02T01:01:01Z",
+		Created:   1698684192,
+		Expires:   1698687792,
 		Body:      "Hello",
 		Version:   ma.VERSION,
 		Signature: "signature",
@@ -38,16 +38,16 @@ func TestPayload(t *testing.T) {
 	}
 }
 
-func TestMarshalPayloadToJSON(t *testing.T) {
+func TestMarshalPayloadToCBOR(t *testing.T) {
 	msg := validMessageWithSignature()
 
-	jsonData, err := msg.MarshalPayloadToJSON()
+	jsonData, err := msg.MarshalPayloadToCBOR()
 	if err != nil {
 		t.Fatalf("MarshalPayloadToJSON failed: %v", err)
 	}
 
 	payload, _ := message.Payload(*msg)
-	expected, _ := json.Marshal(payload)
+	expected, _ := cbor.Marshal(payload)
 
 	if !bytes.Equal(expected, jsonData) {
 		t.Errorf("Expected %s, got %s", string(expected), string(jsonData))
@@ -62,7 +62,7 @@ func TestPayloadPack(t *testing.T) {
 		t.Fatalf("PayloadPack failed: %v", err)
 	}
 
-	jsonData, _ := msg.MarshalPayloadToJSON()
+	jsonData, _ := msg.MarshalPayloadToCBOR()
 	expected, _ := internal.MultibaseEncode(jsonData) // Assuming `Encode` works correctly
 
 	if PayloadPack != expected {

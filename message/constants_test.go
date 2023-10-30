@@ -1,6 +1,7 @@
 package message_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -13,7 +14,8 @@ func TestConstants(t *testing.T) {
 		t.Errorf("Expected version to be '0.0.1', got %s", ma.VERSION)
 	}
 
-	if ma.MESSAGE_MIME_TYPE != "application/x-ma-message" {
+	expected_message_mime_type := fmt.Sprintf("application/x-ma-message; version=%s", ma.VERSION)
+	if ma.MESSAGE_MIME_TYPE != expected_message_mime_type {
 		t.Errorf("Expected type to be 'ma/message', got %s", ma.MESSAGE_MIME_TYPE)
 	}
 

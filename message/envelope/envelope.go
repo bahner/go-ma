@@ -1,19 +1,19 @@
 package envelope
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/bahner/go-ma/internal"
+	cbor "github.com/fxamacker/cbor/v2"
 )
 
 const MIMEType = "application/x-ma-envelope"
 
 // Bask the encrypted message and the encrypted symmetric key in a JSON envelope.
 type Envelope struct {
-	MIMEType string `json:"mime_type"`
-	Seal     string `json:"seal"`
-	Message  string `json:"message"`
+	MIMEType string `cbor:"mime_type"`
+	Seal     string `cbor:"seal"`
+	Message  string `cbor:"message"`
 }
 
 // Use a pointer here, this might be arbitrarily big.
@@ -25,15 +25,15 @@ func New(encodedCipherText string, encodedEphemeralKey string) (*Envelope, error
 	}, nil
 }
 
-func (e *Envelope) MarshalToJSON() ([]byte, error) {
-	return json.Marshal(e)
+func (e *Envelope) MarshalToCBOR() ([]byte, error) {
+	return cbor.Marshal(e)
 }
 
-func UnmarshalFromJSON(data []byte) (*Envelope, error) {
+func UnmarshalFromCBOR(data []byte) (*Envelope, error) {
 
 	e := &Envelope{}
 
-	err := json.Unmarshal(data, e)
+	err := cbor.Unmarshal(data, e)
 	if err != nil {
 		return nil, internal.LogError(fmt.Sprintf("envelope: error unmarshalling envelope: %s\n", err))
 	}
@@ -42,7 +42,7 @@ func UnmarshalFromJSON(data []byte) (*Envelope, error) {
 }
 
 func (e *Envelope) String() string {
-	data, err := e.MarshalToJSON()
+	data, err := e.MarshalToCBOR()
 	if err != nil {
 		return ""
 	}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
+	cbor "github.com/fxamacker/cbor/v2"
 	"lukechampine.com/blake3"
 )
 
@@ -20,7 +21,17 @@ func Payload(d Document) (Document, error) {
 	return d, nil
 }
 
-// ToJSON converts the DID to JSON format
+// Marshals the payload to CBOR for publication
+func (d *Document) MarshalPayloadToCBOR() ([]byte, error) {
+	p, err := Payload(*d)
+	if err != nil {
+		return nil, err
+	}
+
+	return cbor.Marshal(p)
+}
+
+// Marshals the payload to JSON for inspection.
 func (d *Document) MarshalPayloadToJSON() ([]byte, error) {
 	p, err := Payload(*d)
 	if err != nil {
@@ -30,9 +41,9 @@ func (d *Document) MarshalPayloadToJSON() ([]byte, error) {
 	return json.Marshal(p)
 }
 
-func (d *Document) MulticodecHashedPayload() ([]byte, error) {
+func (d *Document) PayloadHash() ([]byte, error) {
 	// Etxract the payload from the document as a JSON string
-	p, err := d.MarshalPayloadToJSON()
+	p, err := d.MarshalPayloadToCBOR()
 	if err != nil {
 		return nil, fmt.Errorf("doc hashing: Error marshalling payload to JSON: %s", err)
 	}

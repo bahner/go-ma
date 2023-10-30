@@ -3,10 +3,9 @@ package message
 import (
 	"time"
 
-	"github.com/Masterminds/semver"
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/internal"
+	semver "github.com/blang/semver/v4"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
@@ -14,16 +13,17 @@ import (
 // This struct mimicks the Message format, but it's *not* Message.
 // It should enable using Message later, if that's a good idea.
 type Message struct {
-	ID           string `json:"id"`
-	MimeType     string `json:"mime_type"`
-	From         string `json:"from"`
-	To           string `json:"to"`
-	Created      string `json:"created"`
-	Expires      string `json:"expires"`
-	BodyMimeType string `json:"body_mime_type"`
-	Body         string `json:"body"`
-	Version      string `json:"version"`
-	Signature    string `json:"signature"`
+	_            struct{} `cbor:",toarray"`
+	ID           string   `cbor:"id" json:"id"`
+	MimeType     string   `cbor:"type" json:"type"`
+	From         string   `cbor:"from" json:"from"`
+	To           string   `cbor:"to" json:"to"`
+	Created      int64    `cbor:"created_time,keyasint64" json:"created_time"`
+	Expires      int64    `cbor:"expires_time,keyasint64" json:"expires_time"`
+	BodyMimeType string   `cbor:"body_mime_type" json:"body_mime_type"`
+	Body         string   `cbor:"body" json:"body"`
+	Version      string   `cbor:"versionId" json:"versionId"`
+	Signature    string   `cbor:"signature" json:"signature"`
 }
 
 // New creates a new Message instance
@@ -40,8 +40,8 @@ func New(
 	}
 
 	now := time.Now().UTC()
-	created := now.Format(time.RFC3339)
-	expires := now.Add(MESSAGE_TTL).Format(time.RFC3339)
+	created := now.Unix()
+	expires := now.Add(MESSAGE_TTL).Unix()
 
 	return &Message{
 		ID:           id,
@@ -76,11 +76,11 @@ func Signed(
 }
 
 func (m *Message) CreatedTime() (time.Time, error) {
-	return internal.CreateTimeFromIsoString(m.Created)
+	return time.Unix(m.Created, 0), nil
 }
 
 func (m *Message) ExpiresTime() (time.Time, error) {
-	return internal.CreateTimeFromIsoString(m.Expires)
+	return time.Unix(m.Expires, 0), nil
 }
 
 func (m *Message) Sender() (*did.DID, error) {
@@ -91,6 +91,6 @@ func (m *Message) Recipient() (*did.DID, error) {
 	return did.Parse(m.To)
 }
 
-func (m *Message) SemVersion() (*semver.Version, error) {
-	return semver.NewVersion(m.Version)
+func (m *Message) SemVersion() (semver.Version, error) {
+	return semver.Make(m.Version)
 }
