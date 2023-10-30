@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bahner/go-ma"
+	"github.com/multiformats/go-multibase"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/ipfs/boxo/ipns"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/peer"
-	"github.com/mr-tron/base58"
 )
 
 // This key struct is for libp2p keys. These are not meant
@@ -101,7 +102,7 @@ func GenerateEncodedKey() (string, error) {
 func DecodePrivKey(privKey string) (crypto.PrivKey, error) {
 
 	// Decode the secret key
-	decoded, err := base58.Decode(privKey)
+	_, decoded, err := multibase.Decode(privKey)
 	if err != nil {
 		log.Errorf("Failed to decode base58 secret key: %v", err)
 		return nil, err
@@ -120,10 +121,13 @@ func EncodePrivKey(privKey crypto.PrivKey) (string, error) {
 
 	marshalledPrivKey, err := crypto.MarshalPrivateKey(privKey)
 	if err != nil {
-		log.Errorf("Failed to marshal private key: %v", err)
-		return "", err
+		return "", fmt.Errorf("failed to marshal private key: %v", err)
 	}
-	encodedPrivKey := base58.Encode(marshalledPrivKey)
+
+	encodedPrivKey, err := multibase.Encode(ma.MULTIBASE_ENCODING, marshalledPrivKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to encode private key: %v", err)
+	}
 
 	return encodedPrivKey, nil
 }

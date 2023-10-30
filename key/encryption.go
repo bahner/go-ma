@@ -36,7 +36,7 @@ func GenerateEncryptionKey(name string) (EncryptionKey, error) {
 	}
 
 	return EncryptionKey{
-		DID:                DID_KEY_PREFIX + publicKeyMultibase + "#" + name,
+		DID:                ma.DID_PREFIX + publicKeyMultibase + "#" + name,
 		Name:               name,
 		PrivKey:            privKey,
 		PubKey:             pubKey,

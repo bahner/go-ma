@@ -14,18 +14,18 @@ type Keyset struct {
 	SigningKey    SigningKey
 }
 
-func NewKeyset(name string) (Keyset, error) {
-	encryptionKey, err := GenerateEncryptionKey(name)
+func NewKeyset(id *did.DID) (Keyset, error) {
+	encryptionKey, err := GenerateEncryptionKey(id.Identifier)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("keyset/new: failed to generate encryption key: %w", err)
 	}
 
-	signatureKey, err := GenerateSigningKey(name)
+	signatureKey, err := GenerateSigningKey(id.Identifier)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
 	}
 
-	ipfsKey, err := internal.IPNSGetOrCreateKey(name)
+	ipfsKey, err := internal.GetOrCreateIPNSKey(id.Fragment)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
 	}
@@ -39,11 +39,6 @@ func NewKeyset(name string) (Keyset, error) {
 
 func NewKeysetFromDID(DID *did.DID) (Keyset, error) {
 
-	return NewKeyset(DID.Fragment)
+	return NewKeyset(DID)
 
-}
-
-func NewKeysetFromIPFSKey(ipfsKey *shell.Key) (Keyset, error) {
-
-	return NewKeyset(ipfsKey.Name)
 }

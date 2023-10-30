@@ -3,11 +3,9 @@ package doc
 import (
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
-	"github.com/bahner/go-ma/key"
 )
 
 // VerificationMethod defines the structure of a Verification Method
@@ -21,13 +19,6 @@ type VerificationMethod struct {
 	// Should probably always be the DID itself, but maybe the DID controller.
 	Controller string `json:"controller"`
 	// Created is the time the verification method was created
-	Created string `json:"created"`
-	// Updated is the time the verification method was last updated
-	Updated string `json:"updated"`
-	// Expires is the time the verification method expires
-	Expires string `json:"expires"`
-	// The public key of the verification method, encoded in multibase, as
-	// per the did core spec.
 	PublicKeyMultibase string `json:"publicKeyMultibase"`
 }
 
@@ -43,27 +34,20 @@ func NewVerificationMethod(
 	id string,
 	// Controller of the verification method
 	controller string,
+	// The DID suite key type specified in the verification method
+	vmType string,
 	// The public key of the verification method, encoded in multibase
 	publicKeyMultibase string,
-	// The number of hours the verification method is valid for.
-	ttl time.Duration,
 ) (VerificationMethod, error) {
 
 	if !internal.IsValidIPNSName(id) {
 		return VerificationMethod{}, internal.ErrInvalidID
 	}
 
-	created := internal.Now()
-	updated := created
-	expires := updated.Add(ttl)
-
 	return VerificationMethod{
-		ID:                 key.DID_KEY_PREFIX + id + internal.GenerateFragment(),
+		ID:                 ma.DID_PREFIX + id + internal.GenerateFragment(),
 		Controller:         controller,
-		Type:               ma.VERIFICATION_METHOD_KEY_TYPE,
-		Created:            internal.TimeIsoString(created),
-		Updated:            internal.TimeIsoString(updated),
-		Expires:            internal.TimeIsoString(expires),
+		Type:               vmType,
 		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
 }

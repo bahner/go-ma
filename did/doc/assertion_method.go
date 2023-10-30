@@ -21,8 +21,8 @@ func (d *Document) AssertionMethodPublicKey() (ed25519.PublicKey, error) {
 		return nil, fmt.Errorf("doc/key_agreement_public_key: Error decoding publicKeyMultibase: %s", err)
 	}
 
-	if codec != ma.ASSERTION_METHOD_MULTICODEC_STRING {
-		return nil, fmt.Errorf("doc/key_agreement_public_key: codec != %s", ma.ASSERTION_METHOD_MULTICODEC_STRING)
+	if codec != ma.VERIFICATION_KEY_MULTICODEC_STRING {
+		return nil, fmt.Errorf("doc/key_agreement_public_key: codec != %s", ma.VERIFICATION_KEY_MULTICODEC_STRING)
 	}
 
 	// Convert the extracted bytes to a public key

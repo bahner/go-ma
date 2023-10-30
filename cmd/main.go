@@ -64,7 +64,7 @@ func createSubject(name string) (*entity.Entity, error) {
 	// Create a new person, object - an entity
 	// id, _ := nanoid.New()
 
-	ipnsKey, err := internal.IPNSGetOrCreateKey(name)
+	ipnsKey, err := internal.GetOrCreateIPNSKey(name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get or create key in IPFS: %v", err)
 	}
@@ -82,8 +82,8 @@ func createSubject(name string) (*entity.Entity, error) {
 	encVM, err := doc.NewVerificationMethod(
 		subject.DID.Identifier,
 		subject.DID.String(),
-		subject.Keyset.EncryptionKey.PublicKeyMultibase,
-		ma.VERIFICATION_METHOD_DEFAULT_TTL)
+		ma.KEY_AGREEMENT_KEY_TYPE,
+		subject.Keyset.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
@@ -93,8 +93,8 @@ func createSubject(name string) (*entity.Entity, error) {
 	signvm, err := doc.NewVerificationMethod(
 		subject.DID.Identifier,
 		subject.DID.String(),
-		subject.Keyset.SigningKey.PublicKeyMultibase,
-		ma.VERIFICATION_METHOD_DEFAULT_TTL)
+		ma.VERIFICATION_KEY_TYPE,
+		subject.Keyset.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
