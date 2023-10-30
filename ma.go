@@ -19,7 +19,7 @@ const (
 
 	// A MIME type for a message. Just to implement it for future proofing.
 	ENVELOPE_MIME_TYPE = "application/x-ma-envelope"
-	MESSAGE_MIME_TYPE  = "application/x-ma-message+cbor"
+	MESSAGE_MIME_TYPE  = "application/x-ma-message; version=0.0.1"
 
 	// The rendezvous string used for peer discovery in libp2p.
 	RENDEZVOUS = "/ma/" + VERSION

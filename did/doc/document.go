@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
 	cbor "github.com/fxamacker/cbor/v2"
@@ -13,6 +14,7 @@ import (
 type Document struct {
 	_                  struct{}             `cbor:",toarray"`
 	Context            []string             `cbor:"@context,toarray" json:"@context"`
+	Version            string               `cbor:"versionId" json:"versionId"`
 	ID                 string               `cbor:"id" json:"id"`
 	Controller         []string             `cbor:"controller,omitempty,toarray" json:"controller,omitempty"`
 	VerificationMethod []VerificationMethod `cbor:"verificationMethod,omitempty,toarray" json:"verificationMethod,omitempty"`
@@ -34,6 +36,7 @@ func New(identifier string, controller string) (*Document, error) {
 
 	doc := Document{
 		Context:    DID_CONTEXT,
+		Version:    ma.VERSION,
 		ID:         identifier,
 		Controller: ctrller,
 	}
