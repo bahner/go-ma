@@ -30,7 +30,7 @@ func (d *Document) MarshalPayloadToCBOR() ([]byte, error) {
 	return cbor.Marshal(p)
 }
 
-func (d *Document) MulticodecHashedPayload() ([]byte, error) {
+func (d *Document) PayloadHash() ([]byte, error) {
 	// Etxract the payload from the document as a JSON string
 	p, err := d.MarshalPayloadToCBOR()
 	if err != nil {

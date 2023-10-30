@@ -46,7 +46,10 @@ func (d *Document) String() (string, error) {
 		return "", fmt.Errorf("doc/string: failed to marshal document to JSON: %w", err)
 	}
 
-	doc := string(bytes)
+	doc, err := internal.MultibaseEncode(bytes)
+	if err != nil {
+		return "", fmt.Errorf("doc/string: failed to multibase encode document: %w", err)
+	}
 
 	return doc, nil
 }
