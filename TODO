@@ -3,3 +3,11 @@
 ## Create a useful README
 The code is approaching useful state, but needs to have the documentation
 leveraged significantly.
+
+## IPNS/IPLD
+
+See if it makes more sense to post IPLD to IPNS for quicker more direct lookup, eg. foo := get /ipns/k7abcdegd/keyAgreement
+
+## kub/rpc
+
+go-ipfs-api has been archived and needs to be replaced with kubo rpc
