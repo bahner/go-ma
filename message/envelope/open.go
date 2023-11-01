@@ -5,6 +5,7 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/key"
 	"github.com/bahner/go-ma/message"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/chacha20poly1305"
@@ -29,11 +30,11 @@ func (e *Envelope) Open(privKey [32]byte) (*message.Message, error) {
 	}
 	log.Debugf("message_decrypt: shared: %x", shared)
 
-	symmetricKey := internal.GenerateSymmetricKey(shared, ma.BLAKE3_SUM_SIZE)
+	symmetricKey := key.GenerateSymmetricKey(shared, ma.BLAKE3_SUM_SIZE)
 	log.Debugf("message_decrypt: symmetricKey: %x", symmetricKey)
 
 	// Decode the encrypted message from the envelope
-	log.Debugf("message_decrypt: encodedCipherTextWithNoce: %x", e.Message)
+	log.Debugf("message_decrypt: encodedCipherTextWithNonce: %x", e.Message)
 	cipherTextWithNonce, err := internal.MultibaseDecode(e.Message)
 	if err != nil {
 		return nil, fmt.Errorf("message_decrypt: error multibase decoding cipher text: %w", err)

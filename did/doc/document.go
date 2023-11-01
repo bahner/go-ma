@@ -58,11 +58,20 @@ func (d *Document) String() (string, error) {
 	return doc, nil
 }
 
-func (d *Document) JSON() (string, error) {
+func (d *Document) JSON() ([]byte, error) {
 	bytes, err := json.Marshal(d)
 	if err != nil {
-		return "", fmt.Errorf("doc/string: failed to marshal document to JSON: %w", err)
+		return nil, fmt.Errorf("doc/string: failed to marshal document to JSON: %w", err)
 	}
 
-	return string(bytes), nil
+	return bytes, nil
+}
+
+func (d *Document) CBOR() ([]byte, error) {
+	bytes, err := json.Marshal(d)
+	if err != nil {
+		return nil, fmt.Errorf("doc/string: failed to marshal document to JSON: %w", err)
+	}
+
+	return bytes, nil
 }

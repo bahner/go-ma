@@ -7,6 +7,7 @@ import (
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/key"
 	"github.com/bahner/go-ma/message"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/chacha20poly1305"
@@ -52,7 +53,7 @@ func Seal(m *message.Message) (*Envelope, error) {
 	log.Debugf("message_encrypt: shared: %x", shared)
 
 	// Generate a symmetric key from the shared secret using blake3
-	symmetricKey := internal.GenerateSymmetricKey(shared, ma.BLAKE3_SUM_SIZE)
+	symmetricKey := key.GenerateSymmetricKey(shared, ma.BLAKE3_SUM_SIZE)
 	log.Debugf("message_encrypt: symmetricKey: %x", symmetricKey)
 
 	// Encrypt the actual message with ChaCha20-Poly1305

@@ -2,74 +2,29 @@ package doc
 
 import (
 	"fmt"
-	"io"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
-	cbor "github.com/fxamacker/cbor/v2"
-	"github.com/multiformats/go-multibase"
-	log "github.com/sirupsen/logrus"
 )
 
-func Fetch(identifier string) (*Document, error) {
+// Takes a DID and fetches the document from IPFS.
+// Eg. Fetch("did:ma:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#bahner")
+func Fetch(d string) (*Document, error) {
 
 	var document = &Document{}
 	var err error
 
-	// First we need to fetch the document from IPFS.
-	// We need to parse the identifier out of the document.
-	// in order to find the fragment, which *MUST* be the keyname.
-
-	// Lookup short name of the identifier, ie. the fragment
-	// The shortname is given to IPFS to lookup the actual key,
-	// but that is transparent to use.
-	// This gived us the possibility to change the key without
-	// having to change the entity name within a given context.
-	docdid, err := did.Parse(identifier)
+	docdid, err := did.Parse(d)
 	if err != nil {
 		return nil, err
 	}
 
 	shell := internal.GetShell()
 
-	// Fetch the document from IPFS
-	// Start by getting an IO.Reader
-	data, err := shell.Cat("/ipns/" + docdid.Identifier)
+	err = shell.DagGet("/ipns/"+docdid.Identifier, document)
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("doc/fetch: failed to fetch document from IPFS: %v\n", err))
+		return nil, internal.LogError(fmt.Sprintf("doc/fetch: failed to get document from IPFS: %v\n", err))
 	}
-	defer data.Close() // Ensure the reader is closed once done
-	log.Debugf("doc/fetch: data: %v", data)
-
-	// The DIDDocuments aren't supposed to be that big,
-	// so we can read it all into memory.
-	encodedContent, err := io.ReadAll(data)
-	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("doc/fetch: failed to read contents from: %v\n", err))
-	}
-	log.Debugf("doc/fetch: content: %s", encodedContent)
-
-	codec, content, err := multibase.Decode(string(encodedContent))
-	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("doc/fetch: failed to decode contents from: %v\n", err))
-	}
-
-	if codec != ma.MULTIBASE_ENCODING {
-		return nil, fmt.Errorf("doc/fetch: unsupported codec: %v", codec)
-	}
-
-	// Unmarshal the document
-	err = cbor.Unmarshal(content, document)
-	if err != nil {
-		return nil, fmt.Errorf("doc/fetch: failed to unmarshal document: %w", err)
-	}
-
-	retrieved_document, err := document.JSON()
-	if err != nil {
-		return nil, fmt.Errorf("doc/fetch: failed to fetch JSON version of document: %w", err)
-	}
-	log.Debugf("Retrieved document: %s\n", retrieved_document)
 
 	return document, nil
 }

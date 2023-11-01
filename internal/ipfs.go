@@ -56,11 +56,23 @@ func IPFSPublishString(data string) (string, error) {
 	return cid, nil
 }
 
-func IPLDPutDag(data string) (string, error) {
+func IPLDPutJSON(data []byte) (string, error) {
+
+	return IPLDPut(data, "json", "dag-cbor")
+
+}
+
+func IPLDPutCBOR(data []byte) (string, error) {
+
+	return IPLDPut(data, "cbor", "dag-cbor")
+
+}
+
+func IPLDPut(data []byte, input string, output string) (string, error) {
+
 	once.Do(initializeApi)
 
-	// cid, err := ipfsAPI.Add(strings.NewReader(data))
-	cid, err := ipfsAPI.DagPut([]byte(data), "json", "cbor")
+	cid, err := ipfsAPI.DagPut(data, input, output)
 
 	if err != nil {
 		log.Printf("ipld: failed to add data IPLD linked data: %v\n", err)
@@ -68,13 +80,14 @@ func IPLDPutDag(data string) (string, error) {
 	}
 
 	return cid, nil
+
 }
 
-// Now if ever there was a sugar function.
-func IPFSPublishBytes(data []byte) (string, error) {
+// // Now if ever there was a sugar function.
+// func IPFSPublishBytes(data []byte) (string, error) {
 
-	return IPFSPublishString(string(data))
-}
+//		return IPFSPublishString(string(data))
+//	}
 func IPNSPublishCID(contentHash string, key string, resolve bool) (*shell.PublishResponse, error) {
 	once.Do(initializeApi)
 

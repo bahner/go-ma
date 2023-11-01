@@ -1,4 +1,4 @@
-package internal
+package key
 
 import (
 	"github.com/bahner/go-ma"

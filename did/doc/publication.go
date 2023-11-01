@@ -24,7 +24,7 @@ func (d *Document) Publish() (*shell.PublishResponse, error) {
 	// A document is not a DID :-) We need to parse the identifier out of the document.
 	// in order to find the fragment, which *MUST* be the keyname.
 
-	data, err := d.String()
+	data, err := d.JSON()
 	if err != nil {
 		return &shell.PublishResponse{},
 			internal.LogError(fmt.Sprintf("doc/publish: failed to marshal document to JSON: %v\n", err))
@@ -32,7 +32,7 @@ func (d *Document) Publish() (*shell.PublishResponse, error) {
 
 	// Publish the document to IPFS first. We need the CID to publish to IPNS.
 	// So without that we ain't going nowhere.
-	cid, err := internal.IPFSPublishString(data)
+	cid, err := internal.IPLDPutJSON(data)
 	if err != nil {
 		internal.LogError(fmt.Sprintf("doc: failed to publish document to IPFS: %v\n", err))
 		return &shell.PublishResponse{}, err
