@@ -8,7 +8,7 @@ import "github.com/bahner/go-ma"
 // It's really meant for testing, but we might want to use it in other places too.
 const (
 	// This is the packed message. You can generate it using cmd/pack_valid_message.go
-	Message_test_packed_valid_message = "zDrMedu2xgJrJ74Ht9BTscCyRX4wtYq9UjfZbNMK5s3CNiwqHBrWpGMzRBvpVz5AaSYYYWHV1eU3yKQSo7AdXhQgwamttGZorxp3ihXMjW6wzKP3sEzahgb2PfooQJrSQdfQhCKiLUB6kYFxxgxvaWQWsxABtxopz988GQvcxpiRsfAcH6SiydJLtYXbbgAiGnUMaX9pZHve5E6WTVaQKtm9BhkhJKwLE5s8FtTBKQ9WVm6GBRHwboSS8mGdg4aUZxuXmeuJa3KvHD5gw9oA2curF6EKnD3NxHjeWLbTB5rgtZYMfCcTzyUfmARBWBosY4eKDYfuEZKycTNJK8yMrzWb"
+	Message_test_packed_valid_message = "zF4oNn5r5xe8hR5ttaes2sfM6ZD5oZNrhiXMVw3Lty7ZJgYxigKpkqETHx5N4tYUeCjn6RrkHMZfu4uC3GQCXBxzSCdSQpam3QfK3Xdkz6YSUyKd9mqzy87W76Nkce7RTbdMmtw4WdyqMPUPLPtoKKqrpbpvw2GnDoMBytnotDEvNDsP2BS4WU4E5epYj1hZM7Zbns7PV8pbwDtWdToWdHhpMBkbfYowWVtjCkkKeHCqpgoMrD1NEkyd9MBytgpNjwfCHNgFWJzQJZsMwx6LC3G7Wja5B9vgqrfN91PeL5HnPKCzpxeBLSYp3op9jdZJwXjG85b6LL2FZ5RjvUeEWE1iHjQHVEULsL9A2eK"
 )
 
 func ValidExampleMessage() *Message {
@@ -16,8 +16,8 @@ func ValidExampleMessage() *Message {
 	msg := &Message{
 		ID:           "CT6EklGVDpQpaYrth_O80",
 		MimeType:     ma.MESSAGE_MIME_TYPE,
-		From:         "did:ma:k51qzi5uqu5djy7ca9encml5bqicdz47khiww4dvcvso4iqg3z7xy0amwnwcwd",
-		To:           "did:ma:k51qzi5uqu5dk3pkcowsu2jqmnby0ry551xud502v000dzftwf4bj68384j84l",
+		From:         "did:ma:k51qzi5uqu5djy7ca9encml5bqicdz47khiww4dvcvso4iqg3z7xy0amwnwcwd#bahner",
+		To:           "did:ma:k51qzi5uqu5dk3pkcowsu2jqmnby0ry551xud502v000dzftwf4bj68384j84l#job",
 		Created:      1698684192,
 		Expires:      1698687792,
 		BodyMimeType: "text/plain",

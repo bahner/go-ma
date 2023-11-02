@@ -8,7 +8,6 @@ import (
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
 	cbor "github.com/fxamacker/cbor/v2"
-	shell "github.com/ipfs/go-ipfs-api"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -33,7 +32,7 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	// Now we create a keyset for the entity.
 	// The keyset creation will lookup the IPNS key again and also
 	// create keys for signing and encryption.
-	myKeyset, err := key.NewKeyset(id)
+	myKeyset, err := key.NewKeyset(id.Fragment)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create key from ipnsKey: %s", err)
 	}
@@ -51,7 +50,7 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	}, nil
 }
 
-func NewFromKey(ipfsKey *shell.Key, controller *did.DID) (*Entity, error) {
+func NewFromKey(ipfsKey key.IPNSKey, controller *did.DID) (*Entity, error) {
 
 	id, err := did.NewFromIPNSKey(ipfsKey)
 	if err != nil {

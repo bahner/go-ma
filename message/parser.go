@@ -133,11 +133,11 @@ func (m *Message) VerifyActors() error {
 
 	var err error
 
-	_, err = did.Parse(m.From)
+	_, err = did.NewFromDID(m.From)
 	if err != nil {
 		return err
 	}
-	_, err = did.Parse(m.To)
+	_, err = did.NewFromDID(m.To)
 	if err != nil {
 		return err
 	}

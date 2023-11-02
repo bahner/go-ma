@@ -36,7 +36,7 @@ func (m *Message) Sign(privKey crypto.PrivKey) error {
 // Verify verifies the Message's signature
 func (m *Message) Verify() (bool, error) {
 
-	did, err := did.Parse(m.From)
+	did, err := did.NewFromDID(m.From)
 	if err != nil {
 		return false, err
 	}

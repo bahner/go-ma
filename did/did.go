@@ -1,13 +1,12 @@
 package did
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
-	shell "github.com/ipfs/go-ipfs-api"
+	"github.com/bahner/go-ma/key"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/peer"
 	nanoid "github.com/matoous/go-nanoid/v2"
@@ -30,26 +29,35 @@ func New() (*DID, error) {
 		return nil, fmt.Errorf("did/new: error generating nanoid: %w", err)
 	}
 
-	ipnsKey, err := internal.GetOrCreateIPNSKey(name)
+	ipnsKey, err := internal.GetShellKey(name)
 	if err != nil {
 		return nil, fmt.Errorf("did/new: failed to get or create key in IPFS: %w", err)
 	}
 
-	return NewFromIdentifier(ipnsKey.Id + "#" + ipnsKey.Name)
+	return NewFromDID(ma.DID_PREFIX + ipnsKey.Id + "#" + ipnsKey.Name)
 
 }
 
 // This creates a new DID from an identifier.
 // This is the base function for all the rest.
 // The identitifier is the IPNS name and the fragment is the key shortname, eg
-// k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#bahner
-// This implies that you have already created an IPNS key.
-func NewFromIdentifier(name string) (*DID, error) {
+// did:ma:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#bahner
+//
+// Remember that is needs to pre-exist in IPFS or be published to IPFS to be useful.
+func NewFromDID(didStr string) (*DID, error) {
 
-	identifier, fragment, err := parseName(name)
+	// Firstly validate the DID
+	err := ValidateDID(didStr)
 	if err != nil {
-		return &DID{}, fmt.Errorf("did/new: failed to parse identifier: %w", err)
+		return &DID{}, fmt.Errorf("did/new: failed to validate DID: %w", err)
 	}
+
+	// Remove the prefix
+	name := strings.TrimPrefix(didStr, ma.DID_PREFIX)
+
+	// Extract the identifier and fragment
+	identifier := internal.GetIdentifierFromDID(name)
+	fragment := internal.GetFragmentFromDID(name)
 
 	return &DID{
 		Identifier: identifier,
@@ -60,7 +68,7 @@ func NewFromIdentifier(name string) (*DID, error) {
 
 func NewFromName(name string) (*DID, error) {
 
-	ipnsKey, err := internal.GetOrCreateIPNSKey(name)
+	ipnsKey, err := internal.GetShellKey(name)
 	if err != nil {
 		return &DID{}, fmt.Errorf("did/new: failed to parse identifier: %w", err)
 	}
@@ -73,72 +81,21 @@ func NewFromName(name string) (*DID, error) {
 }
 
 // If you already have a key, you can use this to create a DID.
-func NewFromIPNSKey(keyName *shell.Key) (*DID, error) {
+func NewFromIPNSKey(keyName key.IPNSKey) (*DID, error) {
 
-	new_id := keyName.Id + "#" + keyName.Name
+	return NewFromDID(keyName.DID)
 
-	return NewFromIdentifier(new_id)
-
-}
-
-func Parse(didStr string) (*DID, error) {
-
-	// Manually splitting by ":"
-	// net/url doesn't handle this.
-	parts := strings.Split(didStr, ":")
-	if len(parts) < 3 {
-		return &DID{}, errors.New("invalid DID format, missing method or ID")
-	}
-
-	scheme := parts[0]
-	method := parts[1]
-	name := parts[2]
-
-	// Verify scheme
-	if scheme != ma.DID_SCHEME {
-		return &DID{}, fmt.Errorf("invalid DID format, scheme must be %s", ma.DID_SCHEME)
-	}
-
-	// Check the method is alphanumeric and 'ma'
-	if !internal.IsAlnum(method) {
-		return &DID{}, fmt.Errorf("invalid DID format, method must be alphanumeric: %s", method)
-	}
-
-	return NewFromIdentifier(name)
-}
-
-func parseName(identifier string) (string, string, error) {
-	// Check if the identifier contains a fragment
-	parts := strings.Split(identifier, "#")
-	if len(parts) > 2 {
-		return "", "", errors.New("invalid DID format, identifier contains more than one fragment")
-	}
-
-	id := parts[0]
-	if !internal.IsValidMultibase(id) {
-		return "", "", errors.New("invalid DID format, identifier is not a valid multibase string")
-	}
-
-	fragment := ""
-	if len(parts) == 2 {
-		fragment = parts[1]
-	}
-
-	if !internal.IsValidNanoID(fragment) {
-		return "", "", errors.New("invalid DID format, fragment is not a valid fragment")
-	}
-
-	return id, fragment, nil
 }
 
 func (d *DID) String() string {
 
-	return ma.DID_PREFIX + d.Identifier + "#" + d.Fragment
+	return ma.DID_PREFIX + d.Name
 
 }
 
+// ValidateDID checks if the DID is valid.
 func (d *DID) IsValid() bool {
-	_, err := Parse(d.Identifier)
+	err := ValidateDID(d.String())
 	return err == nil
 }
 

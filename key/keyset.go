@@ -15,23 +15,26 @@ type Keyset struct {
 
 // Creates new keyset from a name (typically fragment of a DID)
 func NewKeyset(name string) (Keyset, error) {
-	encryptionKey, err := GenerateEncryptionKey(name)
-	if err != nil {
-		return Keyset{}, fmt.Errorf("keyset/new: failed to generate encryption key: %w", err)
-	}
 
-	signatureKey, err := GenerateSigningKey(name)
-	if err != nil {
-		return Keyset{}, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
-	}
-
-	ipfsKey, err := NewIPNSKey(name)
+	IPNSKey, err := NewIPNSKey(name)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
 	}
 
+	identifier := IPNSKey.Identifier()
+
+	encryptionKey, err := GenerateEncryptionKey(identifier)
+	if err != nil {
+		return Keyset{}, fmt.Errorf("keyset/new: failed to generate encryption key: %w", err)
+	}
+
+	signatureKey, err := GenerateSigningKey(identifier)
+	if err != nil {
+		return Keyset{}, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
+	}
+
 	return Keyset{
-		IPNSKey:       ipfsKey,
+		IPNSKey:       IPNSKey,
 		EncryptionKey: encryptionKey,
 		SigningKey:    signatureKey,
 	}, nil

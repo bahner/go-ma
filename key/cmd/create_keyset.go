@@ -39,6 +39,9 @@ func main() {
 	}
 	fmt.Println(packedKeyset)
 
-	err = keyset.IPNSKey.Publish()
+	err = keyset.IPNSKey.ExportToIPFS(ID.Fragment)
+	if err != nil {
+		panic(err)
+	}
 
 }

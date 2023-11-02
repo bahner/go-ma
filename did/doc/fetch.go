@@ -14,7 +14,7 @@ func Fetch(d string) (*Document, error) {
 	var document = &Document{}
 	var err error
 
-	docdid, err := did.Parse(d)
+	docdid, err := did.NewFromDID(d)
 	if err != nil {
 		return nil, err
 	}

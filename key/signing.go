@@ -13,7 +13,6 @@ import (
 
 type SigningKey struct {
 	DID                string
-	Name               string
 	Type               string
 	PrivKey            *ed25519.PrivateKey
 	PubKey             *ed25519.PublicKey
@@ -53,7 +52,6 @@ func GenerateSigningKey(identifier string) (SigningKey, error) {
 	return SigningKey{
 		DID:                ma.DID_PREFIX + identifier + "#" + name,
 		Type:               ma.VERIFICATION_KEY_TYPE,
-		Name:               name,
 		PrivKey:            &privKey,
 		PubKey:             &publicKey,
 		PublicKeyMultibase: publicKeyMultibase,

@@ -5,7 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/entity"
-	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/key"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -13,10 +13,7 @@ func main() {
 
 	log.SetLevel(log.ErrorLevel)
 
-	ipnsKey, err := internal.GetOrCreateIPNSKey("bahner")
-	if err != nil {
-		fmt.Printf("failed to get or create key in IPFS: %v\n", err)
-	}
+	ipnsKey, err := key.NewIPNSKey("bahner")
 
 	id, err := did.NewFromIPNSKey(ipnsKey)
 	if err != nil {

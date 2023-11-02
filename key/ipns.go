@@ -16,20 +16,16 @@ import (
 	"github.com/libp2p/go-libp2p/core/peer"
 )
 
-// This key struct is for libp2p keys. These are not meant
-// for use in the DID document. As we just use IPNS keys
-// from IPFS identity, these are just for convenience.
-// One could evaluate adding an export of the IPNS key
-// for import into IPFS, but that's deprecated in Kubo.
+// The IPNSKey.ID is the DID of the entity it's used for.
+//
 // This IPNSKey can have it's secret key exported as text
 // for storage on a yellow sticker on your monitor
 // where it belongs.
 type IPNSKey struct {
+	DID            string
 	PrivKey        crypto.PrivKey
 	PublicKey      crypto.PubKey
 	EncodedPrivKey string
-	Id             ipns.Name
-	Name           string
 }
 
 // NewIPNSKey creates a new IPNSKey. It generates a new key pair
@@ -43,25 +39,24 @@ func NewIPNSKey(name string) (IPNSKey, error) {
 
 	privKey, pubKey, err := generateEd25519KeyPair()
 	if err != nil {
-		return IPNSKey{}, err
+		return IPNSKey{}, fmt.Errorf("key/new: failed to generate key pair: %w", err)
 	}
 
 	encodedPrivKey, err := EncodeIPNSPrivKey(privKey)
 	if err != nil {
-		return IPNSKey{}, err
+		return IPNSKey{}, fmt.Errorf("key/new: failed to encode private key: %w", err)
 	}
 
-	ipnsName, err := ipnsNameFromPublicKey(pubKey)
+	DID, err := createDIDFromPublicKeyAndName(pubKey, name)
 	if err != nil {
-		return IPNSKey{}, err
+		return IPNSKey{}, fmt.Errorf("key/new: failed to create ID from public key and name: %w", err)
 	}
 
 	return IPNSKey{
+		DID:            DID,
 		PrivKey:        privKey,
 		PublicKey:      pubKey,
 		EncodedPrivKey: encodedPrivKey,
-		Id:             ipnsName,
-		Name:           name,
 	}, nil
 }
 
@@ -73,17 +68,17 @@ func NewIPNSKeyFromEncodedPrivKey(encodedPrivKey string, name string) (IPNSKey, 
 		return IPNSKey{}, err
 	}
 
-	ipnsName, err := ipnsNameFromPublicKey(pubKey)
+	DID, err := createDIDFromPublicKeyAndName(pubKey, name)
+
 	if err != nil {
-		return IPNSKey{}, err
+		return IPNSKey{}, fmt.Errorf("key/new: failed to create ID from public key and name: %w", err)
 	}
 
 	return IPNSKey{
 		PrivKey:        privKey,
 		PublicKey:      pubKey,
 		EncodedPrivKey: encodedPrivKey,
-		Id:             ipnsName,
-		Name:           name,
+		DID:            DID,
 	}, nil
 }
 
@@ -200,4 +195,23 @@ func (i *IPNSKey) ExportToIPFS(name string) error {
 
 	return nil
 
+}
+
+func createDIDFromPublicKeyAndName(pubKey crypto.PubKey, name string) (string, error) {
+
+	ipnsName, err := ipnsNameFromPublicKey(pubKey)
+	if err != nil {
+		return "", err
+	}
+
+	return ma.DID_PREFIX + ipnsName.String() + "#" + name, nil
+
+}
+
+func (i *IPNSKey) Identifier() string {
+	return internal.GetIdentifierFromDID(i.DID)
+}
+
+func (i *IPNSKey) Fragment() string {
+	return internal.GetFragmentFromDID(i.DID)
 }

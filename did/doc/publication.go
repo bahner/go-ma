@@ -43,7 +43,7 @@ func (d *Document) Publish() (*shell.PublishResponse, error) {
 	// but that is transparent to use.
 	// This gived us the possibility to change the key without
 	// having to change the entity name within a given context.
-	docdid, err := did.Parse(d.ID)
+	docdid, err := did.NewFromDID(d.ID)
 	if err != nil {
 		return &shell.PublishResponse{},
 			internal.LogError(fmt.Sprintf("doc/publish: failed to parse DID: %v\n", err))

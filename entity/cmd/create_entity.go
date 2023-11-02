@@ -28,8 +28,8 @@ func main() {
 		panic(err)
 	}
 
-	// Create a new keyset for the entity
-	keyset, err := key.NewKeyset(ID)
+	// Create a new keyset for the entity from the name (fragment)
+	keyset, err := key.NewKeyset(ID.Fragment)
 	if err != nil {
 		panic(err)
 	}
