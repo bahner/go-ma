@@ -5,7 +5,7 @@ go 1.21.3
 require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/fxamacker/cbor/v2 v2.5.0
-	github.com/ipfs/boxo v0.13.1
+	github.com/ipfs/boxo v0.14.0
 	github.com/ipfs/go-ipfs-api v0.7.0
 	github.com/libp2p/go-libp2p v0.32.0
 	github.com/matoous/go-nanoid/v2 v2.0.0
