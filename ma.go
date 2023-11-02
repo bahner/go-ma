@@ -18,7 +18,7 @@ const (
 	DID_PREFIX = DID_SCHEME + ":" + DID_METHOD + ":"
 
 	// A MIME type for a message. Just to implement it for future proofing.
-	ENVELOPE_MIME_TYPE = "application/x-ma-envelope"
+	ENVELOPE_MIME_TYPE = "application/x-ma-envelope; version=0.0.1"
 	MESSAGE_MIME_TYPE  = "application/x-ma-message; version=0.0.1"
 
 	// The rendezvous string used for peer discovery in libp2p.

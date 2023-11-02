@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
 	cbor "github.com/fxamacker/cbor/v2"
 )
-
-const MIMEType = "application/x-ma-envelope"
 
 // Bask the encrypted message and the encrypted symmetric key in a JSON envelope.
 type Envelope struct {
@@ -20,7 +19,7 @@ type Envelope struct {
 // Use a pointer here, this might be arbitrarily big.
 func New(encodedCipherText string, encodedEphemeralKey string) (*Envelope, error) {
 	return &Envelope{
-		MIMEType: MIMEType,
+		MIMEType: ma.ENVELOPE_MIME_TYPE,
 		Seal:     encodedEphemeralKey,
 		Message:  encodedCipherText,
 	}, nil
