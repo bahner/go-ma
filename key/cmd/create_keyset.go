@@ -28,7 +28,7 @@ func main() {
 	}
 
 	// Create a new keyset for the entity
-	keyset, err := key.NewKeyset(ID)
+	keyset, err := key.NewKeyset(ID.Fragment)
 	if err != nil {
 		panic(err)
 	}
@@ -38,5 +38,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(packedKeyset)
+
+	err = keyset.IPNSKey.Publish()
 
 }
