@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
+	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/key"
 )
 
@@ -27,6 +29,8 @@ func main() {
 		panic(err)
 	}
 
+	myID := ID.String()
+
 	// Create a new keyset for the entity
 	keyset, err := key.NewKeyset(ID.Fragment)
 	if err != nil {
@@ -44,4 +48,19 @@ func main() {
 		panic(err)
 	}
 
+	myDoc, err := doc.New(myID, myID)
+	if err != nil {
+		panic(err)
+	}
+
+	sigVM, err := doc.NewVerificationMethod(myID, myID, ma.KEY_AGREEMENT_KEY_TYPE, keyset.SigningKey.PublicKeyMultibase)
+	if err != nil {
+		panic(err)
+	}
+	err = myDoc.AddVerificationMethod(sigVM)
+	if err != nil {
+		panic(err)
+	}
+
+	myDoc.Publish()
 }

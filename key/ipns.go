@@ -184,11 +184,17 @@ func keyPairFromEncodedPrivkey(encodedPrivKey string) (crypto.PrivKey, crypto.Pu
 // a different name.
 func (i *IPNSKey) ExportToIPFS(name string) error {
 
-	keyReader := bytes.NewReader([]byte(i.EncodedPrivKey))
+	// Marshal the key
+	marshalledKey, err := crypto.MarshalPrivateKey(i.PrivKey)
+	if err != nil {
+		return fmt.Errorf("failed to marshal private key: %v", err)
+	}
+
+	keyReader := bytes.NewReader(marshalledKey)
 
 	// Get the key from IPFS
 	shell := internal.GetShell()
-	err := shell.KeyImport(internal.GetContext(), name, keyReader)
+	err = shell.KeyImport(internal.GetContext(), name, keyReader)
 	if err != nil {
 		return fmt.Errorf("failed to import key: %v", err)
 	}

@@ -3,12 +3,8 @@
 ## Create a useful README
 The code is approaching useful state, but needs to have the documentation
 leveraged significantly.
-
-## IPNS/IPLD
-See if it makes more sense to post IPLD to IPNS for quicker more direct lookup, eg. foo := get /ipns/k7abcdegd/keyAgreement
-Update: You can get the entire document like this an Unmarshal directly back to struct,
-but searching is not easy with go-ipfs-api. This will work better with kub/client/rpc, but that's much more complex.
-KISS for now
+#Keys
+Fix race conditions with keys. In order to create entities the first things is to publish it, before continuing. That means the private key must exist early
 
 ## kub/rpc
 

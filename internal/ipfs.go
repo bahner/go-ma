@@ -164,7 +164,7 @@ func GetShellKey(keyName string) (*shell.Key, error) {
 		return key, nil
 	}
 
-	return ipfsAPI.KeyGen(ctx, keyName)
+	return nil, fmt.Errorf("ipfs: failed to find key %s", keyName)
 }
 
 func GetShell() *shell.Shell {

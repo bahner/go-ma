@@ -29,12 +29,12 @@ func New() (*DID, error) {
 		return nil, fmt.Errorf("did/new: error generating nanoid: %w", err)
 	}
 
-	ipnsKey, err := internal.GetShellKey(name)
+	ipnsKey, err := key.NewIPNSKey(name)
 	if err != nil {
 		return nil, fmt.Errorf("did/new: failed to get or create key in IPFS: %w", err)
 	}
 
-	return NewFromDID(ma.DID_PREFIX + ipnsKey.Id + "#" + ipnsKey.Name)
+	return NewFromDID(ipnsKey.DID)
 
 }
 
@@ -66,17 +66,19 @@ func NewFromDID(didStr string) (*DID, error) {
 	}, nil
 }
 
+// NewFromName creates a new DID from a name, where name is just the fragment.
+// The Identifier will be generated.
 func NewFromName(name string) (*DID, error) {
 
-	ipnsKey, err := internal.GetShellKey(name)
+	ipnsKey, err := key.NewIPNSKey(name)
 	if err != nil {
 		return &DID{}, fmt.Errorf("did/new: failed to parse identifier: %w", err)
 	}
 
 	return &DID{
-		Identifier: ipnsKey.Id,
-		Fragment:   name,
-		Name:       ipnsKey.Id + "#" + name,
+		Identifier: internal.GetIdentifierFromDID(ipnsKey.DID),
+		Fragment:   internal.GetFragmentFromDID(ipnsKey.DID),
+		Name:       ipnsKey.DID,
 	}, nil
 }
 
