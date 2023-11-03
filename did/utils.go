@@ -7,7 +7,7 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
-	"google.golang.org/appengine/log"
+	log "github.com/sirupsen/logrus"
 )
 
 // // Sometimes we just want the identifier, not the whole DID.

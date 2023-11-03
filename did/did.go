@@ -10,6 +10,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/peer"
 	nanoid "github.com/matoous/go-nanoid/v2"
+	log "github.com/sirupsen/logrus"
 )
 
 type DID struct {
@@ -28,11 +29,13 @@ func New() (*DID, error) {
 	if err != nil {
 		return nil, fmt.Errorf("did/new: error generating nanoid: %w", err)
 	}
+	log.Debugf("did/new: name: %s", name)
 
 	ipnsKey, err := key.NewIPNSKey(name)
 	if err != nil {
 		return nil, fmt.Errorf("did/new: failed to get or create key in IPFS: %w", err)
 	}
+	log.Debugf("did/new: ipnsKey.DID: %s", ipnsKey.DID)
 
 	return NewFromDID(ipnsKey.DID)
 
@@ -70,14 +73,21 @@ func NewFromDID(didStr string) (*DID, error) {
 // The Identifier will be generated.
 func NewFromName(name string) (*DID, error) {
 
+	log.Debugf("did/new: name: %s", name)
 	ipnsKey, err := key.NewIPNSKey(name)
 	if err != nil {
 		return &DID{}, fmt.Errorf("did/new: failed to parse identifier: %w", err)
 	}
 
+	identifier := internal.GetIdentifierFromDID(ipnsKey.DID)
+	log.Debugf("did/new: identifier: %s", identifier)
+	fragment := internal.GetFragmentFromDID(ipnsKey.DID)
+	log.Debugf("did/new: fragment: %s", fragment)
+	log.Debugf("did/new: ipnsKey.DID: %s", ipnsKey.DID)
+
 	return &DID{
-		Identifier: internal.GetIdentifierFromDID(ipnsKey.DID),
-		Fragment:   internal.GetFragmentFromDID(ipnsKey.DID),
+		Identifier: identifier,
+		Fragment:   fragment,
 		Name:       ipnsKey.DID,
 	}, nil
 }
@@ -91,7 +101,7 @@ func NewFromIPNSKey(keyName key.IPNSKey) (*DID, error) {
 
 func (d *DID) String() string {
 
-	return ma.DID_PREFIX + d.Name
+	return d.Name
 
 }
 

@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/key"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -19,6 +18,7 @@ func main() {
 	fmt.Fprint(os.Stderr, "******************************************************************\n")
 
 	var name string
+	log.SetLevel(log.ErrorLevel)
 
 	flag.StringVar(&name, "name", "", "Name of the entity to create")
 	flag.Parse()
@@ -26,16 +26,19 @@ func main() {
 	// Create a new person, object - an entity
 	ID, err := did.NewFromName(name)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error creating new DID: %v", err)
 	}
+	log.Debugf("main: ID: %v", ID)
 
 	myID := ID.String()
+	log.Debugf("main: myID: %s", myID)
 
 	// Create a new keyset for the entity
 	keyset, err := key.NewKeyset(ID.Fragment)
 	if err != nil {
 		panic(err)
 	}
+	log.Debugf("main: keyset: %v", keyset)
 
 	packedKeyset, err := keyset.Pack()
 	if err != nil {
@@ -47,20 +50,4 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	myDoc, err := doc.New(myID, myID)
-	if err != nil {
-		panic(err)
-	}
-
-	sigVM, err := doc.NewVerificationMethod(myID, myID, ma.KEY_AGREEMENT_KEY_TYPE, keyset.SigningKey.PublicKeyMultibase)
-	if err != nil {
-		panic(err)
-	}
-	err = myDoc.AddVerificationMethod(sigVM)
-	if err != nil {
-		panic(err)
-	}
-
-	myDoc.Publish()
 }

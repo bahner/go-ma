@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma"
+	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
 )
 
@@ -41,12 +42,14 @@ func NewVerificationMethod(
 	publicKeyMultibase string,
 ) (VerificationMethod, error) {
 
-	if !internal.IsValidIPNSName(id) {
+	if !did.IsValidDID(id) {
 		return VerificationMethod{}, internal.ErrInvalidID
 	}
 
+	identifier := internal.GetIdentifierFromDID(id)
+
 	return VerificationMethod{
-		ID:                 ma.DID_PREFIX + id + internal.GenerateFragment(),
+		ID:                 ma.DID_PREFIX + identifier + internal.GenerateFragment(),
 		Controller:         controller,
 		Type:               vmType,
 		PublicKeyMultibase: publicKeyMultibase,
