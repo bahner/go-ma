@@ -1,12 +1,12 @@
 package message
 
 import (
+	"crypto/ed25519"
 	"time"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	semver "github.com/blang/semver/v4"
-	"github.com/libp2p/go-libp2p/core/crypto"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
@@ -62,7 +62,7 @@ func Signed(
 	to string,
 	body string,
 	mime_type string,
-	priv_key crypto.PrivKey) (*Message, error) {
+	priv_key ed25519.PrivateKey) (*Message, error) {
 
 	msg, err := New(from, to, body, mime_type)
 	if err != nil {

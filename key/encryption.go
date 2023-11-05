@@ -18,7 +18,7 @@ type EncryptionKey struct {
 	PublicKeyMultibase string
 }
 
-func GenerateEncryptionKey(identifier string) (EncryptionKey, error) {
+func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 
 	if !internal.IsValidIPNSName(identifier) {
 		return EncryptionKey{}, fmt.Errorf("key/encryption: invalid identifier: %s", identifier)

@@ -1,15 +1,16 @@
 package message
 
 import (
+	"crypto/ed25519"
+	"crypto/rand"
 	"fmt"
 
 	"github.com/bahner/go-ma/did"
+	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/internal"
-	"github.com/libp2p/go-libp2p/core/crypto"
-	"github.com/libp2p/go-libp2p/core/peer"
 )
 
-func (m *Message) Sign(privKey crypto.PrivKey) error {
+func (m *Message) Sign(privKey ed25519.PrivateKey) error {
 
 	data_to_sign, err := m.PayloadPack()
 	if err != nil {
@@ -18,7 +19,7 @@ func (m *Message) Sign(privKey crypto.PrivKey) error {
 
 	bytes_to_sign := []byte(data_to_sign)
 
-	sig, err := privKey.Sign(bytes_to_sign)
+	sig, err := privKey.Sign(rand.Reader, bytes_to_sign, nil)
 	if err != nil {
 		return fmt.Errorf("failed to sign Message: %v", err)
 	}
@@ -38,28 +39,23 @@ func (m *Message) Verify() (bool, error) {
 
 	did, err := did.NewFromDID(m.From)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("message/verify: failed to create did from From: %v", err)
 	}
 
-	publicKey, err := did.PublicKey()
+	senderDoc, err := doc.Fetch(did.Name)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("message/verify: failed to fetch sender document")
+	}
+
+	signingKey, err := senderDoc.AssertionMethodPublicKey()
+	if err != nil {
+		return false, fmt.Errorf("message/verify: failed to get signing key: %v", err)
 	}
 
 	payload, err := m.PayloadPack()
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("message/verify: failed to pack payload: %v", err)
 	}
 
-	return publicKey.Verify([]byte(payload), []byte(m.Signature))
-}
-
-func PublicKey(d *did.DID) (crypto.PubKey, error) {
-	pid, err := peer.Decode(d.Identifier)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode Peer: %v", err)
-	}
-
-	return pid.ExtractPublicKey()
-
+	return ed25519.Verify(signingKey, []byte(payload), []byte(m.Signature)), nil
 }

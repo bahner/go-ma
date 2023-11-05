@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/key"
+	keyset "github.com/bahner/go-ma/key/set"
 )
 
-func NewFromKeyset(keyset key.Keyset) (*Entity, error) {
+func NewFromKeyset(keyset keyset.Keyset) (*Entity, error) {
 
 	id, err := did.NewFromIPNSKey(keyset.IPNSKey)
 	if err != nil {
@@ -28,7 +28,7 @@ func NewFromKeyset(keyset key.Keyset) (*Entity, error) {
 
 func NewFromPackedKeyset(data string) (*Entity, error) {
 
-	keyset, err := key.UnpackKeyset(data)
+	keyset, err := keyset.Unpack(data)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to unpack keyset: %s", err)
 	}

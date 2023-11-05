@@ -7,8 +7,7 @@ import (
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/entity"
-	"github.com/bahner/go-ma/message"
-	"github.com/bahner/go-ma/message/envelope"
+	keyset "github.com/bahner/go-ma/key/set"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -16,58 +15,76 @@ import (
 
 func main() {
 
-	bahnerKeyset := "z3FZbnDdLWN9fJvc6Cgce2D9P3nTdnLJzu7AudrZN1DFfjzXVvRUfURiHAhfGW7Ee46G93cUe3zF7yaT8hmJbuaRVdWZhgGtHchuUQs25MjhgcfDBqURwiABbVf6ETTn6PbcZyTUkMitvzQQbDuJrbVN8vkWkqp7EVtiJMEpSdifSvNJ3X6LTw7N1aWXf9dRaeBvDUtmSk6WxJRpSNiUWsW3xnZFwXdkq6hBNxeRJSA2GAd81m9SFBgy3A1qzZ9RGZvnUGgX9JUxc9UcNyBasU5tcXH7HCUS8aXXN33CpCsEi9aUwTMuyTq8fchUpAWQWsDHhgi54YWZAkfpSY7Lei3qc4cyoLm1mDc5yPrEEawFe8GA3XjCxCm6iAbbVhQvXdQzDP95VLa7Jze3rYNJJxYc6TCDY8bei6wXtu9wycSL57arnTE7zEwE4QT7rpWAqEz25ymtVhbDLABrq16byrWta9Y2MsR4BfVTfEHR7S32k7ZFvRM4f3DLp2wfwutUz7bxLRrTFzQs8Rkmvgys1VvzSBygUUmh3mKvaPikifiAq9aqBYgcTWC8UxosMgWm59NwwYoFhQ9GuCeySS6fvrsiiTxUoiypiAWi2gLdCfUGsjUyk7rK6ZsiKxQeqN65LJfQMUbYv1a2c65wUd3TYH2jXkHXbfTMpstTdTugFmf8m5JdL8HNZY7xVrVagZLbrAPTHW1uD3WgF2cdjGq9QwvHaa6TkW1DexWdC6AZ9YwCPCnRzijcg3UigdTm5ngNj2YEFerjYNkCKyhpJSpwjfJLFvDCMrUUVASiJEqQ5rWRL1jXVMWgFKygcKe6FQDMqeRnZbm95aWz2meLTuNtnU28KtRYfeLMQdKHBizpoweGGp7dSsqQsNXSehZ5PcV71p4Yhp2Qn7Rm4c9FU248ZrsGeVUxf1sChb6bQuLXbzdAirD9gMwGevT3wmS4zwgo7x5zYDezDfUFd9GsdgxxbuzvyUxAeQV6igL9MHDnQzY1XvogteZ1YGF7AzabV6j1fUZz96H54bhvozmv5yD4p3fDersgFcxYxsRTs7gucJwzkCq"
-	jobKeyset := "z2X4qaUJR6muxsSVZZ5x4jk55PBGdocTLtuGGEQpybHzv1qGwWrdFzPXkg3ZJgHiYXqLjWU7Qdhbea44jC6jxM8TaZXpTzet64wLd2jegUutS4mmAAMGp2uP6nsP8EEZ83CZ46BZyLHdp1UgpXA8cy1Uf5U1Hy7VGSANSVfLmxZYpEXpxSeGKzn2M2zJ7q7tSzVA6kUqZaGdQJngwse97Py9Y2K6j35BWYeuK2CrsUG6Q1ckmJc23gZaZu87ri8anMYvDDXbs4jo1JWwrCZkqBXo2dmCy2utCmPhTnhpYwt3GeTNq9g96sk7LGWNJJFMR7mcwAviq3SvB7KLpcdfMPfLtkufRSbSJGj6NdvNNcSZ1mtPsW2vvAsbMx1GFiKzWnNcM8sv8VH1GTsf2A3zRoAxehCc1j1MkHSBjckpAWYDq1LbJ48ZRwJAsBpaMYiJJDQ4ur7pASzqTaH6mFRL9SAMiRQpWk2KtyzT6C5YcyGFQCTnHCNyjWL9EcHLZ5N1G4e34ZUNLEnGbfea8GWFb1hFe9fqEi9aXdHbQpVtXt2czE3iaNi3ZYGCxxLxx2RMkJFkFTHybJ1vaRjbcwW3PSLraETjupCSu4BVVxY5xtQJ6AiVxdgyNU8YLwPqzFQ6tLzNXjvQzwqvzeyky8N38V7Cz6KVpPsp1z5TB5MJXouPNq9QWGuWo5xE4JNNNtboJz2f4e6F46kptgzDfdaiXVwgNfMQBedHskxEZguR5F2WhrvhtZyXU7LwNSMwFe1aEDrRwoX7Z7CRsd4aeLE2KnuAAASmP3gBEAiP9kskaWeFYz5Mu4fNXYA8X2iRdpSy9nYDP53YdTnaMWUKaYZ6cLeJFy1qNuiNuTDGbwpbAyiEziwvBzSLJY7RqSDpwnR5EJVpxLxBK7BqBcAjUgP7TxR5Pk4k2w7JYofBZrHa69WLtFbKZBnk5SSnFRJ2T8D6gdFzYcGkuKpgdWAWJqjLtFc588hzMQhRb2fLaQSp9QF7CKG2vTJXip476DPQyCN12wYu9wwDNk4AvNzf9KxcDUsZhw2KLrQ8WQq7fYe4vFB"
+	// bahnerKeyset := "z4zt5ELTEWA2DthCxJ4FNiwdeXwtQdJRKLyBmeDcNYMpzPW4K66Dn1NZR2atpAdMUyUkxebKSodEozCJPo9jqw4xJpXtCusvLZS3QtJN3nsa74fPXpygjh37GqFMdhv7ba7BwJE9eZKutTy5UABcrj3t7UFpiKNh9pn6Xhov7tpebSTF3z8C2VNRUeyLfFvMmy1Dq2TfdqBC3WNWXcLuSmirut8gdkSQMwYaXgKkY6dExgFfRXghsqL8V2uETPcmiezQT9EitqRL1yNMKCkxUBGVzCxT1zsBhLNzFgw8PrX8xRBC9RxKnm56UZyPnJ7EEBiQQHNMqzHCobVQajLNx5Cm8Q3w84PRyRqsoY2S15cKofMZqFDk21KpWiD5WzPSPRxcE9ELddqMbjg4H1NhJofr2yn6hRfmik4MgENYb3GqhXb5UFG94wfZAxuefacMrisTPrUsfkdYFBVGpBFpEZR3oZT31J61nyRbPXQd7pnruTyZnKb71Umes7ZY1y4oZH2PTGiAK1ghmUzFv2yxg4sppVrLqY56AajRiT3yFKVfHk1R6MrdG9mgbbfk37UwqTmbmzpAdRbQRgWpYghEoN6Ko5fMKMxg6cf7bTKgndEhsj2zirZBTokMEgSD7hoqirJpAvirE98ERRcLJ1ZL2pGLGCeSWPJotfMEnLKd8jEJ7x9RmruCyrVpi87CFUmSUn5Nv8MfH5sxZLacGKXAGEGwZYJyAYM3tNfDf3oEfQ14nqXLN32TkkU5bf6Ma8PwdP9LGGxMTeBjcExzVXU3q981gGn38gZ3h4DtRm9mhPLpxUv3EbepFzxAxswtVkqVf22UUkgYhwzGmjMKGTMcdAB5S8DAVj5VyVpLv6XQ54LiABF1cvYjKNMiwytxVw7jj2MUgKwwuiFAGLKrUaQCLHGrYzBQSgf2ZjATQCbPChDCPJP7Hxc3pkt7KQ6QAwgCooLZHiKPEUgD5mSHrxDNxCvNv23SKvEnnudnimyLa7NYpSVfFo4ff6pv9puqxyG4qVEzhiku4pfaHCcnnnUR98Ni5BKEp1XdVtERt6ALy5RqULhxSg2oVeo4QDzGdezYhjNCmaFoY1bZDhyun"
+	// jobKeyset := "z3hQcSxxrHPZSLq8okEmDfahHtVGFTd2d9eADfyPxoGBBDdhg4fWvaKksPkyFJwSVfRorPZz3ZPt5gvzKBeUVetjgoG2Hdv2FgeW19aQqQUoDsxZhqyAU6QmNw8f422GAwFJxKchQubLYSJiQxw6gyEMkdEwp16ZYhZS8bT82jufpWDmZWtWDXgUD9h9jwubec3ZNPk3H9Pvw4NQ7VRMZz4mLq6xAYoVkKWGDEzPfgv6pHTNQSbW8MW3uRhmGX9rRiWo3X1FA2kWYN4a3UnMXMQSYQXVFAve16aGWF7WYRnKcAXhFnA5JkvCciapyn44dgQz6GxoMBGHnHxsYuA6NoLDg3pcCdXNMzzsqAvX7g3FKks7YTSUNX4dExjTjZBbxsV7Wiuu9rB2B78fDhRd25cWMUFRhakQyLxmSfRiXK4qJJCrWR8to9DwJXbstimUK4j3BbWaAzywqKw8L2AwuYnMcsSvrywSMiveXQnmUhhzcgnLT9WwDgsLbj5sRQw1keUMAJbRooHQuVM3JamrePDc5wD48Bcg6DSLEvLK2rNanbKi7gtA23eJ6MSzNpE1qHAffLzfZ9spj2ec35BoCsq417CopqTAdVrvm4nfAR9XJEwSToM1UYNV9t7HtCfidxCnspJ6f1R332JmQE1mWrwXggk4ARhPG9CZoWvyPmNrTwVkdi8eHhsK226msXt4P9XjbNvTvh2cnghNYLdLYHRKWdoMxdsUadB1WtBXzUyq2QDG76vzUmKaips8L6p2SwiMKxjZAy5GAWSp6tbxBEqd2dKJjZgE6YKMrYvBpQUn3dB7FkYVXaFCL46dmCV23WAPb2j1uU6wAAQyTByP2JmXpKge4ARKmmfzo63jWE8mSbLE3Ehpzq16AeRSyDmi3P8scPWwrdunbob1G2P3HyqYCDVNnvqF71fxhEUeumQtefqVaKxR27KVsUwzjpxG9KPvnR4aT4zWzzDAXvexL8vPtcGYBP5LT5WYsKmbe3C7QFxZn5C65CzVxKRUMC6HzYXNpbW5efLURJHqtsy8wLozS8GPzCtMcTDaBMw81jP2wy1vTbtxPQmRxS6w47KPYctcNzJyxUpB3"
 	log.SetLevel(log.DebugLevel)
 
 	os.Setenv("IPFS_API_SOCKET", "localhost:45005")
 
-	// shell := internal.GetShell()
+	bahner, err := keyset.New("bahner")
+	if err != nil {
+		fmt.Printf("error creating new keyset: %v\n", err)
+	}
 
-	// Create a new person, object - an entity
-	// id, _ := nanoid.New()
-	bahner, err := entity.NewFromPackedKeyset(bahnerKeyset)
+	bahnerPacked, err := bahner.Pack()
+	if err != nil {
+		fmt.Printf("error packing keyset: %v\n", err)
+	}
+	fmt.Println(bahnerPacked)
+
+	foo, err := keyset.Unpack(bahnerPacked)
+	if err != nil {
+		fmt.Printf("error unpacking keyset: %v\n", err)
+	}
+
+	fmt.Println(foo.IPNSKey.DID)
+
+	// // shell := internal.GetShell()
+
+	// // Create a new person, object - an entity
+	// // id, _ := nanoid.New()
+	// // bahner, err := entity.NewFromPackedKeyset(bahnerKeyset)
 	// bahner, err := createSubjectFromPackedKeyset(bahnerKeyset)
-	if err != nil {
-		fmt.Printf("Error creating new identity in ma: %v\n", err)
-	}
-	job, err := entity.NewFromPackedKeyset(jobKeyset)
+	// if err != nil {
+	// 	fmt.Printf("Error creating new identity in ma: %v\n", err)
+	// }
+	// // job, err := entity.NewFromPackedKeyset(jobKeyset)
 	// job, err := createSubjectFromPackedKeyset(jobKeyset)
-	if err != nil {
-		fmt.Printf("Error creating new identity in ma: %v\n", err)
-	}
+	// if err != nil {
+	// 	fmt.Printf("Error creating new identity in ma: %v\n", err)
+	// }
 
-	msgBody := "Share and enjoy!"
-	msgMimeType := "text/plain"
+	// msgBody := "Share and enjoy!"
+	// msgMimeType := "text/plain"
 
-	myMessage, err := message.New(
-		bahner.DID.String(),
-		job.DID.String(),
-		msgBody,
-		msgMimeType)
-	if err != nil {
-		fmt.Printf("Error creating new message: %v\n", err)
-	}
+	// myMessage, err := message.New(
+	// 	bahner.DID.String(),
+	// 	job.DID.String(),
+	// 	msgBody,
+	// 	msgMimeType)
+	// if err != nil {
+	// 	fmt.Printf("Error creating new message: %v\n", err)
+	// }
 
-	fmt.Println(myMessage)
+	// fmt.Println(myMessage)
 
-	msgEnvelope, err := envelope.Seal(myMessage)
-	if err != nil {
-		fmt.Printf("Error creating new envelope: %v\n", err)
-	}
-	messageJSON, err := msgEnvelope.MarshalToJSON()
-	if err != nil {
-		fmt.Printf("Error marshalling message to JSON: %v\n", err)
-	}
+	// msgEnvelope, err := envelope.Seal(myMessage)
+	// if err != nil {
+	// 	fmt.Printf("Error creating new envelope: %v\n", err)
+	// }
+	// messageJSON, err := msgEnvelope.MarshalToJSON()
+	// if err != nil {
+	// 	fmt.Printf("Error marshalling message to JSON: %v\n", err)
+	// }
 
-	fmt.Println(string(messageJSON))
+	// fmt.Println(string(messageJSON))
 
-	letter, err := msgEnvelope.Open(job.Keyset.EncryptionKey.PrivKey)
-	if err != nil {
-		fmt.Printf("Error unsealing envelope: %v\n", err)
-	}
+	// letter, err := msgEnvelope.Open(job.Keyset.EncryptionKey.PrivKey)
+	// if err != nil {
+	// 	fmt.Printf("Error unsealing envelope: %v\n", err)
+	// }
 
-	fmt.Println(letter)
+	// fmt.Println(letter)
 
 }
 

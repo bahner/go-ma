@@ -5,7 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/entity"
-	"github.com/bahner/go-ma/key"
+	ipnskey "github.com/bahner/go-ma/key/ipns"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -13,7 +13,7 @@ func main() {
 
 	log.SetLevel(log.ErrorLevel)
 
-	ipnsKey, err := key.NewIPNSKey("bahner")
+	ipnsKey, err := ipnskey.New("bahner")
 
 	id, err := did.NewFromIPNSKey(ipnsKey)
 	if err != nil {

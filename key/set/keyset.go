@@ -1,34 +1,36 @@
-package key
+package set
 
 import (
 	"fmt"
 
 	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/key"
+	ipnskey "github.com/bahner/go-ma/key/ipns"
 	cbor "github.com/fxamacker/cbor/v2"
 )
 
 type Keyset struct {
-	IPNSKey       IPNSKey
-	EncryptionKey EncryptionKey
-	SigningKey    SigningKey
+	IPNSKey       ipnskey.Key
+	EncryptionKey key.EncryptionKey
+	SigningKey    key.SigningKey
 }
 
 // Creates new keyset from a name (typically fragment of a DID)
-func NewKeyset(name string) (Keyset, error) {
+func New(name string) (Keyset, error) {
 
-	IPNSKey, err := NewIPNSKey(name)
+	IPNSKey, err := ipnskey.New(name)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
 	}
 
-	identifier := IPNSKey.Identifier()
+	identifier := internal.GetIdentifierFromDID(IPNSKey.DID)
 
-	encryptionKey, err := GenerateEncryptionKey(identifier)
+	encryptionKey, err := key.NewEncryptionKey(identifier)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("keyset/new: failed to generate encryption key: %w", err)
 	}
 
-	signatureKey, err := GenerateSigningKey(identifier)
+	signatureKey, err := key.NewSigningKey(identifier)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
 	}
@@ -44,7 +46,7 @@ func (k Keyset) MarshalToCBOR() ([]byte, error) {
 	return cbor.Marshal(k)
 }
 
-func UnmarshalKeysetFromCBOR(data []byte) (Keyset, error) {
+func UnmarshalFromCBOR(data []byte) (Keyset, error) {
 	var k Keyset
 	err := cbor.Unmarshal(data, &k)
 	if err != nil {
@@ -63,12 +65,12 @@ func (k Keyset) Pack() (string, error) {
 	return internal.MultibaseEncode(data)
 }
 
-func UnpackKeyset(data string) (Keyset, error) {
+func Unpack(data string) (Keyset, error) {
 
 	decoded, err := internal.MultibaseDecode(data)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("keyset/unpack: failed to decode keyset: %w", err)
 	}
 
-	return UnmarshalKeysetFromCBOR(decoded)
+	return UnmarshalFromCBOR(decoded)
 }

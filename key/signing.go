@@ -1,10 +1,10 @@
 package key
 
 import (
-	"crypto/rand"
 	"fmt"
 
 	"crypto/ed25519"
+	"crypto/rand"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
@@ -28,7 +28,7 @@ func (k *SigningKey) Sign(data []byte) ([]byte, error) {
 }
 
 // Generates a signing key for the given identifier, ie. IPNS name
-func GenerateSigningKey(identifier string) (SigningKey, error) {
+func NewSigningKey(identifier string) (SigningKey, error) {
 
 	if !internal.IsValidIPNSName(identifier) {
 		return SigningKey{}, fmt.Errorf("key/ed25519: invalid identifier: %s", identifier)
@@ -36,7 +36,7 @@ func GenerateSigningKey(identifier string) (SigningKey, error) {
 
 	publicKey, privKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
-		return SigningKey{}, err
+		return SigningKey{}, fmt.Errorf("key/signing: error generating key pair: %w", err)
 	}
 
 	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, ma.VERIFICATION_KEY_MULTICODEC_STRING)

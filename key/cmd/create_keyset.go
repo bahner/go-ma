@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/key"
+	keyset "github.com/bahner/go-ma/key/set"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -34,7 +34,7 @@ func main() {
 	log.Debugf("main: myID: %s", myID)
 
 	// Create a new keyset for the entity
-	keyset, err := key.NewKeyset(ID.Fragment)
+	keyset, err := keyset.New(ID.Fragment)
 	if err != nil {
 		panic(err)
 	}

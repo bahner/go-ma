@@ -7,7 +7,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/entity"
-	"github.com/bahner/go-ma/key"
+	keyset "github.com/bahner/go-ma/key/set"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 	}
 
 	// Create a new keyset for the entity from the name (fragment)
-	keyset, err := key.NewKeyset(ID.Fragment)
+	keyset, err := keyset.New(ID.Fragment)
 	if err != nil {
 		panic(err)
 	}

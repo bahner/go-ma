@@ -6,9 +6,7 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
-	"github.com/bahner/go-ma/key"
-	"github.com/libp2p/go-libp2p/core/crypto"
-	"github.com/libp2p/go-libp2p/core/peer"
+	ipnskey "github.com/bahner/go-ma/key/ipns"
 	nanoid "github.com/matoous/go-nanoid/v2"
 	log "github.com/sirupsen/logrus"
 )
@@ -31,7 +29,7 @@ func New() (*DID, error) {
 	}
 	log.Debugf("did/new: name: %s", name)
 
-	ipnsKey, err := key.NewIPNSKey(name)
+	ipnsKey, err := ipnskey.New(name)
 	if err != nil {
 		return nil, fmt.Errorf("did/new: failed to get or create key in IPFS: %w", err)
 	}
@@ -74,7 +72,7 @@ func NewFromDID(didStr string) (*DID, error) {
 func NewFromName(name string) (*DID, error) {
 
 	log.Debugf("did/new: name: %s", name)
-	ipnsKey, err := key.NewIPNSKey(name)
+	ipnsKey, err := ipnskey.New(name)
 	if err != nil {
 		return &DID{}, fmt.Errorf("did/new: failed to parse identifier: %w", err)
 	}
@@ -93,7 +91,7 @@ func NewFromName(name string) (*DID, error) {
 }
 
 // If you already have a key, you can use this to create a DID.
-func NewFromIPNSKey(keyName key.IPNSKey) (*DID, error) {
+func NewFromIPNSKey(keyName ipnskey.Key) (*DID, error) {
 
 	return NewFromDID(keyName.DID)
 
@@ -109,18 +107,6 @@ func (d *DID) String() string {
 func (d *DID) IsValid() bool {
 	err := ValidateDID(d.String())
 	return err == nil
-}
-
-func (d *DID) PublicKey() (crypto.PubKey, error) {
-
-	// Decode the PeerID from the ID which is the IPNS name
-	pid, err := peer.Decode(d.Identifier)
-	if err != nil {
-		return nil, err
-	}
-
-	return peer.ID.ExtractPublicKey(pid)
-
 }
 
 func (d *DID) IsIdenticalTo(did DID) bool {

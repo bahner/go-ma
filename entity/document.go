@@ -6,11 +6,11 @@ import (
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/did/doc"
-	"github.com/bahner/go-ma/key"
+	keyset "github.com/bahner/go-ma/key/set"
 	log "github.com/sirupsen/logrus"
 )
 
-func CreateEntityDocument(id *did.DID, controller *did.DID, keyset key.Keyset) (*doc.Document, error) {
+func CreateEntityDocument(id *did.DID, controller *did.DID, keyset keyset.Keyset) (*doc.Document, error) {
 	// Initialize a new DID Document
 	myDoc, err := doc.New(id.String(), id.String())
 	if err != nil {

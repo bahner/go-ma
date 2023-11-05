@@ -6,7 +6,8 @@ import (
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/internal"
-	"github.com/bahner/go-ma/key"
+	ipnskey "github.com/bahner/go-ma/key/ipns"
+	keyset "github.com/bahner/go-ma/key/set"
 	cbor "github.com/fxamacker/cbor/v2"
 	log "github.com/sirupsen/logrus"
 )
@@ -21,7 +22,7 @@ import (
 type Entity struct {
 	DID    *did.DID
 	Doc    *doc.Document
-	Keyset key.Keyset
+	Keyset keyset.Keyset
 }
 
 // This creates a new Entity from an identifier.
@@ -32,7 +33,7 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	// Now we create a keyset for the entity.
 	// The keyset creation will lookup the IPNS key again and also
 	// create keys for signing and encryption.
-	myKeyset, err := key.NewKeyset(id.Fragment)
+	myKeyset, err := keyset.New(id.Fragment)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create key from ipnsKey: %s", err)
 	}
@@ -50,7 +51,7 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	}, nil
 }
 
-func NewFromKey(ipfsKey key.IPNSKey, controller *did.DID) (*Entity, error) {
+func NewFromKey(ipfsKey ipnskey.Key, controller *did.DID) (*Entity, error) {
 
 	id, err := did.NewFromIPNSKey(ipfsKey)
 	if err != nil {
