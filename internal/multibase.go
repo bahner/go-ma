@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"github.com/bahner/go-ma"
 	"github.com/multiformats/go-multibase"
 )
 
@@ -9,7 +8,7 @@ import (
 // message attributes and the message itself.
 func MultibaseEncode(data []byte) (string, error) {
 
-	encoded_attr, err := multibase.Encode(ma.MULTIBASE_ENCODING, data)
+	encoded_attr, err := multibase.Encode(multibase.Base58BTC, data)
 	if err != nil {
 		return "", err
 	}

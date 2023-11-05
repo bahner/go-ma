@@ -10,6 +10,11 @@ import (
 	"golang.org/x/crypto/curve25519"
 )
 
+const (
+	KEY_AGREEMENT_MULTICODEC_STRING = "x25519-pub"
+	KEY_AGREEMENT_KEY_TYPE          = "MultiKey"
+)
+
 type EncryptionKey struct {
 	DID                string
 	Type               string
@@ -36,7 +41,7 @@ func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 	curve25519.ScalarBaseMult(&pubKey, &privKey)
 
 	// Encode the public key to multibase
-	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(pubKey[:], ma.KEY_AGREEMENT_MULTICODEC_STRING)
+	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(pubKey[:], KEY_AGREEMENT_MULTICODEC_STRING)
 	if err != nil {
 		return EncryptionKey{}, fmt.Errorf("key_generate: error encoding public key multibase: %w", err)
 	}
@@ -48,7 +53,7 @@ func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 
 	return EncryptionKey{
 		DID:                ma.DID_PREFIX + identifier + "#" + name,
-		Type:               ma.KEY_AGREEMENT_KEY_TYPE,
+		Type:               KEY_AGREEMENT_KEY_TYPE,
 		PrivKey:            privKey,
 		PubKey:             pubKey,
 		PublicKeyMultibase: publicKeyMultibase,

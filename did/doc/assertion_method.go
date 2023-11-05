@@ -5,8 +5,8 @@ import (
 
 	"crypto/ed25519"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/key"
 )
 
 func (d *Document) AssertionMethodPublicKey() (ed25519.PublicKey, error) {
@@ -21,8 +21,8 @@ func (d *Document) AssertionMethodPublicKey() (ed25519.PublicKey, error) {
 		return nil, fmt.Errorf("doc/key_agreement_public_key: Error decoding publicKeyMultibase: %s", err)
 	}
 
-	if codec != ma.VERIFICATION_KEY_MULTICODEC_STRING {
-		return nil, fmt.Errorf("doc/key_agreement_public_key: codec != %s", ma.VERIFICATION_KEY_MULTICODEC_STRING)
+	if codec != key.ASSERTION_METHOD_KEY_MULTICODEC_STRING {
+		return nil, fmt.Errorf("doc/key_agreement_public_key: codec != %s", key.ASSERTION_METHOD_KEY_MULTICODEC_STRING)
 	}
 
 	// Convert the extracted bytes to a public key

@@ -15,8 +15,8 @@ func TestConstants(t *testing.T) {
 	}
 
 	expected_message_mime_type := fmt.Sprintf("application/x-ma-message; version=%s", ma.VERSION)
-	if ma.MESSAGE_MIME_TYPE != expected_message_mime_type {
-		t.Errorf("Expected type to be 'ma/message', got %s", ma.MESSAGE_MIME_TYPE)
+	if message.MIME_TYPE != expected_message_mime_type {
+		t.Errorf("Expected type to be 'ma/message', got %s", message.MIME_TYPE)
 	}
 
 	if message.MESSAGE_TTL != time.Hour*24 {

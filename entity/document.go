@@ -3,9 +3,9 @@ package entity
 import (
 	"fmt"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/did/doc"
+	"github.com/bahner/go-ma/key"
 	keyset "github.com/bahner/go-ma/key/set"
 	log "github.com/sirupsen/logrus"
 )
@@ -23,7 +23,7 @@ func CreateEntityDocument(id *did.DID, controller *did.DID, keyset keyset.Keyset
 	myEncVM, err := doc.NewVerificationMethod(
 		id.Identifier,
 		id.String(),
-		ma.KEY_AGREEMENT_KEY_TYPE,
+		key.KEY_AGREEMENT_KEY_TYPE,
 		keyset.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create encryption verification method: %s", err)
@@ -35,7 +35,7 @@ func CreateEntityDocument(id *did.DID, controller *did.DID, keyset keyset.Keyset
 	// Add the signing key to the document and set it as the assertion method.
 	mySignVM, err := doc.NewVerificationMethod(id.Identifier,
 		id.String(),
-		ma.VERIFICATION_KEY_TYPE,
+		key.ASSERTION_METHOD_KEY_TYPE,
 		keyset.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create signing verification method: %s", err)

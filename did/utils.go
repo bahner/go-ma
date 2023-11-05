@@ -15,7 +15,7 @@ import (
 
 // 	did, err := Parse(didStr)
 // 	if err != nil {
-// 		return "", internal.LogError(fmt.Sprintf("did: not a valid identifier: %v\n", err))
+// 		return "", fmt.Errorf("did: not a valid identifier: %v\n", err))
 // 	}
 
 // 	return did.Identifier, nil

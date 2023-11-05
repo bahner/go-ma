@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/entity"
+	"github.com/bahner/go-ma/key"
 	keyset "github.com/bahner/go-ma/key/set"
 	log "github.com/sirupsen/logrus"
 )
@@ -105,7 +105,7 @@ func createSubjectFromPackedKeyset(keyset string) (*entity.Entity, error) {
 	encVM, err := doc.NewVerificationMethod(
 		subject.DID.Identifier,
 		subject.DID.String(),
-		ma.KEY_AGREEMENT_KEY_TYPE,
+		key.KEY_AGREEMENT_KEY_TYPE,
 		subject.Keyset.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
@@ -120,7 +120,7 @@ func createSubjectFromPackedKeyset(keyset string) (*entity.Entity, error) {
 	signvm, err := doc.NewVerificationMethod(
 		subject.DID.Identifier,
 		subject.DID.String(),
-		ma.VERIFICATION_KEY_TYPE,
+		key.ASSERTION_METHOD_KEY_TYPE,
 		subject.Keyset.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)

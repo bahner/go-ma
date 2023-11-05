@@ -3,8 +3,8 @@ package doc
 import (
 	"fmt"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/key"
 	"golang.org/x/crypto/curve25519"
 )
 
@@ -35,8 +35,8 @@ func (d *Document) KeyAgreementPublicKeyBytes() ([]byte, error) {
 		return nil, fmt.Errorf("doc/key_agreement_public_key: Error decoding publicKeyMultibase: %s", err)
 	}
 
-	if codec != ma.KEY_AGREEMENT_MULTICODEC_STRING {
-		return nil, fmt.Errorf("doc/key_agreement_public_key: codec != %s", ma.KEY_AGREEMENT_MULTICODEC_STRING)
+	if codec != key.KEY_AGREEMENT_MULTICODEC_STRING {
+		return nil, fmt.Errorf("doc/key_agreement_public_key: codec != %s", key.KEY_AGREEMENT_MULTICODEC_STRING)
 	}
 
 	// Check if the number of bytes is correct for a curve25519 public key

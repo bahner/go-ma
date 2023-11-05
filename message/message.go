@@ -45,7 +45,7 @@ func New(
 
 	return &Message{
 		ID:           id,
-		MimeType:     ma.MESSAGE_MIME_TYPE,
+		MimeType:     MIME_TYPE,
 		Version:      ma.VERSION,
 		From:         from,
 		To:           to,

@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/bahner/go-ma"
-	"github.com/bahner/go-ma/internal"
 	cbor "github.com/fxamacker/cbor/v2"
 )
 
@@ -19,7 +17,7 @@ type Envelope struct {
 // Use a pointer here, this might be arbitrarily big.
 func New(encodedCipherText string, encodedEphemeralKey string) (*Envelope, error) {
 	return &Envelope{
-		MIMEType: ma.ENVELOPE_MIME_TYPE,
+		MIMEType: MIME_TYPE,
 		Seal:     encodedEphemeralKey,
 		Message:  encodedCipherText,
 	}, nil
@@ -39,7 +37,7 @@ func UnmarshalFromCBOR(data []byte) (*Envelope, error) {
 
 	err := cbor.Unmarshal(data, e)
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("envelope: error unmarshalling envelope: %s\n", err))
+		return nil, fmt.Errorf("envelope: error unmarshalling envelope: %s\n", err)
 	}
 
 	return e, nil

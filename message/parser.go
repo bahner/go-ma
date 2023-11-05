@@ -36,7 +36,7 @@ func (m *Message) IsValid() error {
 		return errors.New("nil Message provided")
 	}
 
-	if m.MimeType != ma.MESSAGE_MIME_TYPE {
+	if m.MimeType != MIME_TYPE {
 		return errors.New("invalid Message type")
 	}
 

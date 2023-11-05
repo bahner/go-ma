@@ -11,6 +11,11 @@ import (
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
+const (
+	ASSERTION_METHOD_KEY_MULTICODEC_STRING = "ed25519-pub"
+	ASSERTION_METHOD_KEY_TYPE              = "MultiKey"
+)
+
 type SigningKey struct {
 	DID                string
 	Type               string
@@ -39,7 +44,7 @@ func NewSigningKey(identifier string) (SigningKey, error) {
 		return SigningKey{}, fmt.Errorf("key/signing: error generating key pair: %w", err)
 	}
 
-	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, ma.VERIFICATION_KEY_MULTICODEC_STRING)
+	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, ASSERTION_METHOD_KEY_MULTICODEC_STRING)
 	if err != nil {
 		return SigningKey{}, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
 	}
@@ -51,7 +56,7 @@ func NewSigningKey(identifier string) (SigningKey, error) {
 
 	return SigningKey{
 		DID:                ma.DID_PREFIX + identifier + "#" + name,
-		Type:               ma.VERIFICATION_KEY_TYPE,
+		Type:               ASSERTION_METHOD_KEY_TYPE,
 		PrivKey:            &privKey,
 		PubKey:             &publicKey,
 		PublicKeyMultibase: publicKeyMultibase,

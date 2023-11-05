@@ -20,12 +20,12 @@ func Seal(m *message.Message) (*Envelope, error) {
 	// Fail fast.
 	msg, err := m.Pack()
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("message_encrypt: error packing message: %s\n", err))
+		return nil, fmt.Errorf("message_encrypt: error packing message: %s\n", err)
 	}
 
 	to, err := doc.Fetch(m.To)
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("message_encrypt: error fetching recipient document: %s\n", err))
+		return nil, fmt.Errorf("message_encrypt: error fetching recipient document: %s\n", err)
 	}
 
 	recipientPublicKeyBytes, err := to.KeyAgreementPublicKeyBytes()
@@ -81,7 +81,7 @@ func Seal(m *message.Message) (*Envelope, error) {
 	// Encode the cipher text to multibase for safe transport as text
 	encodedCipherTextWithNonce, err := internal.MultibaseEncode(cipherTextWithNonce)
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("message_encrypt: error encoding cipher text: %s", err))
+		return nil, fmt.Errorf("message_encrypt: error encoding cipher text: %s", err)
 	}
 	log.Debugf("message_encrypt: encodedCipherTextWithNonce: %x", encodedCipherTextWithNonce)
 

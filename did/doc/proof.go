@@ -3,7 +3,6 @@ package doc
 import (
 	"fmt"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
 	"github.com/multiformats/go-multibase"
@@ -31,19 +30,19 @@ func (d *Document) Sign(signKey key.SigningKey, vm VerificationMethod) error {
 
 	multicodecHashed, err := d.PayloadHash()
 	if err != nil {
-		return internal.LogError(fmt.Sprintf("doc sign: Error hashing payload: %s\n", err))
+		return fmt.Errorf("doc sign: Error hashing payload: %s", err)
 	}
 
 	// Sign the hashed payload with an ed25519 key
 	signature, err := signKey.Sign(multicodecHashed)
 	if err != nil {
-		return internal.LogError(fmt.Sprintf("doc sign: Error signing payload: %s\n", err))
+		return fmt.Errorf("doc sign: Error signing payload: %s", err)
 	}
 
 	// Multibase encode the signed data for public consumption
-	proofValue, err := multibase.Encode(ma.MULTIBASE_ENCODING, signature)
+	proofValue, err := multibase.Encode(multibase.Base58BTC, signature)
 	if err != nil {
-		return internal.LogError(fmt.Sprintf("doc sign: Error encoding signature: %s\n", err))
+		return fmt.Errorf("doc sign: Error encoding signature: %s", err)
 	}
 
 	d.Proof = NewProof(proofValue, vm.ID)

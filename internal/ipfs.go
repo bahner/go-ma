@@ -141,7 +141,7 @@ func IPNSLookupKeyName(keyName string) (*shell.Key, error) {
 
 	keys, err := IPNSListKeys()
 	if err != nil {
-		return lookedupKey, LogError(fmt.Sprintf("ipfs: failed to list : %v\n", err))
+		return lookedupKey, fmt.Errorf("ipfs: failed to list : %v", err)
 	}
 
 	// A little deeper than I usually like to nest, but hey, it's a one off.

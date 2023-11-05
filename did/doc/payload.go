@@ -52,7 +52,7 @@ func (d *Document) PayloadHash() ([]byte, error) {
 	hashed := blake3.Sum256(p)
 	multicodecHashed, err := internal.MulticodecEncode(ma.HASH_ALGORITHM_MULTICODEC_STRING, hashed[:])
 	if err != nil {
-		return nil, internal.LogError(fmt.Sprintf("doc sign: Error multiencoding hashed payload: %s\n", err))
+		return nil, fmt.Errorf("doc sign: Error multiencoding hashed payload: %s", err)
 	}
 
 	return multicodecHashed, nil

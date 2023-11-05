@@ -14,7 +14,7 @@ import (
 func validMessageWithSignature() *message.Message {
 	return &message.Message{
 		ID:        "validNanoID",
-		MimeType:  ma.MESSAGE_MIME_TYPE,
+		MimeType:  message.MIME_TYPE,
 		From:      "did:ma:from",
 		To:        "did:ma:to",
 		Created:   1698684192,
