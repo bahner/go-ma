@@ -3,11 +3,20 @@ package did
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
+	"github.com/ipfs/boxo/ipns"
+	nanoid "github.com/matoous/go-nanoid/v2"
 	log "github.com/sirupsen/logrus"
+)
+
+var (
+	fragment           = regexp.MustCompile("^#[a-zA-Z0-9_-]*$")
+	ErrInvalidID       = errors.New("invalid ID")
+	ErrInvalidFragment = errors.New("invalid fragment")
 )
 
 // // Sometimes we just want the identifier, not the whole DID.
@@ -63,4 +72,53 @@ func ValidateDID(didStr string) error {
 // which makes them Identical in my book.
 func AreIdentical(did1 *DID, did2 *DID) bool {
 	return did1.Identifier == did2.Identifier
+}
+
+func GenerateFragment() string {
+	fragment, _ := nanoid.New()
+
+	return "#" + fragment
+}
+
+func GetFragment(did string) string {
+
+	didName := strings.TrimPrefix(did, ma.DID_PREFIX)
+
+	elements := strings.Split(didName, "#")
+
+	return elements[len(elements)-1]
+}
+
+func GetIdentifier(did string) string {
+
+	didName := strings.TrimPrefix(did, ma.DID_PREFIX)
+
+	elements := strings.Split(didName, "#")
+
+	return elements[0]
+}
+
+// This simply checks that the string is a valid nanoID,
+// prefixed with a "#".
+func IsValidFragment(str string) bool {
+	return fragment.MatchString(str)
+}
+
+func IsValidIdentifier(identifier string) bool {
+
+	parts := strings.Split(identifier, "#")
+	if len(parts) != 2 {
+		return false
+	}
+
+	// Check that the identifier has a valid fragment
+	if !IsValidFragment(parts[1]) {
+		return false
+	}
+
+	// Check that the id is a valid IPNS name
+	_, err := ipns.NameFromString(identifier)
+
+	// Last check so check that it has not errors
+	return err == nil
 }

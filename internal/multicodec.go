@@ -12,7 +12,7 @@ func MulticodecEncode(codecName string, payload []byte) ([]byte, error) {
 
 	var officialCodec multicodec.Code
 	if err := officialCodec.Set(codecName); err != nil {
-		return nil, fmt.Errorf("error setting codec: %w", err)
+		return nil, fmt.Errorf("invalid codec name: %w", err)
 	}
 	codec := uint64(officialCodec)
 

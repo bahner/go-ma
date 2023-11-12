@@ -25,3 +25,8 @@ func MultibaseDecode(attr string) ([]byte, error) {
 
 	return decoded_attr, nil
 }
+
+func IsValidMultibase(input string) bool {
+	_, _, err := multibase.Decode(input)
+	return err == nil
+}

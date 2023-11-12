@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/bahner/go-ma"
-	"github.com/bahner/go-ma/internal"
 	ipnskey "github.com/bahner/go-ma/key/ipns"
 	nanoid "github.com/matoous/go-nanoid/v2"
 	log "github.com/sirupsen/logrus"
@@ -57,8 +56,8 @@ func NewFromDID(didStr string) (*DID, error) {
 	name := strings.TrimPrefix(didStr, ma.DID_PREFIX)
 
 	// Extract the identifier and fragment
-	identifier := internal.GetIdentifierFromDID(name)
-	fragment := internal.GetFragmentFromDID(name)
+	identifier := GetIdentifier(name)
+	fragment := GetFragment(name)
 
 	return &DID{
 		Identifier: identifier,
@@ -77,9 +76,9 @@ func NewFromName(name string) (*DID, error) {
 		return &DID{}, fmt.Errorf("did/new: failed to parse identifier: %w", err)
 	}
 
-	identifier := internal.GetIdentifierFromDID(ipnsKey.DID)
+	identifier := GetIdentifier(ipnsKey.DID)
 	log.Debugf("did/new: identifier: %s", identifier)
-	fragment := internal.GetFragmentFromDID(ipnsKey.DID)
+	fragment := GetFragment(ipnsKey.DID)
 	log.Debugf("did/new: fragment: %s", fragment)
 	log.Debugf("did/new: ipnsKey.DID: %s", ipnsKey.DID)
 

@@ -3,6 +3,7 @@ package set
 import (
 	"fmt"
 
+	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
 	ipnskey "github.com/bahner/go-ma/key/ipns"
@@ -23,7 +24,7 @@ func New(name string) (Keyset, error) {
 		return Keyset{}, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
 	}
 
-	identifier := internal.GetIdentifierFromDID(IPNSKey.DID)
+	identifier := did.GetIdentifier(IPNSKey.DID)
 
 	encryptionKey, err := key.NewEncryptionKey(identifier)
 	if err != nil {
