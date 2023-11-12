@@ -21,7 +21,7 @@ func CreateEntityDocument(id *did.DID, controller *did.DID, keyset keyset.Keyset
 	// Add the encryption key to the document,
 	// and set it as the key agreement key.
 	myEncVM, err := doc.NewVerificationMethod(
-		id.Identifier,
+		id.String(),
 		id.String(),
 		key.KEY_AGREEMENT_KEY_TYPE,
 		keyset.EncryptionKey.PublicKeyMultibase)
@@ -33,7 +33,8 @@ func CreateEntityDocument(id *did.DID, controller *did.DID, keyset keyset.Keyset
 	log.Debugf("entity: myEncVM: %v", myDoc.KeyAgreement)
 
 	// Add the signing key to the document and set it as the assertion method.
-	mySignVM, err := doc.NewVerificationMethod(id.Identifier,
+	mySignVM, err := doc.NewVerificationMethod(
+		id.String(),
 		id.String(),
 		key.ASSERTION_METHOD_KEY_TYPE,
 		keyset.SigningKey.PublicKeyMultibase)

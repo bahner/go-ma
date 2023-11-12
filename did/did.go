@@ -99,7 +99,7 @@ func NewFromIPNSKey(keyName ipnskey.Key) (*DID, error) {
 
 func (d *DID) String() string {
 
-	return d.Name
+	return ma.DID_PREFIX + d.Name
 
 }
 

@@ -32,9 +32,9 @@ type VerificationMethod struct {
 // vmType must be of type MultiKey, so that the format never changes -
 // even if the underlying key type changes.
 func NewVerificationMethod(
-	// Id of the subject to create a verification method for
+	// DID of the subject to create a verification method for
 	id string,
-	// Controller of the verification method
+	// DID of the controller of the verification method
 	controller string,
 	// The DID suite key type specified in the verification method
 	vmType string,
