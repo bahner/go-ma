@@ -9,17 +9,15 @@ import (
 
 // Bask the encrypted message and the encrypted symmetric key in a JSON envelope.
 type Envelope struct {
-	MIMEType string `cbor:"mime_type"`
-	Seal     string `cbor:"seal"`
-	Message  string `cbor:"message"`
+	Seal    string `cbor:"seal" json:"seal"`
+	Message string `cbor:"message" json:"message"`
 }
 
 // Use a pointer here, this might be arbitrarily big.
 func New(encodedCipherText string, encodedEphemeralKey string) (*Envelope, error) {
 	return &Envelope{
-		MIMEType: MIME_TYPE,
-		Seal:     encodedEphemeralKey,
-		Message:  encodedCipherText,
+		Seal:    encodedEphemeralKey,
+		Message: encodedCipherText,
 	}, nil
 }
 
@@ -57,8 +55,4 @@ func (e *Envelope) GetEncryptedKey() string {
 
 func (e *Envelope) GetEncryptedMsg() string {
 	return e.Message
-}
-
-func (e *Envelope) GetMIMEType() string {
-	return e.MIMEType
 }
