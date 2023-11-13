@@ -18,12 +18,12 @@ func main() {
 	fmt.Fprint(os.Stderr, "******************************************************************\n")
 
 	var name string
-	var forcePublish bool
+	var forceUpdate bool
 
 	log.SetLevel(log.ErrorLevel)
 
 	flag.StringVar(&name, "name", "", "Name of the entity to create")
-	flag.BoolVar(&forcePublish, "force", false, "Force publish to IPFS")
+	flag.BoolVar(&forceUpdate, "force", false, "Force publish to IPFS")
 	flag.Parse()
 
 	// Create a new person, object - an entity
@@ -50,7 +50,7 @@ func main() {
 	fmt.Println(packedKeyset)
 
 	// Forces update of key to IPFS
-	err = keyset.IPNSKey.ExportToIPFS(ID.Fragment, forcePublish)
+	err = keyset.IPNSKey.ExportToIPFS(ID.Fragment, forceUpdate)
 	if err != nil {
 		panic(err)
 	}

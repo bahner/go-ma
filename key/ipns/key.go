@@ -106,3 +106,11 @@ func (k *Key) UnmarshalCBOR(data []byte) error {
 	k.PublicKey = pubKey
 	return nil
 }
+
+func (k *Key) IsPublished() bool {
+
+	identifier := internal.GetDIDIdentifier(k.DID)
+	fragment := internal.GetDIDFragment(k.DID)
+
+	return KeyExists(fragment, identifier)
+}
