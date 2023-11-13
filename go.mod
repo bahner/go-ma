@@ -1,20 +1,20 @@
 module github.com/bahner/go-ma
 
-go 1.21.3
+go 1.21.4
 
 require (
 	github.com/blang/semver/v4 v4.0.0
 	github.com/fxamacker/cbor/v2 v2.5.0
-	github.com/ipfs/boxo v0.14.0
+	github.com/ipfs/boxo v0.15.0
 	github.com/ipfs/go-ipfs-api v0.7.0
-	github.com/libp2p/go-libp2p v0.32.0
+	github.com/libp2p/go-libp2p v0.32.1
 	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/multiformats/go-multicodec v0.9.0
 	github.com/multiformats/go-varint v0.0.7
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/crypto v0.14.0
+	golang.org/x/crypto v0.15.0
 	lukechampine.com/blake3 v1.2.1
 )
 
@@ -47,7 +47,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
