@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma/internal"
+	"github.com/libp2p/go-libp2p/core/crypto"
 )
 
 // Import the key into IPFS under it's IPNS name.
@@ -14,9 +15,9 @@ import (
 // a different name.
 func (i *Key) ExportToIPFS(name string) error {
 
-	privKeyBytes, err := i.PrivKey.Raw()
+	privKeyBytes, err := crypto.MarshalPrivateKey(i.PrivKey)
 	if err != nil {
-		return fmt.Errorf("key/ipns: failed to get raw private key: %v", err)
+		return fmt.Errorf("failed to marshal private key: %v", err)
 	}
 
 	keyReader := bytes.NewReader(privKeyBytes)
