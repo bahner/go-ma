@@ -1,4 +1,4 @@
-package message
+package msg
 
 import (
 	"github.com/bahner/go-ma/internal"
@@ -30,7 +30,7 @@ func (m *Message) MarshalPayloadToCBOR() ([]byte, error) {
 
 // Returns the Message as a multibase encoded JSON string
 // with the Signature field set to the empty string.
-// NB! This is made from a copy of the Message.
+// NB! This is made from a copy of the message.
 // The original Message is not changed.
 // This is what we will sign!
 func (m *Message) PayloadPack() (string, error) {

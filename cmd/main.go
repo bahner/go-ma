@@ -58,7 +58,7 @@ func main() {
 	// msgBody := "Share and enjoy!"
 	// msgMimeType := "text/plain"
 
-	// myMessage, err := message.New(
+	// myMessage, err := msg.New(
 	// 	bahner.DID.String(),
 	// 	job.DID.String(),
 	// 	msgBody,

@@ -8,24 +8,24 @@ import (
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
-	"github.com/bahner/go-ma/message"
+	"github.com/bahner/go-ma/msg"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/curve25519"
 )
 
-func Seal(m *message.Message) (*Envelope, error) {
+func Seal(m *msg.Message) (*Envelope, error) {
 
 	// First check the stuff we don't have control over.
 	// Fail fast.
 	msg, err := m.Pack()
 	if err != nil {
-		return nil, fmt.Errorf("message_encrypt: error packing message: %s\n", err)
+		return nil, fmt.Errorf("message_encrypt: error packing message: %s", err)
 	}
 
 	to, err := doc.Fetch(m.To)
 	if err != nil {
-		return nil, fmt.Errorf("message_encrypt: error fetching recipient document: %s\n", err)
+		return nil, fmt.Errorf("message_encrypt: error fetching recipient document: %s", err)
 	}
 
 	recipientPublicKeyBytes, err := to.KeyAgreementPublicKeyBytes()

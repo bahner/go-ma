@@ -1,9 +1,9 @@
-package message_test
+package msg_test
 
 import (
 	"testing"
 
-	"github.com/bahner/go-ma/message"
+	"github.com/bahner/go-ma/msg"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -11,7 +11,7 @@ func TestMimeTypeAliases(t *testing.T) {
 	expectedAliases := []string{
 		"car", "ipld_cbor", "ipld_json", "ipld", "ipns-record", "json", "message", "text",
 	}
-	aliases := message.MimeTypeAliases()
+	aliases := msg.MimeTypeAliases()
 	assert.ElementsMatch(t, expectedAliases, aliases)
 }
 
@@ -26,7 +26,7 @@ func TestMimeTypes(t *testing.T) {
 		"application/x-ma-message; version=0.0.1",
 		"text/plain",
 	}
-	types := message.MimeTypes()
+	types := msg.MimeTypes()
 	assert.ElementsMatch(t, expectedTypes, types)
 }
 
@@ -41,7 +41,7 @@ func TestMimeTypeTuples(t *testing.T) {
 		{"message", "application/x-ma-message; version=0.0.1"},
 		{"text", "text/plain"},
 	}
-	tuples := message.MimeTypeTuples()
+	tuples := msg.MimeTypeTuples()
 	assert.ElementsMatch(t, expectedTuples, tuples)
 }
 
@@ -58,7 +58,7 @@ func TestMimeType(t *testing.T) {
 	}
 
 	for alias, expectedType := range tests {
-		assert.Equal(t, expectedType, message.MimeType(alias))
+		assert.Equal(t, expectedType, msg.MimeType(alias))
 	}
 }
 
@@ -71,7 +71,7 @@ func TestIsValidMimeType(t *testing.T) {
 		"text/plain; charset=utf-8",
 	}
 	for _, mimetype := range validMimeTypes {
-		assert.True(t, message.IsValidMimeType(mimetype), "Expected MIME type to be valid: "+mimetype)
+		assert.True(t, msg.IsValidMimeType(mimetype), "Expected MIME type to be valid: "+mimetype)
 	}
 
 	// Intentionally malformed MIME types for testing invalid cases
@@ -80,6 +80,6 @@ func TestIsValidMimeType(t *testing.T) {
 		"text/plain; charset==", // invalid parameter
 	}
 	for _, mimetype := range invalidMimeTypes {
-		assert.False(t, message.IsValidMimeType(mimetype), "Expected MIME type to be invalid: "+mimetype)
+		assert.False(t, msg.IsValidMimeType(mimetype), "Expected MIME type to be invalid: "+mimetype)
 	}
 }

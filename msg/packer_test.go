@@ -1,15 +1,15 @@
-package message_test
+package msg_test
 
 import (
 	"bytes"
 	"testing"
 
 	"github.com/bahner/go-ma/internal"
-	"github.com/bahner/go-ma/message"
+	"github.com/bahner/go-ma/msg"
 	cbor "github.com/fxamacker/cbor/v2"
 )
 
-var input_message = message.ValidExampleMessage()
+var input_message = msg.ValidExampleMessage()
 
 func TestMarshalToCBOR(t *testing.T) {
 
@@ -39,10 +39,10 @@ func TestPack(t *testing.T) {
 }
 
 func TestUnpack(t *testing.T) {
-	packed := message.Message_test_packed_valid_message
-	expected := message.ValidExampleMessage()
+	packed := msg.Message_test_packed_valid_message
+	expected := msg.ValidExampleMessage()
 
-	actual, err := message.Unpack(packed)
+	actual, err := msg.Unpack(packed)
 	if err != nil {
 		t.Fatalf("Unpack failed: %v", err)
 	}

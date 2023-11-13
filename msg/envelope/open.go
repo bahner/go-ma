@@ -6,14 +6,14 @@ import (
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
-	"github.com/bahner/go-ma/message"
+	"github.com/bahner/go-ma/msg"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/curve25519"
 )
 
 // Open takes an envelope and a private key and returns the decrypted message.
-func (e *Envelope) Open(privKey [32]byte) (*message.Message, error) {
+func (e *Envelope) Open(privKey [32]byte) (*msg.Message, error) {
 	ephemeralKey, err := internal.MultibaseDecode(e.Seal)
 	if err != nil {
 		return nil, fmt.Errorf("message_decrypt: error multibase decoding ephemeral public key: %w", err)
@@ -56,14 +56,14 @@ func (e *Envelope) Open(privKey [32]byte) (*message.Message, error) {
 	}
 	log.Debugf("message_decrypt: aead: %x", aead)
 
-	msg, err := aead.Open(nil, nonce, cipherText, nil)
-	log.Debugf("message_decrypt: msg: %x", msg)
+	m, err := aead.Open(nil, nonce, cipherText, nil)
+	log.Debugf("message_decrypt: msg: %x", m)
 	if err != nil {
 		return nil, fmt.Errorf("message_decrypt: error decrypting message: %w", err)
 	}
 
 	// Unpack the decrypted message
-	unpackedMsg, err := message.Parse(string(msg))
+	unpackedMsg, err := msg.Parse(string(m))
 	if err != nil {
 		return nil, err
 	}

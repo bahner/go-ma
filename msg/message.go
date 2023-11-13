@@ -1,4 +1,4 @@
-package message
+package msg
 
 import (
 	"crypto/ed25519"
@@ -64,14 +64,14 @@ func Signed(
 	mime_type string,
 	priv_key ed25519.PrivateKey) (*Message, error) {
 
-	msg, err := New(from, to, body, mime_type)
+	m, err := New(from, to, body, mime_type)
 	if err != nil {
 		return nil, err
 	}
 
-	msg.Sign(priv_key)
+	m.Sign(priv_key)
 
-	return msg, nil
+	return m, nil
 
 }
 

@@ -1,4 +1,4 @@
-package message_test
+package msg_test
 
 import (
 	"bytes"
@@ -6,15 +6,15 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
-	"github.com/bahner/go-ma/message"
+	"github.com/bahner/go-ma/msg"
 	cbor "github.com/fxamacker/cbor/v2"
 )
 
 // Helper function to create a valid Message instance for testing.
-func validMessageWithSignature() *message.Message {
-	return &message.Message{
+func validMessageWithSignature() *msg.Message {
+	return &msg.Message{
 		ID:        "validNanoID",
-		MimeType:  message.MIME_TYPE,
+		MimeType:  msg.MIME_TYPE,
 		From:      "did:ma:from",
 		To:        "did:ma:to",
 		Created:   1698684192,
@@ -26,9 +26,9 @@ func validMessageWithSignature() *message.Message {
 }
 
 func TestPayload(t *testing.T) {
-	msg := validMessageWithSignature()
+	m := validMessageWithSignature()
 
-	payload, err := message.Payload(*msg)
+	payload, err := msg.Payload(*m)
 	if err != nil {
 		t.Fatalf("Payload failed: %v", err)
 	}
@@ -39,14 +39,14 @@ func TestPayload(t *testing.T) {
 }
 
 func TestMarshalPayloadToCBOR(t *testing.T) {
-	msg := validMessageWithSignature()
+	m := validMessageWithSignature()
 
-	jsonData, err := msg.MarshalPayloadToCBOR()
+	jsonData, err := m.MarshalPayloadToCBOR()
 	if err != nil {
 		t.Fatalf("MarshalPayloadToJSON failed: %v", err)
 	}
 
-	payload, _ := message.Payload(*msg)
+	payload, _ := msg.Payload(*m)
 	expected, _ := cbor.Marshal(payload)
 
 	if !bytes.Equal(expected, jsonData) {

@@ -35,7 +35,7 @@ func UnmarshalFromCBOR(data []byte) (*Envelope, error) {
 
 	err := cbor.Unmarshal(data, e)
 	if err != nil {
-		return nil, fmt.Errorf("envelope: error unmarshalling envelope: %s\n", err)
+		return nil, fmt.Errorf("envelope: error unmarshalling envelope: %s", err)
 	}
 
 	return e, nil

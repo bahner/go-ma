@@ -1,4 +1,4 @@
-package message_test
+package msg_test
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/bahner/go-ma"
-	"github.com/bahner/go-ma/message"
+	"github.com/bahner/go-ma/msg"
 )
 
 func TestConstants(t *testing.T) {
@@ -15,12 +15,12 @@ func TestConstants(t *testing.T) {
 	}
 
 	expected_message_mime_type := fmt.Sprintf("application/x-ma-message; version=%s", ma.VERSION)
-	if message.MIME_TYPE != expected_message_mime_type {
-		t.Errorf("Expected type to be 'ma/message', got %s", message.MIME_TYPE)
+	if msg.MIME_TYPE != expected_message_mime_type {
+		t.Errorf("Expected type to be 'ma/message', got %s", msg.MIME_TYPE)
 	}
 
-	if message.MESSAGE_TTL != time.Hour*24 {
-		t.Errorf("Expected TTL to be 24 hours, got %s", message.MESSAGE_TTL)
+	if msg.MESSAGE_TTL != time.Hour*24 {
+		t.Errorf("Expected TTL to be 24 hours, got %s", msg.MESSAGE_TTL)
 	}
 
 }

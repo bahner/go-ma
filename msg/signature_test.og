@@ -5,7 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/key"
-	"github.com/bahner/go-ma/message"
+	"github.com/bahner/go-ma/msg"
 )
 
 func TestSign(t *testing.T) {
@@ -17,7 +17,7 @@ func TestSign(t *testing.T) {
 	myIdentifier := myKey.IPNSName.String() + "#footerFragment"
 	myDID := did.New("ma", myIdentifier)
 
-	myMessage, err := message.New(
+	myMessage, err := msg.New(
 		myDID.String(),
 		myDID.String(),
 		"Hello, World!",
@@ -73,7 +73,7 @@ func TestPublicKey(t *testing.T) {
 	myIdentifier := myKey.IPNSName.String() + "#footerFragment"
 	myDID := did.New("ma", myIdentifier)
 
-	publicKey, err := message.PublicKey(myDID)
+	publicKey, err := msg.PublicKey(myDID)
 	if err != nil {
 		t.Fatalf("PublicKey failed: %v", err)
 	}

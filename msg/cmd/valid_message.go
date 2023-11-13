@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bahner/go-ma/message"
+	"github.com/bahner/go-ma/msg"
 )
 
 func main() {
 
-	m := message.ValidExampleMessage()
+	m := msg.ValidExampleMessage()
 	packed, err := m.Pack()
 	if err != nil {
 		fmt.Printf("Error packing message: %s\n", err)

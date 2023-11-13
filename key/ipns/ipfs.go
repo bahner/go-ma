@@ -20,6 +20,7 @@ import (
 func (i *Key) ExportToIPFS(name string, forceUpdate bool) error {
 
 	// If key is already published, then we're good.
+	log.Debugf("key/ipns: checking if key with name %s exists", name)
 	if i.Exists() {
 		return nil
 	}
