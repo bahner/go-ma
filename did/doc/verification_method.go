@@ -6,6 +6,7 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
+	"github.com/bahner/go-ma/internal"
 )
 
 // VerificationMethod defines the structure of a Verification Method
@@ -45,7 +46,7 @@ func NewVerificationMethod(
 		return VerificationMethod{}, did.ErrInvalidID
 	}
 
-	identifier := did.GetIdentifier(id)
+	identifier := internal.GetDIDIdentifier(id)
 
 	return VerificationMethod{
 		ID:                 ma.DID_PREFIX + identifier + did.GenerateFragment(),
@@ -96,5 +97,5 @@ func (vm VerificationMethod) GetID() string {
 }
 
 func (vm VerificationMethod) Fragment() string {
-	return did.GetFragment(vm.ID)
+	return internal.GetDIDFragment(vm.ID)
 }
