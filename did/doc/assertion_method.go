@@ -31,3 +31,13 @@ func (d *Document) AssertionMethodPublicKey() (ed25519.PublicKey, error) {
 	return pubKey, nil
 
 }
+
+func (d *Document) GetAssertionMethod() (VerificationMethod, error) {
+
+	return d.GetVerificationMethodbyID(d.AssertionMethod)
+}
+
+func (d *Document) GetKeyAgreementMethod() (VerificationMethod, error) {
+
+	return d.GetVerificationMethodbyID(d.KeyAgreement)
+}
