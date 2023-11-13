@@ -5,6 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/did/doc"
+	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
 	keyset "github.com/bahner/go-ma/key/set"
 	log "github.com/sirupsen/logrus"
@@ -24,6 +25,7 @@ func CreateEntityDocument(id *did.DID, controller *did.DID, keyset keyset.Keyset
 		id.String(),
 		id.String(),
 		key.KEY_AGREEMENT_KEY_TYPE,
+		internal.GetDIDFragment(keyset.EncryptionKey.DID),
 		keyset.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create encryption verification method: %s", err)
@@ -37,6 +39,7 @@ func CreateEntityDocument(id *did.DID, controller *did.DID, keyset keyset.Keyset
 		id.String(),
 		id.String(),
 		key.ASSERTION_METHOD_KEY_TYPE,
+		internal.GetDIDFragment(keyset.SigningKey.DID),
 		keyset.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create signing verification method: %s", err)

@@ -38,6 +38,9 @@ func NewVerificationMethod(
 	controller string,
 	// The DID suite key type specified in the verification method
 	vmType string,
+	// Name (fragment) of the verification method. If "", a random fragment will be generated
+	// Fragment should not be prefixed with "#"
+	fragment string,
 	// The public key of the verification method, encoded in multibase
 	publicKeyMultibase string,
 ) (VerificationMethod, error) {
@@ -48,8 +51,19 @@ func NewVerificationMethod(
 
 	identifier := internal.GetDIDIdentifier(id)
 
+	// Create a random fragment if none is provided
+	if fragment == "" {
+		fragment = did.GenerateFragment()
+	} else {
+		fragment = "#" + fragment
+	}
+
+	if !did.IsValidFragment(fragment) {
+		return VerificationMethod{}, did.ErrInvalidFragment
+	}
+
 	return VerificationMethod{
-		ID:                 ma.DID_PREFIX + identifier + did.GenerateFragment(),
+		ID:                 ma.DID_PREFIX + identifier + fragment,
 		Controller:         controller,
 		Type:               vmType,
 		PublicKeyMultibase: publicKeyMultibase,
