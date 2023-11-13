@@ -20,7 +20,7 @@ import (
 func (i *Key) ExportToIPFS(name string, forceUpdate bool) error {
 
 	// If key is already published, then we're good.
-	if i.IsPublished() {
+	if i.Exists() {
 		return nil
 	}
 
@@ -176,8 +176,10 @@ func GetKeyByIdentifier(identifier string) (*shell.Key, error) {
 // Check if a key with the same name and identifier exists.
 func KeyExists(name string, identifier string) bool {
 
+	log.Debugf("key/ipns: checking if key with name %s and identifier %s exists", name, identifier)
 	// Check if the key already exists. Return OK if it does.
 	existingKey, err := GetKeyByName(name)
+	log.Debugf("key/ipns: existing key: %v", existingKey)
 
 	if err == nil {
 		// This means that an existing key with the same name exists.

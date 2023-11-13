@@ -107,7 +107,7 @@ func (k *Key) UnmarshalCBOR(data []byte) error {
 	return nil
 }
 
-func (k *Key) IsPublished() bool {
+func (k *Key) Exists() bool {
 
 	identifier := internal.GetDIDIdentifier(k.DID)
 	fragment := internal.GetDIDFragment(k.DID)
