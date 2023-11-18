@@ -1,6 +1,6 @@
 module github.com/bahner/go-ma
 
-go 1.21.4
+go 1.21
 
 require (
 	github.com/blang/semver/v4 v4.0.0
