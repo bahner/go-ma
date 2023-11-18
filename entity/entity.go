@@ -100,3 +100,22 @@ func Unpack(data string) (*Entity, error) {
 
 	return e, nil
 }
+
+// Publishes the entity's DIDDocument and IPNSKey to IPFS.
+// If force is true, it will publish even if the IPNSKey is already published.
+func (e *Entity) Publish(force bool) error {
+
+	// Publish the IPNSKey to IPFS for publication.
+	err := e.Keyset.IPNSKey.ExportToIPFS(e.DID.Fragment, force)
+	if err != nil {
+		return fmt.Errorf("new_actor: Failed to export IPNSKey to IPFS: %v", err)
+	}
+
+	// Make sure the DIDDocument is published to IPFS if it's not already.
+	_, err = e.Doc.Publish()
+	if err != nil {
+		return fmt.Errorf("new_actor: Failed to publish DOC: %v", err)
+	}
+
+	return nil
+}
