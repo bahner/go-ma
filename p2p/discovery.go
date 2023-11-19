@@ -19,5 +19,19 @@ func StartPeerDiscovery(ctx context.Context, h host.Host) error {
 	wg.Wait()
 	log.Info("Peer discovery finished.")
 
-	return nil
+	// Wait for the wait group or the timeout
+	done := make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-ctx.Done():
+		log.Warn("Peer discovery timed out.")
+		return ctx.Err()
+	case <-done:
+		log.Info("Peer discovery finished.")
+		return nil
+	}
 }
