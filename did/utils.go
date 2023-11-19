@@ -10,7 +10,6 @@ import (
 	"github.com/bahner/go-ma/internal"
 	"github.com/ipfs/boxo/ipns"
 	nanoid "github.com/matoous/go-nanoid/v2"
-	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -38,17 +37,14 @@ func IsValidDID(didStr string) bool {
 
 func ValidateDID(didStr string) error {
 
-	log.Debugf("did/validate: didStr: %s", didStr)
 	if !strings.HasPrefix(didStr, ma.DID_PREFIX) {
 		return fmt.Errorf("invalid DID format, must start with %s", ma.DID_PREFIX)
 	}
 
 	identifier := strings.TrimPrefix(didStr, ma.DID_PREFIX)
-	log.Debugf("did/validate: identifier: %s", identifier)
 
 	name := strings.Split(identifier, "#")
 	id := name[0]
-	log.Debugf("did/validate: id: %s", id)
 	fragment := name[1]
 
 	if len(name) != 2 {
