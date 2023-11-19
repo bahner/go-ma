@@ -1,6 +1,7 @@
 package set
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/bahner/go-ma/internal"
@@ -45,14 +46,28 @@ func New(name string) (Keyset, error) {
 func (k Keyset) MarshalToCBOR() ([]byte, error) {
 	return cbor.Marshal(k)
 }
-
 func UnmarshalFromCBOR(data []byte) (Keyset, error) {
 	var k Keyset
 	err := cbor.Unmarshal(data, &k)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("keyset/unmarshal: failed to unmarshal keyset: %w", err)
 	}
+
 	return k, nil
+}
+
+func (k Keyset) MarshalToJSON() ([]byte, error) {
+	return json.Marshal(k)
+}
+
+// Prints keyset as JSON string, fails silently
+// with "" if there is an error.
+func (k Keyset) String() string {
+
+	jsonBytes, _ := k.MarshalToJSON()
+
+	return string(jsonBytes)
+
 }
 
 func (k Keyset) Pack() (string, error) {
