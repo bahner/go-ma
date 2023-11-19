@@ -37,7 +37,6 @@ func initMDNS(h host.Host, rendezvous string) chan peer.AddrInfo {
 func DiscoverMDNSPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host) chan peer.AddrInfo {
 
 	log.Debugf("Discovering MDNS peers for servicename: %s", ma.RENDEZVOUS)
-	defer wg.Done()
 
 	peerChan := initMDNS(h, ma.RENDEZVOUS)
 	for {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/bahner/go-ma"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
@@ -82,9 +81,7 @@ func initDHT(ctx context.Context, h host.Host) (*dht.IpfsDHT, error) {
 	log.Info("Kademlia DHT bootstrapped successfully.")
 	return kademliaDHT, nil
 }
-
 func DiscoverDHTPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host) error {
-	defer wg.Done()
 
 	log.Debug("Starting DHT route discovery.")
 
@@ -118,10 +115,7 @@ func DiscoverDHTPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host) erro
 					continue // Skip self connection
 				}
 
-				// Connect to peer with a timeout
-				connectCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-				err := h.Connect(connectCtx, peer)
-				cancel()
+				err := h.Connect(ctx, peer) // Using the outer context directly
 				if err != nil {
 					log.Debugf("Failed connecting to %s, error: %v\n", peer.ID.String(), err)
 				} else {
