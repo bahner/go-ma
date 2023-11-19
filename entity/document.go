@@ -11,7 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func CreateEntityDocument(id *did.DID, controller *did.DID, keyset keyset.Keyset) (*doc.Document, error) {
+func CreateEntityDocument(id *did.DID, controller *did.DID, keyset *keyset.Keyset) (*doc.Document, error) {
 	// Initialize a new DID Document
 	myDoc, err := doc.New(id.String(), id.String())
 	if err != nil {

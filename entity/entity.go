@@ -22,7 +22,7 @@ import (
 type Entity struct {
 	DID    *did.DID
 	Doc    *doc.Document
-	Keyset keyset.Keyset
+	Keyset *keyset.Keyset
 }
 
 // This creates a new Entity from an identifier.
@@ -51,7 +51,7 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	}, nil
 }
 
-func NewFromKey(ipfsKey ipnskey.Key, controller *did.DID) (*Entity, error) {
+func NewFromKey(ipfsKey *ipnskey.Key, controller *did.DID) (*Entity, error) {
 
 	id, err := did.NewFromIPNSKey(ipfsKey)
 	if err != nil {

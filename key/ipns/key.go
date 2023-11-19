@@ -15,31 +15,31 @@ import (
 // for storage on a yellow sticker on your monitor
 // where it belongs.
 type Key struct {
-	DID       string
-	PrivKey   crypto.PrivKey
-	PublicKey crypto.PubKey
+	DID       string         `cbor:"DID" json:"DID"`
+	PrivKey   crypto.PrivKey `cbor:"PrivKey" json:"PrivKey"`
+	PublicKey crypto.PubKey  `cbor:"PublicKey" json:"PublicKey"`
 }
 
 // New creates a new Key. It generates a new key pair
 // and derives the IPNS name from the public key.
 // This function does .not require an IPFS node to be running.
-func New(name string) (Key, error) {
+func New(name string) (*Key, error) {
 
 	if !internal.IsValidNanoID(name) {
-		return Key{}, fmt.Errorf("key/new: invalid name: %v", name)
+		return nil, fmt.Errorf("key/new: invalid name: %v", name)
 	}
 
 	privKey, pubKey, err := crypto.GenerateEd25519Key(rand.Reader)
 	if err != nil {
-		return Key{}, fmt.Errorf("key/new: failed to generate key pair: %w", err)
+		return nil, fmt.Errorf("key/new: failed to generate key pair: %w", err)
 	}
 
 	DID, err := CreateDIDFromPublicKeyAndName(pubKey, name)
 	if err != nil {
-		return Key{}, fmt.Errorf("key/new: failed to create ID from public key and name: %w", err)
+		return nil, fmt.Errorf("key/new: failed to create ID from public key and name: %w", err)
 	}
 
-	return Key{
+	return &Key{
 		DID:       DID,
 		PrivKey:   privKey,
 		PublicKey: pubKey,

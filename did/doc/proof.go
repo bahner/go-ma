@@ -22,7 +22,7 @@ type Proof struct {
 	ProofValue         string   `cbor:"proofValue" json:"proofValue"`
 }
 
-func (d *Document) Sign(signKey key.SigningKey, vm VerificationMethod) error {
+func (d *Document) Sign(signKey *key.SigningKey, vm VerificationMethod) error {
 
 	if signKey.PublicKeyMultibase != vm.PublicKeyMultibase {
 		return fmt.Errorf("doc sign: signKey.PublicKeyMultibase != vm.PublicKeyMultibase")

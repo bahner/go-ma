@@ -23,17 +23,17 @@ type EncryptionKey struct {
 	PublicKeyMultibase string
 }
 
-func NewEncryptionKey(identifier string) (EncryptionKey, error) {
+func NewEncryptionKey(identifier string) (*EncryptionKey, error) {
 
 	if !internal.IsValidIPNSName(identifier) {
-		return EncryptionKey{}, fmt.Errorf("key/encryption: invalid identifier: %s", identifier)
+		return nil, fmt.Errorf("key/encryption: invalid identifier: %s", identifier)
 	}
 
 	// Generate a random private key
 	var privKey [curve25519.ScalarSize]byte
 	_, err := rand.Read(privKey[:])
 	if err != nil {
-		return EncryptionKey{}, err
+		return nil, err
 	}
 
 	// Calculate the corresponding public key
@@ -43,15 +43,15 @@ func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 	// Encode the public key to multibase
 	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(pubKey[:], KEY_AGREEMENT_MULTICODEC_STRING)
 	if err != nil {
-		return EncryptionKey{}, fmt.Errorf("key_generate: error encoding public key multibase: %w", err)
+		return nil, fmt.Errorf("key_generate: error encoding public key multibase: %w", err)
 	}
 
 	name, err := nanoid.New()
 	if err != nil {
-		return EncryptionKey{}, fmt.Errorf("key_generate: error generating nanoid: %w", err)
+		return nil, fmt.Errorf("key_generate: error generating nanoid: %w", err)
 	}
 
-	return EncryptionKey{
+	return &EncryptionKey{
 		DID:                ma.DID_PREFIX + identifier + "#" + name,
 		Type:               KEY_AGREEMENT_KEY_TYPE,
 		PrivKey:            privKey,
