@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/bahner/go-ma"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
@@ -15,7 +16,6 @@ import (
 )
 
 func initDHT(ctx context.Context, h host.Host) (*dht.IpfsDHT, error) {
-
 	log.Info("Initializing DHT.")
 
 	kademliaDHT, err := dht.New(ctx, h)
@@ -34,6 +34,7 @@ func initDHT(ctx context.Context, h host.Host) (*dht.IpfsDHT, error) {
 		log.Debug("Kademlia DHT bootstrap setup.")
 	}
 
+	var wg sync.WaitGroup
 	for _, peerAddr := range dht.DefaultBootstrapPeers {
 		peerinfo, err := peer.AddrInfoFromP2pAddr(peerAddr)
 		if err != nil {
@@ -43,14 +44,39 @@ func initDHT(ctx context.Context, h host.Host) (*dht.IpfsDHT, error) {
 
 		log.Debugf("Bootstrapping to peer: %s", peerinfo.ID.String())
 
+		wg.Add(1)
 		go func(pInfo peer.AddrInfo) {
+			defer wg.Done()
 
-			log.Debugf("Attempting connection to peer: %s", pInfo.ID.String())
+			errCh := make(chan error, 1)
+			go func() {
+				errCh <- h.Connect(ctx, pInfo)
+			}()
 
-			if err := h.Connect(ctx, pInfo); err != nil {
-				log.Warnf("Bootstrap warning: %v", err)
+			select {
+			case <-ctx.Done():
+				log.Debug("Context cancelled, aborting connection attempt.")
+				return
+			case err := <-errCh:
+				if err != nil {
+					log.Warnf("Bootstrap warning: %v", err)
+				}
 			}
 		}(*peerinfo)
+	}
+
+	// Wait for all bootstrap attempts to complete or context cancellation
+	go func() {
+		wg.Wait()
+		log.Info("All bootstrap attempts completed.")
+	}()
+
+	select {
+	case <-ctx.Done():
+		log.Info("Context cancelled during bootstrap.")
+		return nil, ctx.Err()
+	default:
+		// Continue with other operations if context is not cancelled
 	}
 
 	log.Info("Kademlia DHT bootstrapped successfully.")
@@ -58,7 +84,6 @@ func initDHT(ctx context.Context, h host.Host) (*dht.IpfsDHT, error) {
 }
 
 func DiscoverDHTPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host) error {
-
 	defer wg.Done()
 
 	log.Debug("Starting DHT route discovery.")
@@ -76,24 +101,39 @@ func DiscoverDHTPeers(ctx context.Context, wg *sync.WaitGroup, h host.Host) erro
 	retryCount := 0
 
 	for {
-
 		peerChan, err := routingDiscovery.FindPeers(ctx, ma.RENDEZVOUS)
 		if err != nil {
 			return fmt.Errorf("peer discovery error: %w", err)
 		}
 
 		anyConnected := false
-		for peer := range peerChan {
-			if peer.ID == h.ID() {
-				continue // Skip self connection
-			}
+		for {
+			select {
+			case peer, ok := <-peerChan:
+				if !ok {
+					peerChan = nil
+					break
+				}
+				if peer.ID == h.ID() {
+					continue // Skip self connection
+				}
 
-			err := h.Connect(ctx, peer)
-			if err != nil {
-				log.Debugf("Failed connecting to %s, error: %v\n", peer.ID.String(), err)
-			} else {
-				log.Infof("Connected to DHT peer: %s", peer.ID.String())
-				anyConnected = true
+				// Connect to peer with a timeout
+				connectCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+				err := h.Connect(connectCtx, peer)
+				cancel()
+				if err != nil {
+					log.Debugf("Failed connecting to %s, error: %v\n", peer.ID.String(), err)
+				} else {
+					log.Infof("Connected to DHT peer: %s", peer.ID.String())
+					anyConnected = true
+				}
+			case <-ctx.Done():
+				log.Info("Context cancelled, stopping DHT peer discovery.")
+				return nil
+			}
+			if peerChan == nil {
+				break
 			}
 		}
 
