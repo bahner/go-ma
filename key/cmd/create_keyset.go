@@ -50,7 +50,7 @@ func main() {
 	fmt.Println(packedKeyset)
 
 	// Forces update of key to IPFS
-	err = keyset.IPNSKey.ExportToIPFS(ID.Fragment, forceUpdate)
+	err = keyset.IPNSKey.ExportToIPFS(forceUpdate)
 	if err != nil {
 		panic(err)
 	}

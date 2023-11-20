@@ -106,7 +106,7 @@ func Unpack(data string) (*Entity, error) {
 func (e *Entity) Publish(force bool) error {
 
 	// Publish the IPNSKey to IPFS for publication.
-	err := e.Keyset.IPNSKey.ExportToIPFS(e.DID.Fragment, force)
+	err := e.Keyset.IPNSKey.ExportToIPFS(force)
 	if err != nil {
 		return fmt.Errorf("new_actor: Failed to export IPNSKey to IPFS: %v", err)
 	}
