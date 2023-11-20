@@ -84,21 +84,6 @@ func (i *Key) ExportToIPFS(forceUpdate bool) error {
 
 }
 
-// Checks if another IPNS key with either the same name or identifier exists in the IPFS daemon.
-func (i *Key) IsUnique() bool {
-
-	if KeyWithNameExists(internal.GetDIDFragment(i.DID)) {
-		return false
-	}
-
-	if KeyWithIdentifierExists(internal.GetDIDIdentifier(i.DID)) {
-		return false
-	}
-
-	return true
-
-}
-
 // Checks if a key with the same name/alias exists in the IPFS daemon.
 func KeyWithNameExists(name string) bool {
 

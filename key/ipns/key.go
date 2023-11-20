@@ -114,3 +114,18 @@ func (k *Key) Exists() bool {
 
 	return KeyExists(fragment, identifier)
 }
+
+// Checks if another IPNS key with either the same name or identifier exists in the IPFS daemon.
+func (i *Key) IsUnique() bool {
+
+	if KeyWithNameExists(internal.GetDIDFragment(i.DID)) {
+		return false
+	}
+
+	if KeyWithIdentifierExists(internal.GetDIDIdentifier(i.DID)) {
+		return false
+	}
+
+	return true
+
+}

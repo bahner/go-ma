@@ -17,17 +17,14 @@ func main() {
 	fmt.Fprint(os.Stderr, "*              It is only meant for testing.                     *\n")
 	fmt.Fprint(os.Stderr, "******************************************************************\n")
 
-	var name string
-	var forceUpdate bool
-
 	log.SetLevel(log.ErrorLevel)
 
-	flag.StringVar(&name, "name", "", "Name of the entity to create")
-	flag.BoolVar(&forceUpdate, "force", false, "Force publish to IPFS")
+	name := flag.String("name", "", "Name of the entity to create")
+	forceUpdate := flag.Bool("force", false, "Force publish to IPFS")
 	flag.Parse()
 
 	// Create a new person, object - an entity
-	ID, err := did.NewFromName(name)
+	ID, err := did.NewFromName(*name)
 	if err != nil {
 		fmt.Printf("Error creating new DID: %v", err)
 	}
@@ -37,7 +34,7 @@ func main() {
 	log.Debugf("main: myID: %s", myID)
 
 	// Create a new keyset for the entity
-	keyset, err := keyset.New(ID.Fragment)
+	keyset, err := keyset.New(*name, *forceUpdate)
 	if err != nil {
 		panic(err)
 	}
@@ -49,9 +46,4 @@ func main() {
 	}
 	fmt.Println(packedKeyset)
 
-	// Forces update of key to IPFS
-	err = keyset.IPNSKey.ExportToIPFS(forceUpdate)
-	if err != nil {
-		panic(err)
-	}
 }

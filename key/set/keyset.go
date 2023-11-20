@@ -8,6 +8,7 @@ import (
 	"github.com/bahner/go-ma/key"
 	ipnskey "github.com/bahner/go-ma/key/ipns"
 	cbor "github.com/fxamacker/cbor/v2"
+	log "github.com/sirupsen/logrus"
 )
 
 type Keyset struct {
@@ -17,12 +18,19 @@ type Keyset struct {
 }
 
 // Creates new keyset from a name (typically fragment of a DID)
-func New(name string) (*Keyset, error) {
+func New(name string, forceUpdate bool) (*Keyset, error) {
+
+	var IPNSKey *ipnskey.Key
 
 	IPNSKey, err := ipnskey.New(name)
 	if err != nil {
 		return nil, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
 	}
+
+	return NewFromIPNSKey(IPNSKey, forceUpdate)
+}
+
+func NewFromIPNSKey(IPNSKey *ipnskey.Key, forceUpdate bool) (*Keyset, error) {
 
 	identifier := internal.GetDIDIdentifier(IPNSKey.DID)
 
@@ -34,6 +42,11 @@ func New(name string) (*Keyset, error) {
 	signatureKey, err := key.NewSigningKey(identifier)
 	if err != nil {
 		return nil, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
+	}
+
+	err = IPNSKey.ExportToIPFS(forceUpdate)
+	if err != nil {
+		log.Errorf("keyset/new: failed to export IPNS key to IPFS: %v", err)
 	}
 
 	return &Keyset{
