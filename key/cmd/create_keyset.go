@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bahner/go-ma/did"
 	keyset "github.com/bahner/go-ma/key/set"
 	log "github.com/sirupsen/logrus"
 )
@@ -20,18 +19,8 @@ func main() {
 	log.SetLevel(log.ErrorLevel)
 
 	name := flag.String("name", "", "Name of the entity to create")
-	forceUpdate := flag.Bool("force", false, "Force publish to IPFS")
+	forceUpdate := flag.Bool("forceUpdate", false, "Force publish to IPFS")
 	flag.Parse()
-
-	// Create a new person, object - an entity
-	ID, err := did.NewFromName(*name)
-	if err != nil {
-		fmt.Printf("Error creating new DID: %v", err)
-	}
-	log.Debugf("main: ID: %v", ID)
-
-	myID := ID.String()
-	log.Debugf("main: myID: %s", myID)
 
 	// Create a new keyset for the entity
 	keyset, err := keyset.New(*name, *forceUpdate)

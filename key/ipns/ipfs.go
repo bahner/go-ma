@@ -33,15 +33,13 @@ func (i *Key) ExportToIPFS(forceUpdate bool) error {
 	if !i.IsUnique() {
 
 		existingKey, err := GetKeyByIdentifier(internal.GetDIDIdentifier(i.DID))
-		if err != nil {
-			return fmt.Errorf("key/ipns: failed to get key by identifier: %v", err)
+		if err == nil {
+			return fmt.Errorf(
+				"key/ipns: key with identifier %s already exists with another name: %s",
+				internal.GetDIDIdentifier(i.DID),
+				existingKey.Name,
+			)
 		}
-
-		return fmt.Errorf(
-			"key/ipns: key with identifier %s already exists with another name: %s",
-			internal.GetDIDIdentifier(i.DID),
-			existingKey.Name,
-		)
 	}
 
 	// If an existing key with the same name exists, but it has a different
