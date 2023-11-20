@@ -8,30 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// func StartPeerDiscovery(ctx context.Context, h host.Host) error {
-// 	log.Debug("Starting peer discovery...")
-
-// 	wg := &sync.WaitGroup{}
-// 	wg.Add(2)
-// 	go DiscoverDHTPeers(ctx, wg, h)
-// 	go DiscoverMDNSPeers(ctx, wg, h)
-
-// 	// Wait for the wait group or the timeout
-// 	done := make(chan struct{})
-// 	go func() {
-// 		wg.Wait()
-// 		close(done)
-// 	}()
-
-//		select {
-//		case <-ctx.Done():
-//			log.Warn("Peer discovery timed out.")
-//			return ctx.Err()
-//		case <-done:
-//			log.Info("Peer discovery successfully completed.")
-//			return nil
-//		}
-//	}
+// StartPeerDiscovery starts peer discovery using  DHT
+// Try and be smart and exist, when one of the discovery methods is done
 func StartPeerDiscovery(ctx context.Context, h host.Host) error {
 	log.Debug("Starting peer discovery...")
 
@@ -42,17 +20,11 @@ func StartPeerDiscovery(ctx context.Context, h host.Host) error {
 	done := make(chan bool, 2)
 
 	wg := &sync.WaitGroup{}
-	wg.Add(2)
+	wg.Add(1)
 
 	go func() {
 		defer wg.Done()
 		DiscoverDHTPeers(ctx, wg, h)
-		done <- true
-		cancel() // Cancel the other discovery method
-	}()
-	go func() {
-		defer wg.Done()
-		DiscoverMDNSPeers(ctx, wg, h)
 		done <- true
 		cancel() // Cancel the other discovery method
 	}()
