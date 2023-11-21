@@ -1,11 +1,11 @@
 # TODO
 
 ## Create a useful README
-The code is approaching useful state, but needs to have the documentation
-leveraged significantly.
-#Keys
-Fix race conditions with keys. In order to create entities the first things is to publish it, before continuing. That means the private key must exist early
+The code is approaching useful state, but needs to have the documentation leveraged significantly.
 
-## kub/rpc
+## kubo/rpc
 
 go-ipfs-api has been archived and needs to be replaced with kubo rpc
+
+## Constant error messages.
+Instead of parsing error strings low-level function should return ErrMessages. Eg. ErrKeyIPNSKeyExists, so that this error can easily be ignored by calling function.
