@@ -23,7 +23,7 @@ var (
 
 // 	did, err := Parse(didStr)
 // 	if err != nil {
-// 		return "", fmt.Errorf("did: not a valid identifier: %v\n", err))
+// 		return "", fmt.Errorf("did: not a valid identifier: %w\n", err))
 // 	}
 
 // 	return did.Identifier, nil
