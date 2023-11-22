@@ -22,18 +22,18 @@ import (
 type Entity struct {
 	DID    *did.DID
 	Doc    *doc.Document
-	Keyset keyset.Keyset
+	Keyset *keyset.Keyset
 }
 
 // This creates a new Entity from an identifier.
 // Set controller as the world DID or as self.
 
-func New(id *did.DID, controller *did.DID) (*Entity, error) {
+func New(id *did.DID, controller *did.DID, forceUpdate bool) (*Entity, error) {
 
 	// Now we create a keyset for the entity.
 	// The keyset creation will lookup the IPNS key again and also
 	// create keys for signing and encryption.
-	myKeyset, err := keyset.New(id.Fragment)
+	myKeyset, err := keyset.New(id.Fragment, forceUpdate)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create key from ipnsKey: %s", err)
 	}
@@ -51,14 +51,14 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	}, nil
 }
 
-func NewFromKey(ipfsKey ipnskey.Key, controller *did.DID) (*Entity, error) {
+func NewFromKey(ipfsKey *ipnskey.Key, controller *did.DID, forceUpdate bool) (*Entity, error) {
 
 	id, err := did.NewFromIPNSKey(ipfsKey)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create did from ipnsKey: %s", err)
 	}
 
-	return New(id, controller)
+	return New(id, controller, forceUpdate)
 }
 
 func (e *Entity) MarshalToCBOR() ([]byte, error) {
@@ -106,7 +106,7 @@ func Unpack(data string) (*Entity, error) {
 func (e *Entity) Publish(force bool) error {
 
 	// Publish the IPNSKey to IPFS for publication.
-	err := e.Keyset.IPNSKey.ExportToIPFS(e.DID.Fragment, force)
+	err := e.Keyset.IPNSKey.ExportToIPFS(force)
 	if err != nil {
 		return fmt.Errorf("new_actor: Failed to export IPNSKey to IPFS: %v", err)
 	}

@@ -7,7 +7,7 @@ import (
 	keyset "github.com/bahner/go-ma/key/set"
 )
 
-func NewFromKeyset(keyset keyset.Keyset) (*Entity, error) {
+func NewFromKeyset(keyset *keyset.Keyset) (*Entity, error) {
 
 	id, err := did.NewFromIPNSKey(keyset.IPNSKey)
 	if err != nil {

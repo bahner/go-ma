@@ -33,28 +33,28 @@ func (k *SigningKey) Sign(data []byte) ([]byte, error) {
 }
 
 // Generates a signing key for the given identifier, ie. IPNS name
-func NewSigningKey(identifier string) (SigningKey, error) {
+func NewSigningKey(identifier string) (*SigningKey, error) {
 
 	if !internal.IsValidIPNSName(identifier) {
-		return SigningKey{}, fmt.Errorf("key/ed25519: invalid identifier: %s", identifier)
+		return nil, fmt.Errorf("key/ed25519: invalid identifier: %s", identifier)
 	}
 
 	publicKey, privKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
-		return SigningKey{}, fmt.Errorf("key/signing: error generating key pair: %w", err)
+		return nil, fmt.Errorf("key/signing: error generating key pair: %w", err)
 	}
 
 	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, ASSERTION_METHOD_KEY_MULTICODEC_STRING)
 	if err != nil {
-		return SigningKey{}, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
+		return nil, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
 	}
 
 	name, err := nanoid.New()
 	if err != nil {
-		return SigningKey{}, fmt.Errorf("key/ed25519: error generating nanoid: %w", err)
+		return nil, fmt.Errorf("key/ed25519: error generating nanoid: %w", err)
 	}
 
-	return SigningKey{
+	return &SigningKey{
 		DID:                ma.DID_PREFIX + identifier + "#" + name,
 		Type:               ASSERTION_METHOD_KEY_TYPE,
 		PrivKey:            &privKey,

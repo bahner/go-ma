@@ -91,7 +91,7 @@ func NewFromName(name string) (*DID, error) {
 }
 
 // If you already have a key, you can use this to create a DID.
-func NewFromIPNSKey(keyName ipnskey.Key) (*DID, error) {
+func NewFromIPNSKey(keyName *ipnskey.Key) (*DID, error) {
 
 	return NewFromDID(keyName.DID)
 

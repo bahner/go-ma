@@ -20,7 +20,7 @@ func main() {
 		fmt.Printf("failed to create new DID from IPNS key: %v\n", err)
 	}
 
-	i, err := entity.New(id, id)
+	i, err := entity.New(id, id, false)
 	if err != nil {
 		fmt.Printf("Error creating new identity in ma: %v\n", err)
 	}

@@ -22,7 +22,7 @@ func main() {
 
 	os.Setenv("IPFS_API_SOCKET", "localhost:45005")
 
-	bahner, err := keyset.New("bahner")
+	bahner, err := keyset.New("bahner", false)
 	if err != nil {
 		fmt.Printf("error creating new keyset: %v\n", err)
 	}
