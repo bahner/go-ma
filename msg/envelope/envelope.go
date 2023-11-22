@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/bahner/go-ma/internal"
 	cbor "github.com/fxamacker/cbor/v2"
 )
 
@@ -36,6 +37,36 @@ func UnmarshalFromCBOR(data []byte) (*Envelope, error) {
 	err := cbor.Unmarshal(data, e)
 	if err != nil {
 		return nil, fmt.Errorf("envelope: error unmarshalling envelope: %s", err)
+	}
+
+	return e, nil
+}
+
+func (e *Envelope) Pack() (string, error) {
+	marshalled, err := e.MarshalToCBOR()
+	if err != nil {
+		return "", fmt.Errorf("envelope: failed to marshal envelope: %v", err)
+	}
+
+	packed, err := internal.MultibaseEncode(marshalled)
+	if err != nil {
+		return "", fmt.Errorf("envelope: failed to multibase encode envelope: %v", err)
+	}
+
+	return packed, nil
+
+}
+
+func Unpack(packed string) (*Envelope, error) {
+
+	data, err := internal.MultibaseDecode(packed)
+	if err != nil {
+		return nil, fmt.Errorf("envelope: failed to multibase decode envelope: %v", err)
+	}
+
+	e, err := UnmarshalFromCBOR(data)
+	if err != nil {
+		return nil, fmt.Errorf("envelope: failed to unmarshal envelope: %v", err)
 	}
 
 	return e, nil
