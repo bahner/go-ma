@@ -62,7 +62,7 @@ func Signed(
 	to string,
 	body string,
 	mime_type string,
-	priv_key ed25519.PrivateKey) (*Message, error) {
+	priv_key *ed25519.PrivateKey) (*Message, error) {
 
 	m, err := New(from, to, body, mime_type)
 	if err != nil {

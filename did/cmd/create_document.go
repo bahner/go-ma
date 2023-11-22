@@ -14,10 +14,13 @@ func main() {
 	log.SetLevel(log.ErrorLevel)
 
 	ipnsKey, err := ipnskey.New("bahner")
+	if err != nil {
+		fmt.Printf("failed to create new IPNS key: %v\n", err)
+	}
 
 	id, err := did.NewFromIPNSKey(ipnsKey)
 	if err != nil {
-		fmt.Printf("failed to create new DID from IPNS key: %w\n", err)
+		fmt.Printf("failed to create new DID from IPNS key: %v\n", err)
 	}
 
 	i, err := entity.New(id, id, false)

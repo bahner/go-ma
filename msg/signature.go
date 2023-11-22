@@ -10,7 +10,7 @@ import (
 	"github.com/bahner/go-ma/internal"
 )
 
-func (m *Message) Sign(privKey ed25519.PrivateKey) error {
+func (m *Message) Sign(privKey *ed25519.PrivateKey) error {
 
 	data_to_sign, err := m.PayloadPack()
 	if err != nil {

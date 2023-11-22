@@ -26,7 +26,7 @@ type Key struct {
 func New(name string) (*Key, error) {
 
 	if !internal.IsValidNanoID(name) {
-		return nil, fmt.Errorf("key/new: invalid name: %w", name)
+		return nil, fmt.Errorf("key/new: invalid name: %s", name)
 	}
 
 	privKey, pubKey, err := crypto.GenerateEd25519Key(rand.Reader)
