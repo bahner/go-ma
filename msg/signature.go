@@ -35,27 +35,33 @@ func (m *Message) Sign(privKey *ed25519.PrivateKey) error {
 }
 
 // Verify verifies the Message's signature
-func (m *Message) Verify() (bool, error) {
+// Returns nil if the signature is valid
+func (m *Message) Verify() error {
 
 	did, err := did.NewFromDID(m.From)
 	if err != nil {
-		return false, fmt.Errorf("message/verify: failed to create did from From: %w", err)
+		return fmt.Errorf("message/verify: failed to create did from From: %w", err)
 	}
 
 	senderDoc, err := doc.Fetch(did.Name)
 	if err != nil {
-		return false, fmt.Errorf("message/verify: failed to fetch sender document")
+		return fmt.Errorf("message/verify: failed to fetch sender document")
 	}
 
 	signingKey, err := senderDoc.AssertionMethodPublicKey()
 	if err != nil {
-		return false, fmt.Errorf("message/verify: failed to get signing key: %w", err)
+		return fmt.Errorf("message/verify: failed to get signing key: %w", err)
 	}
 
 	payload, err := m.PayloadPack()
 	if err != nil {
-		return false, fmt.Errorf("message/verify: failed to pack payload: %w", err)
+		return fmt.Errorf("message/verify: failed to pack payload: %w", err)
 	}
 
-	return ed25519.Verify(signingKey, []byte(payload), []byte(m.Signature)), nil
+	verification := ed25519.Verify(signingKey, []byte(payload), []byte(m.Signature))
+	if !verification {
+		return fmt.Errorf("message/verify: failed to verify signature")
+	}
+
+	return nil
 }
