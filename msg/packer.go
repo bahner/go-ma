@@ -2,6 +2,7 @@ package msg
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/bahner/go-ma/internal"
 	cbor "github.com/fxamacker/cbor/v2"
@@ -48,4 +49,14 @@ func Unpack(data string) (*Message, error) {
 	}
 
 	return &p, nil
+}
+
+func (m *Message) Bytes() ([]byte, error) {
+
+	packedMessage, err := m.Pack()
+	if err != nil {
+		return nil, fmt.Errorf("msg/bytes: failed to pack message: %w", err)
+	}
+
+	return []byte(packedMessage), nil
 }
