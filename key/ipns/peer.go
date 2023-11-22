@@ -36,7 +36,7 @@ func IdentifierFromPublicKey(pubKey crypto.PubKey) (ipns.Name, error) {
 
 	pid, err := peer.IDFromPublicKey(pubKey)
 	if err != nil {
-		return ipns.Name{}, fmt.Errorf("key/ipns: failed to generate peer ID from public key: %v", err)
+		return ipns.Name{}, fmt.Errorf("key/ipns: failed to generate peer ID from public key: %w", err)
 	}
 	ipnsName := ipns.NameFromPeer(pid)
 

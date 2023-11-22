@@ -27,14 +27,14 @@ func (d *Document) Publish() (*shell.PublishResponse, error) {
 	data, err := d.JSON()
 	if err != nil {
 		return &shell.PublishResponse{},
-			fmt.Errorf("doc/publish: failed to marshal document to JSON: %v", err)
+			fmt.Errorf("doc/publish: failed to marshal document to JSON: %w", err)
 	}
 
 	// Publish the document to IPFS first. We need the CID to publish to IPNS.
 	// So without that we ain't going nowhere.
 	cid, err := internal.IPLDPutJSON(data)
 	if err != nil {
-		return &shell.PublishResponse{}, fmt.Errorf("doc: failed to publish document to IPFS: %v", err)
+		return &shell.PublishResponse{}, fmt.Errorf("doc: failed to publish document to IPFS: %w", err)
 	}
 
 	// Lookup short name of the identifier, ie. the fragment
@@ -45,7 +45,7 @@ func (d *Document) Publish() (*shell.PublishResponse, error) {
 	docdid, err := did.NewFromDID(d.ID)
 	if err != nil {
 		return &shell.PublishResponse{},
-			fmt.Errorf("doc/publish: failed to parse DID: %v", err)
+			fmt.Errorf("doc/publish: failed to parse DID: %w", err)
 	}
 
 	return internal.IPNSPublishCID(cid, docdid.Fragment, true)

@@ -23,7 +23,7 @@ func Fetch(d string) (*Document, error) {
 
 	err = shell.DagGet("/ipns/"+docdid.Identifier, document)
 	if err != nil {
-		return nil, fmt.Errorf("doc/fetch: failed to get document from IPFS: %v", err)
+		return nil, fmt.Errorf("doc/fetch: failed to get document from IPFS: %w", err)
 	}
 
 	return document, nil

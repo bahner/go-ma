@@ -111,7 +111,7 @@ func IPNSFindKeyID(name string) (string, error) {
 
 	keys, err := IPNSListKeys()
 	if err != nil {
-		return "", fmt.Errorf("ipfs: failed to list : %v", err)
+		return "", fmt.Errorf("ipfs: failed to list : %w", err)
 	}
 	for _, key := range keys {
 		if key.Name == name {
@@ -125,7 +125,7 @@ func IPNSFindKeyName(id string) (string, error) {
 
 	keys, err := IPNSListKeys()
 	if err != nil {
-		return "", fmt.Errorf("ipfs: failed to list : %v", err)
+		return "", fmt.Errorf("ipfs: failed to list : %w", err)
 	}
 	for _, key := range keys {
 		if key.Id == id {
@@ -141,7 +141,7 @@ func IPNSLookupKeyName(keyName string) (*shell.Key, error) {
 
 	keys, err := IPNSListKeys()
 	if err != nil {
-		return lookedupKey, fmt.Errorf("ipfs: failed to list : %v", err)
+		return lookedupKey, fmt.Errorf("ipfs: failed to list : %w", err)
 	}
 
 	// A little deeper than I usually like to nest, but hey, it's a one off.

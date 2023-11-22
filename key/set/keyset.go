@@ -45,7 +45,7 @@ func NewFromIPNSKey(IPNSKey *ipnskey.Key, forceUpdate bool) (*Keyset, error) {
 
 	err = IPNSKey.ExportToIPFS(forceUpdate)
 	if err != nil {
-		log.Errorf("keyset/new: failed to export IPNS key to IPFS: %v", err)
+		log.Errorf("keyset/new: failed to export IPNS key to IPFS: %w", err)
 	}
 
 	return &Keyset{

@@ -27,11 +27,11 @@ func NewFromKeyset(k *set.Keyset, controller string) (*Document, error) {
 		internal.GetDIDFragment(k.EncryptionKey.DID),
 		k.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
-		return nil, fmt.Errorf("new_actor: Failed to create encryption verification method: %v", err)
+		return nil, fmt.Errorf("new_actor: Failed to create encryption verification method: %w", err)
 	}
 	err = d.AddVerificationMethod(encVm)
 	if err != nil {
-		return nil, fmt.Errorf("new_actor: Failed to add encryption verification method to DOC: %v", err)
+		return nil, fmt.Errorf("new_actor: Failed to add encryption verification method to DOC: %w", err)
 	}
 	d.KeyAgreement = encVm.ID
 
@@ -42,11 +42,11 @@ func NewFromKeyset(k *set.Keyset, controller string) (*Document, error) {
 		internal.GetDIDFragment(k.SigningKey.DID),
 		k.SigningKey.PublicKeyMultibase)
 	if err != nil {
-		return nil, fmt.Errorf("new_actor: Failed to create assertion verification method: %v", err)
+		return nil, fmt.Errorf("new_actor: Failed to create assertion verification method: %w", err)
 	}
 	err = d.AddVerificationMethod(assertVm)
 	if err != nil {
-		return nil, fmt.Errorf("new_actor: Failed to add assertion verification method to DOC: %v", err)
+		return nil, fmt.Errorf("new_actor: Failed to add assertion verification method to DOC: %w", err)
 	}
 	d.AssertionMethod = assertVm.ID
 

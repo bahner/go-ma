@@ -108,13 +108,13 @@ func (e *Entity) Publish(force bool) error {
 	// Publish the IPNSKey to IPFS for publication.
 	err := e.Keyset.IPNSKey.ExportToIPFS(force)
 	if err != nil {
-		return fmt.Errorf("new_actor: Failed to export IPNSKey to IPFS: %v", err)
+		return fmt.Errorf("new_actor: Failed to export IPNSKey to IPFS: %w", err)
 	}
 
 	// Make sure the DIDDocument is published to IPFS if it's not already.
 	_, err = e.Doc.Publish()
 	if err != nil {
-		return fmt.Errorf("new_actor: Failed to publish DOC: %v", err)
+		return fmt.Errorf("new_actor: Failed to publish DOC: %w", err)
 	}
 
 	return nil

@@ -45,12 +45,12 @@ func UnmarshalFromCBOR(data []byte) (*Envelope, error) {
 func (e *Envelope) Pack() (string, error) {
 	marshalled, err := e.MarshalToCBOR()
 	if err != nil {
-		return "", fmt.Errorf("envelope: failed to marshal envelope: %v", err)
+		return "", fmt.Errorf("envelope: failed to marshal envelope: %w", err)
 	}
 
 	packed, err := internal.MultibaseEncode(marshalled)
 	if err != nil {
-		return "", fmt.Errorf("envelope: failed to multibase encode envelope: %v", err)
+		return "", fmt.Errorf("envelope: failed to multibase encode envelope: %w", err)
 	}
 
 	return packed, nil
@@ -61,12 +61,12 @@ func Unpack(packed string) (*Envelope, error) {
 
 	data, err := internal.MultibaseDecode(packed)
 	if err != nil {
-		return nil, fmt.Errorf("envelope: failed to multibase decode envelope: %v", err)
+		return nil, fmt.Errorf("envelope: failed to multibase decode envelope: %w", err)
 	}
 
 	e, err := UnmarshalFromCBOR(data)
 	if err != nil {
-		return nil, fmt.Errorf("envelope: failed to unmarshal envelope: %v", err)
+		return nil, fmt.Errorf("envelope: failed to unmarshal envelope: %w", err)
 	}
 
 	return e, nil

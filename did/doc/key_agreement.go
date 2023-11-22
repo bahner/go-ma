@@ -27,12 +27,12 @@ func (d *Document) KeyAgreementPublicKeyBytes() ([]byte, error) {
 
 	vm, err := d.GetVerificationMethodbyID(d.KeyAgreement)
 	if err != nil {
-		return nil, fmt.Errorf("doc/key_agreement_public_key: Error getting verification method by ID: %s", err)
+		return nil, fmt.Errorf("doc/key_agreement_public_key: Error getting verification method by ID: %w", err)
 	}
 	// Decode the multibase-encoded public key
 	codec, pubKeyBytes, err := internal.DecodePublicKeyMultibase(vm.PublicKeyMultibase)
 	if err != nil {
-		return nil, fmt.Errorf("doc/key_agreement_public_key: Error decoding publicKeyMultibase: %s", err)
+		return nil, fmt.Errorf("doc/key_agreement_public_key: Error decoding publicKeyMultibase: %w", err)
 	}
 
 	if codec != key.KEY_AGREEMENT_MULTICODEC_STRING {

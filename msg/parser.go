@@ -110,7 +110,7 @@ func (m *Message) VerifyTimestamps() error {
 
 	created_time, err := m.CreatedTime()
 	if err != nil {
-		return fmt.Errorf("invalid CreatedTime: %v", err)
+		return fmt.Errorf("invalid CreatedTime: %w", err)
 	}
 
 	if created_time.After(now) {
@@ -119,7 +119,7 @@ func (m *Message) VerifyTimestamps() error {
 
 	expires_time, err := m.ExpiresTime()
 	if err != nil {
-		return fmt.Errorf("invalid CreatedTime: %v", err)
+		return fmt.Errorf("invalid CreatedTime: %w", err)
 	}
 
 	if expires_time.Before(created_time) {

@@ -45,13 +45,13 @@ func (i *Key) ExportToIPFS(forceUpdate bool) error {
 	// If an existing key with the same name exists, but it has a different
 	// identifier, then we must require forceUpdate to be true.
 	if KeyWithNameExists(name) && !forceUpdate {
-		return fmt.Errorf("key/ipns: key with name %s already exists and publication isn't forced", name)
+		return fmt.Errorf("ipns.ExportToIPFS: key with name %s already exists and publication isn't forced", name)
 	}
 
 	// Serialise the private key to bytes
 	privKeyBytes, err := crypto.MarshalPrivateKey(i.PrivKey)
 	if err != nil {
-		return fmt.Errorf("failed to marshal private key: %v", err)
+		return fmt.Errorf("failed to marshal private key: %w", err)
 	}
 
 	// Create a reader from the bytes, as the publication requires a file object
@@ -66,15 +66,15 @@ func (i *Key) ExportToIPFS(forceUpdate bool) error {
 	if KeyWithNameExists(name) && forceUpdate {
 		_, err = shell.KeyRm(internal.GetContext(), name)
 		if err != nil {
-			return fmt.Errorf("failed to delete existing key: %v", err)
+			return fmt.Errorf("failed to delete existing key: %w", err)
 		}
-		log.Infof("key/ipns: deleted existing key with name %s because of forced publication", name)
+		log.Infof("ipns.KeyWithNameExists: deleted existing key with name %s because of forced publication", name)
 	}
 
 	// Import the key into IPFS
 	err = shell.KeyImport(internal.GetContext(), name, keyReader)
 	if err != nil {
-		return fmt.Errorf("failed to import key: %v", err)
+		return fmt.Errorf("failed to import key: %w", err)
 	}
 	log.Debugf("key/ipns: imported key with name %s", name)
 
@@ -131,7 +131,7 @@ func GetKeyByName(name string) (*shell.Key, error) {
 	// Get the key from IPFS
 	shellKeys, err := shell.KeyList(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get key list: %v", err)
+		return nil, fmt.Errorf("failed to get key list: %w", err)
 	}
 
 	for _, ipnsKey := range shellKeys {
@@ -152,7 +152,7 @@ func GetKeyByIdentifier(identifier string) (*shell.Key, error) {
 	// Get the key from IPFS
 	shellKeys, err := shell.KeyList(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get key list: %v", err)
+		return nil, fmt.Errorf("failed to get key list: %w", err)
 	}
 
 	for _, ipnsKey := range shellKeys {

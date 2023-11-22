@@ -29,7 +29,7 @@ func New(identifier string, controller string) (*Document, error) {
 	log.Debugf("doc/new: controller: %s\n", controller)
 	_, err := did.NewFromDID(identifier)
 	if err != nil {
-		return nil, fmt.Errorf("doc/new: failed to parse DID: %v", err)
+		return nil, fmt.Errorf("doc/new: failed to parse DID: %w", err)
 	}
 
 	ctrller := []string{controller}

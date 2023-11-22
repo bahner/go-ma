@@ -17,7 +17,7 @@ func main() {
 
 	id, err := did.NewFromIPNSKey(ipnsKey)
 	if err != nil {
-		fmt.Printf("failed to create new DID from IPNS key: %v\n", err)
+		fmt.Printf("failed to create new DID from IPNS key: %w\n", err)
 	}
 
 	i, err := entity.New(id, id, false)

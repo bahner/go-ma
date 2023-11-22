@@ -21,12 +21,12 @@ func (m *Message) Sign(privKey ed25519.PrivateKey) error {
 
 	sig, err := privKey.Sign(rand.Reader, bytes_to_sign, nil)
 	if err != nil {
-		return fmt.Errorf("failed to sign Message: %v", err)
+		return fmt.Errorf("failed to sign Message: %w", err)
 	}
 
 	encoded_sig, err := internal.MultibaseEncode(sig)
 	if err != nil {
-		return fmt.Errorf("failed to encode signature: %v", err)
+		return fmt.Errorf("failed to encode signature: %w", err)
 	}
 
 	m.Signature = encoded_sig
@@ -39,7 +39,7 @@ func (m *Message) Verify() (bool, error) {
 
 	did, err := did.NewFromDID(m.From)
 	if err != nil {
-		return false, fmt.Errorf("message/verify: failed to create did from From: %v", err)
+		return false, fmt.Errorf("message/verify: failed to create did from From: %w", err)
 	}
 
 	senderDoc, err := doc.Fetch(did.Name)
@@ -49,12 +49,12 @@ func (m *Message) Verify() (bool, error) {
 
 	signingKey, err := senderDoc.AssertionMethodPublicKey()
 	if err != nil {
-		return false, fmt.Errorf("message/verify: failed to get signing key: %v", err)
+		return false, fmt.Errorf("message/verify: failed to get signing key: %w", err)
 	}
 
 	payload, err := m.PayloadPack()
 	if err != nil {
-		return false, fmt.Errorf("message/verify: failed to pack payload: %v", err)
+		return false, fmt.Errorf("message/verify: failed to pack payload: %w", err)
 	}
 
 	return ed25519.Verify(signingKey, []byte(payload), []byte(m.Signature)), nil
