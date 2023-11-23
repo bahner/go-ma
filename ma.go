@@ -13,6 +13,7 @@ const (
 
 	// The rendezvous string used for peer discovery in libp2p.
 	RENDEZVOUS = "/" + NAME + "/" + VERSION
+	BROADCAST  = RENDEZVOUS + "/broadcast"
 
 	// BLAKE3 label for symmetric key generation.
 	HASH_ALGORITHM_MULTICODEC_STRING = "blake3"
