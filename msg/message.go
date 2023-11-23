@@ -21,7 +21,7 @@ type Message struct {
 	Created      int64    `cbor:"created_time,keyasint64" json:"created_time"`
 	Expires      int64    `cbor:"expires_time,keyasint64" json:"expires_time"`
 	BodyMimeType string   `cbor:"body_mime_type" json:"body_mime_type"`
-	Body         string   `cbor:"body" json:"body"`
+	Body         []byte   `cbor:"body" json:"body"`
 	Version      string   `cbor:"versionId" json:"versionId"`
 	Signature    string   `cbor:"signature" json:"signature"`
 }
@@ -31,7 +31,7 @@ type Message struct {
 func New(
 	from string,
 	to string,
-	body string,
+	body []byte,
 	mime_type string) (*Message, error) {
 
 	id, err := nanoid.New()
@@ -60,7 +60,7 @@ func New(
 func Signed(
 	from string,
 	to string,
-	body string,
+	body []byte,
 	mime_type string,
 	priv_key *ed25519.PrivateKey) (*Message, error) {
 

@@ -41,7 +41,7 @@ func (m *Message) IsValid() error {
 	}
 
 	// Check that message body is not empty
-	if m.Body == "" {
+	if m.Body == nil {
 		return errors.New("body must be non-empty")
 	}
 

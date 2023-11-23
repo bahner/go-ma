@@ -8,7 +8,7 @@ import "github.com/bahner/go-ma"
 // It's really meant for testing, but we might want to use it in other places too.
 const (
 	// This is the packed message. You can generate it using cmd/pack_valid_message.go
-	Message_test_packed_valid_message = "zF4oNn5r5xe8hR5ttaes2sfM6ZD5oZNrhiXMVw3Lty7ZJgYxigKpkqETHx5N4tYUeCjn6RrkHMZfu4uC3GQCXBxzSCdSQpam3QfK3Xdkz6YSUyKd9mqzy87W76Nkce7RTbdMmtw4WdyqMPUPLPtoKKqrpbpvw2GnDoMBytnotDEvNDsP2BS4WU4E5epYj1hZM7Zbns7PV8pbwDtWdToWdHhpMBkbfYowWVtjCkkKeHCqpgoMrD1NEkyd9MBytgpNjwfCHNgFWJzQJZsMwx6LC3G7Wja5B9vgqrfN91PeL5HnPKCzpxeBLSYp3op9jdZJwXjG85b6LL2FZ5RjvUeEWE1iHjQHVEULsL9A2eK"
+	Message_test_packed_valid_message = "zF4oNn5r5xe8hR5ttaes2sfM6ZD5oZNrhiXMVw3Lty7ZJgYxigKpkqETHx5N4tYUeCjn6RrkHMZfu4uC3GQCXBxzSCdSQpam3QfK3Xdkz6YSUyKd9mqzy87W76Nkce7RTbdMmtw4WdyqMPUPLPtoKKqrpbpvw2GnDoMBytnotDEvNDsP2BS4WU4E5epYj1hZM7Zbns7PV8pbwDtWdToWdHhpMBkbfYowWVtjCkkKeHCqpgoMrD1NEkyd9MBytgpNjwfCHNgFWJzQJZsMwx6LC3G7Wja5B9vgqrfN91PeL5HnPKCzpxeBLSYp3op9jdZJwXjG85YB8htDPjnBZdDLk6avNftNmHABkVVD3rX"
 )
 
 func ValidExampleMessage() *Message {
@@ -21,7 +21,7 @@ func ValidExampleMessage() *Message {
 		Created:      1698684192,
 		Expires:      1698687792,
 		BodyMimeType: "text/plain",
-		Body:         "Share and Enjoy!",
+		Body:         []byte("Share and Enjoy!"),
 		Version:      ma.VERSION,
 		Signature:    "",
 	}

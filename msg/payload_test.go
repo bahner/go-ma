@@ -19,7 +19,7 @@ func validMessageWithSignature() *msg.Message {
 		To:        "did:ma:to",
 		Created:   1698684192,
 		Expires:   1698687792,
-		Body:      "Hello",
+		Body:      []byte("Hello"),
 		Version:   ma.VERSION,
 		Signature: "signature",
 	}

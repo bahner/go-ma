@@ -1,6 +1,7 @@
 package msg_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/bahner/go-ma/msg"
@@ -31,7 +32,7 @@ func TestParse(t *testing.T) {
 
 	// Check if parsed matches your expectation (this assumes you have equality comparison for Message)
 	expected := msg.ValidExampleMessage()
-	if *parsed != *expected {
+	if !reflect.DeepEqual(*parsed, *expected) {
 		t.Errorf("Expected parsed to be %v, got %v", expected, parsed)
 	}
 }
