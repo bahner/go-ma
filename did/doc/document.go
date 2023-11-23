@@ -11,6 +11,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var err error
+
 type Document struct {
 	_                  struct{}             `cbor:",toarray"`
 	Context            []string             `cbor:"@context,toarray" json:"@context"`

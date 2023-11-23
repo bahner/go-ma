@@ -23,7 +23,7 @@ func Seal(m *msg.Message) (*Envelope, error) {
 		return nil, fmt.Errorf("message_encrypt: error packing message: %s", err)
 	}
 
-	to, err := doc.Fetch(m.To)
+	to, err := doc.FetchFromDID(m.To)
 	if err != nil {
 		return nil, fmt.Errorf("message_encrypt: error fetching recipient document: %s", err)
 	}
