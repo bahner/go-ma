@@ -2,7 +2,6 @@ package msg
 
 import (
 	"crypto/ed25519"
-	"crypto/rand"
 	"fmt"
 
 	"github.com/bahner/go-ma/did"
@@ -12,6 +11,11 @@ import (
 
 func (m *Message) Sign(privKey *ed25519.PrivateKey) error {
 
+	// Sign requires key to be of correct size
+	if len(*privKey) != ed25519.PrivateKeySize {
+		return fmt.Errorf("message/sign: invalid key size %d. Expected %d", len(*privKey), ed25519.PrivateKeySize)
+	}
+
 	data_to_sign, err := m.PayloadPack()
 	if err != nil {
 		return err
@@ -19,10 +23,8 @@ func (m *Message) Sign(privKey *ed25519.PrivateKey) error {
 
 	bytes_to_sign := []byte(data_to_sign)
 
-	sig, err := privKey.Sign(rand.Reader, bytes_to_sign, nil)
-	if err != nil {
-		return fmt.Errorf("failed to sign Message: %w", err)
-	}
+	// sig, err := privKey.Sign(rand.Reader, bytes_to_sign, nil)
+	sig := ed25519.Sign(*privKey, bytes_to_sign)
 
 	encoded_sig, err := internal.MultibaseEncode(sig)
 	if err != nil {
