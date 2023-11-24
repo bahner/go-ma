@@ -13,7 +13,10 @@ const (
 
 	// The rendezvous string used for peer discovery in libp2p.
 	RENDEZVOUS = "/" + NAME + "/" + VERSION
-	BROADCAST  = RENDEZVOUS + "/broadcast"
+
+	// The topic prefix used in pubsub. It is the same as the rendezvous string.
+	// But we keep it separate for future flexibility.
+	TOPIC_PREFIX = RENDEZVOUS
 
 	// BLAKE3 label for symmetric key generation.
 	HASH_ALGORITHM_MULTICODEC_STRING = "blake3"
