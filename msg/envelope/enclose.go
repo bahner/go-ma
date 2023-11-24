@@ -6,7 +6,6 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
-	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
 	"github.com/bahner/go-ma/msg"
 	log "github.com/sirupsen/logrus"
@@ -14,7 +13,7 @@ import (
 	"golang.org/x/crypto/curve25519"
 )
 
-func Seal(m *msg.Message) (*Envelope, error) {
+func Enclose(m *msg.Message) (*Envelope, error) {
 
 	// First check the stuff we don't have control over.
 	// Fail fast.
@@ -78,19 +77,5 @@ func Seal(m *msg.Message) (*Envelope, error) {
 	cipherTextWithNonce := append(nonce, cipherText...)
 	log.Debugf("message_encrypt: cipherTextWithNonce: %x", cipherTextWithNonce)
 
-	// Encode the cipher text to multibase for safe transport as text
-	encodedCipherTextWithNonce, err := internal.MultibaseEncode(cipherTextWithNonce)
-	if err != nil {
-		return nil, fmt.Errorf("message_encrypt: error encoding cipher text: %s", err)
-	}
-	log.Debugf("message_encrypt: encodedCipherTextWithNonce: %x", encodedCipherTextWithNonce)
-
-	// Send the ephemeral public key
-	encodedEphemeralPubkey, err := internal.MultibaseEncode(ephemeralPublic)
-	if err != nil {
-		return nil, fmt.Errorf("message_encrypt: error encoding ephemeral public key: %w", err)
-	}
-	log.Debugf("message_encrypt: encodedEphemeralPubkey: %x", encodedEphemeralPubkey)
-
-	return New(encodedCipherTextWithNonce, encodedEphemeralPubkey)
+	return New(cipherTextWithNonce, ephemeralPublic)
 }

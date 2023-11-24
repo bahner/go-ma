@@ -10,15 +10,15 @@ import (
 
 // Bask the encrypted message and the encrypted symmetric key in a JSON envelope.
 type Envelope struct {
-	Seal    string `cbor:"seal" json:"seal"`
-	Message string `cbor:"message" json:"message"`
+	EphemeralKey []byte `cbor:"ephemeralKey" json:"ephemeralKey"`
+	Message      []byte `cbor:"message" json:"message"`
 }
 
 // Use a pointer here, this might be arbitrarily big.
-func New(encodedCipherText string, encodedEphemeralKey string) (*Envelope, error) {
+func New(encodedCipherText []byte, encodedEphemeralKey []byte) (*Envelope, error) {
 	return &Envelope{
-		Seal:    encodedEphemeralKey,
-		Message: encodedCipherText,
+		EphemeralKey: encodedEphemeralKey,
+		Message:      encodedCipherText,
 	}, nil
 }
 
@@ -42,36 +42,6 @@ func UnmarshalFromCBOR(data []byte) (*Envelope, error) {
 	return e, nil
 }
 
-func (e *Envelope) Pack() (string, error) {
-	marshalled, err := e.MarshalToCBOR()
-	if err != nil {
-		return "", fmt.Errorf("envelope: failed to marshal envelope: %w", err)
-	}
-
-	packed, err := internal.MultibaseEncode(marshalled)
-	if err != nil {
-		return "", fmt.Errorf("envelope: failed to multibase encode envelope: %w", err)
-	}
-
-	return packed, nil
-
-}
-
-func Unpack(packed string) (*Envelope, error) {
-
-	data, err := internal.MultibaseDecode(packed)
-	if err != nil {
-		return nil, fmt.Errorf("envelope: failed to multibase decode envelope: %w", err)
-	}
-
-	e, err := UnmarshalFromCBOR(data)
-	if err != nil {
-		return nil, fmt.Errorf("envelope: failed to unmarshal envelope: %w", err)
-	}
-
-	return e, nil
-}
-
 func (e *Envelope) String() string {
 	data, err := e.MarshalToCBOR()
 	if err != nil {
@@ -80,10 +50,37 @@ func (e *Envelope) String() string {
 	return string(data)
 }
 
-func (e *Envelope) GetEncryptedKey() string {
-	return e.Seal
+func (e *Envelope) Bytes() ([]byte, error) {
+	return e.MarshalToCBOR()
 }
 
-func (e *Envelope) GetEncryptedMsg() string {
+func (e *Envelope) GetEncryptedMsg() []byte {
 	return e.Message
+}
+
+func (e *Envelope) GetEphemeralKey() []byte {
+	return e.EphemeralKey
+}
+
+func (e *Envelope) MultibaseEncode() (string, error) {
+	data, err := e.MarshalToCBOR()
+	if err != nil {
+		return "", fmt.Errorf("envelope: error marshalling envelope: %s", err)
+	}
+
+	return internal.MultibaseEncode(data)
+}
+
+func MultibaseDecode(data string) (*Envelope, error) {
+	decodedData, err := internal.MultibaseDecode(data)
+	if err != nil {
+		return nil, fmt.Errorf("envelope: error decoding envelope: %s", err)
+	}
+
+	e, err := UnmarshalFromCBOR(decodedData)
+	if err != nil {
+		return nil, fmt.Errorf("envelope: error unmarshalling envelope: %s", err)
+	}
+
+	return e, nil
 }
