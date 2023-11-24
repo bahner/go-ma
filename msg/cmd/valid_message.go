@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/bahner/go-ma/msg"
 )
@@ -12,8 +13,7 @@ func main() {
 	m := msg.ValidExampleMessage()
 	packed, err := m.Pack()
 	if err != nil {
-		fmt.Printf("Error packing message: %s\n", err)
-		os.Exit(70) // EX_SOFTWARE
+		log.Fatalf("Error packing message: %s", err)
 	}
 
 	json_message, _ := m.MarshalToCBOR()

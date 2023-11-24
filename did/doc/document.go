@@ -25,8 +25,8 @@ type Document struct {
 
 func New(identifier string, controller string) (*Document, error) {
 
-	log.Debugf("doc/new: identifier: %s\n", identifier)
-	log.Debugf("doc/new: controller: %s\n", controller)
+	log.Debugf("doc/new: identifier: %s", identifier)
+	log.Debugf("doc/new: controller: %s", controller)
 	_, err := did.NewFromDID(identifier)
 	if err != nil {
 		return nil, fmt.Errorf("doc/new: failed to parse DID: %w", err)

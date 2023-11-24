@@ -41,7 +41,7 @@ func initializeApi() {
 
 	_, err := ipfsAPI.ID()
 	if err != nil {
-		log.Fatalf("ipfs: failed to connect to IPFS API: %v\n", err)
+		log.Fatalf("ipfs: failed to connect to IPFS API: %v", err)
 	}
 }
 
@@ -54,7 +54,7 @@ func IPFSPublishString(data string) (string, error) {
 
 	cid, err := ipfsAPI.Add(strings.NewReader(data))
 	if err != nil {
-		log.Printf("ipfs: failed to add data to IPFS: %v\n", err)
+		log.Printf("ipfs: failed to add data to IPFS: %v", err)
 		return "", err
 	}
 
@@ -80,7 +80,7 @@ func IPLDPut(data []byte, input string, output string) (string, error) {
 	cid, err := ipfsAPI.DagPut(data, input, output)
 
 	if err != nil {
-		log.Printf("ipld: failed to add data IPLD linked data: %v\n", err)
+		log.Printf("ipld: failed to add data IPLD linked data: %v", err)
 		return "", err
 	}
 

@@ -18,17 +18,6 @@ var (
 	ErrInvalidFragment = errors.New("invalid fragment")
 )
 
-// // Sometimes we just want the identifier, not the whole DID.
-// func ExtractID(didStr string) (string, error) {
-
-// 	did, err := Parse(didStr)
-// 	if err != nil {
-// 		return "", fmt.Errorf("did: not a valid identifier: %w\n", err))
-// 	}
-
-// 	return did.Identifier, nil
-// }
-
 func IsValidDID(didStr string) bool {
 
 	err := ValidateDID(didStr)
