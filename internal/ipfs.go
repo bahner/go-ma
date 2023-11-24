@@ -39,10 +39,6 @@ func initializeApi() {
 	}
 	ipfsAPI = shell.NewShell(ipfsAPISocket)
 
-	_, err := ipfsAPI.ID()
-	if err != nil {
-		log.Fatalf("ipfs: failed to connect to IPFS API: %v", err)
-	}
 }
 
 // PublishToIPFS publishes the provided data string to IPFS and returns the CID.
