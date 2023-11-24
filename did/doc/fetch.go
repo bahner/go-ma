@@ -22,6 +22,8 @@ func FetchFromDID(didStr string) (*Document, error) {
 
 func Fetch(id string) (*Document, error) {
 
+	var err error
+
 	var document = &Document{}
 
 	shell := internal.GetShell()
