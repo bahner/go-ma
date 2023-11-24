@@ -8,6 +8,7 @@ require (
 	github.com/ipfs/boxo v0.15.0
 	github.com/ipfs/go-ipfs-api v0.7.0
 	github.com/libp2p/go-libp2p v0.32.1
+	github.com/libp2p/go-libp2p-pubsub v0.10.0
 	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/multiformats/go-multibase v0.2.0
 	github.com/multiformats/go-multicodec v0.9.0
@@ -24,6 +25,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/hashicorp/golang-lru/v2 v2.0.5 // indirect
 	github.com/ipfs/go-cid v0.4.1 // indirect
 	github.com/ipfs/go-log/v2 v2.5.1 // indirect
 	github.com/ipld/go-ipld-prime v0.21.0 // indirect
@@ -31,6 +33,7 @@ require (
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
 	github.com/libp2p/go-flow-metrics v0.1.0 // indirect
 	github.com/libp2p/go-libp2p-record v0.2.0 // indirect
+	github.com/libp2p/go-msgio v0.3.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -50,6 +53,5 @@ require (
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/sys v0.14.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
-	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/bahner/go-ma"
-	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/msg"
+	"github.com/bahner/go-ma/msg/mime"
 	cbor "github.com/fxamacker/cbor/v2"
 )
 
@@ -14,7 +14,7 @@ import (
 func validMessageWithSignature() *msg.Message {
 	return &msg.Message{
 		ID:        "validNanoID",
-		MimeType:  msg.MIME_TYPE,
+		MimeType:  mime.MESSAGE_MIME_TYPE,
 		From:      "did:ma:from",
 		To:        "did:ma:to",
 		Created:   1698684192,
@@ -28,7 +28,7 @@ func validMessageWithSignature() *msg.Message {
 func TestPayload(t *testing.T) {
 	m := validMessageWithSignature()
 
-	payload, err := msg.Payload(*m)
+	payload, err := m.Unsigned()
 	if err != nil {
 		t.Fatalf("Payload failed: %v", err)
 	}
@@ -41,31 +41,15 @@ func TestPayload(t *testing.T) {
 func TestMarshalPayloadToCBOR(t *testing.T) {
 	m := validMessageWithSignature()
 
-	jsonData, err := m.MarshalPayloadToCBOR()
+	jsonData, err := m.MarshalUnsignedToCBOR()
 	if err != nil {
 		t.Fatalf("MarshalPayloadToJSON failed: %v", err)
 	}
 
-	payload, _ := msg.Payload(*m)
+	payload, _ := m.Unsigned()
 	expected, _ := cbor.Marshal(payload)
 
 	if !bytes.Equal(expected, jsonData) {
 		t.Errorf("Expected %s, got %s", string(expected), string(jsonData))
-	}
-}
-
-func TestPayloadPack(t *testing.T) {
-	msg := validMessageWithSignature()
-
-	PayloadPack, err := msg.PayloadPack()
-	if err != nil {
-		t.Fatalf("PayloadPack failed: %v", err)
-	}
-
-	jsonData, _ := msg.MarshalPayloadToCBOR()
-	expected, _ := internal.MultibaseEncode(jsonData) // Assuming `Encode` works correctly
-
-	if PayloadPack != expected {
-		t.Errorf("Expected %s, got %s", expected, PayloadPack)
 	}
 }

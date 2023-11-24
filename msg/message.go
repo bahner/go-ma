@@ -6,8 +6,18 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
+	mime "github.com/bahner/go-ma/msg/mime"
 	semver "github.com/blang/semver/v4"
 	nanoid "github.com/matoous/go-nanoid/v2"
+)
+
+const (
+
+	// Messages which are older than a day should be ignored
+	MESSAGE_TTL = time.Hour * 24
+
+	// How we identify the messages we support
+	MESSAGE_ENCRYPTION_LABEL = mime.MESSAGE_MIME_TYPE
 )
 
 // This struct mimicks the Message format, but it's *not* Message.
@@ -45,7 +55,7 @@ func New(
 
 	return &Message{
 		ID:           id,
-		MimeType:     MIME_TYPE,
+		MimeType:     mime.MESSAGE_MIME_TYPE,
 		Version:      ma.VERSION,
 		From:         from,
 		To:           to,

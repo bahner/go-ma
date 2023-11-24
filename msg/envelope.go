@@ -1,24 +1,21 @@
-package envelope
+package msg
 
 import (
 	"fmt"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/key"
-	"github.com/bahner/go-ma/msg"
+	"github.com/bahner/go-ma/msg/envelope"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/curve25519"
 )
 
-// Open takes an envelope and a private key and returns the decrypted message.
-func (e *Envelope) Open(privKey [32]byte) (*msg.Message, error) {
-
-	// Convert the private key to a byte slice
-	privKeyBytes := privKey[:]
+// Takes an envelope an an x25519 privkey byte[] and returns a decrypted message
+func OpenEnvelope(e *envelope.Envelope, privKey []byte) (*Message, error) {
 
 	// Derive the shared secret using recipient's private key and ephemeral public key
-	shared, err := curve25519.X25519(privKeyBytes, e.EphemeralKey)
+	shared, err := curve25519.X25519(privKey, e.EphemeralKey)
 	if err != nil {
 		return nil, fmt.Errorf("message_decrypt: error deriving shared secret: %w", err)
 	}
@@ -49,7 +46,7 @@ func (e *Envelope) Open(privKey [32]byte) (*msg.Message, error) {
 	}
 
 	// Unpack the decrypted message
-	unpackedMsg, err := msg.Parse(string(m))
+	unpackedMsg, err := Parse(string(m))
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,9 @@
 package msg
 
-import "github.com/bahner/go-ma"
+import (
+	"github.com/bahner/go-ma"
+	"github.com/bahner/go-ma/msg/mime"
+)
 
 // This requires a bit of foo to create these values. So we'll just hardcode them here.
 // So we only have one single source of truth.
@@ -15,7 +18,7 @@ func ValidExampleMessage() *Message {
 
 	msg := &Message{
 		ID:           "CT6EklGVDpQpaYrth_O80",
-		MimeType:     MIME_TYPE,
+		MimeType:     mime.MESSAGE_MIME_TYPE,
 		From:         "did:ma:k51qzi5uqu5djy7ca9encml5bqicdz47khiww4dvcvso4iqg3z7xy0amwnwcwd#bahner",
 		To:           "did:ma:k51qzi5uqu5dk3pkcowsu2jqmnby0ry551xud502v000dzftwf4bj68384j84l#job",
 		Created:      1698684192,

@@ -40,7 +40,7 @@ func TestParse(t *testing.T) {
 func TestIsValid(t *testing.T) {
 	msg := msg.ValidExampleMessage()
 
-	if err := msg.IsValid(); err != nil {
+	if err := msg.Validate(); err != nil {
 		t.Errorf("IsValid failed: %v", err)
 	}
 

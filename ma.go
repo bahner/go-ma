@@ -22,4 +22,5 @@ const (
 	HASH_ALGORITHM_MULTICODEC_STRING = "blake3"
 	BLAKE3_LABEL                     = "ma"
 	BLAKE3_SUM_SIZE                  = 32 // 256 bits
+
 )

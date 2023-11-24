@@ -2,20 +2,23 @@ package msg
 
 import (
 	"github.com/bahner/go-ma/internal"
+
 	cbor "github.com/fxamacker/cbor/v2"
+	"lukechampine.com/blake3"
 )
 
 // Returns a copy of the Message payload
-func Payload(m Message) (Message, error) {
+func (m *Message) Unsigned() (Message, error) {
 
-	m.Signature = ""
+	c := *m
+	c.Signature = ""
 
-	return m, nil
+	return c, nil
 }
 
-func (m *Message) MarshalPayloadToCBOR() ([]byte, error) {
+func (m *Message) MarshalUnsignedToCBOR() ([]byte, error) {
 
-	payload, err := Payload(*m)
+	payload, err := m.Unsigned()
 	if err != nil {
 		return nil, err
 	}
@@ -28,21 +31,23 @@ func (m *Message) MarshalPayloadToCBOR() ([]byte, error) {
 	return marshalled_payload, nil
 }
 
-// Returns the Message as a multibase encoded JSON string
-// with the Signature field set to the empty string.
-// NB! This is made from a copy of the message.
-// The original Message is not changed.
-// This is what we will sign!
-func (m *Message) PayloadPack() (string, error) {
+// Returns the multibase-encoded hash of the Message payload
+// Or empty string if an error occurs
+// This is mostly intended for debugging purposes
+func (m *Message) MultibaseEncodedPayloadHash() string {
 
-	marshalled_payload, err := m.MarshalPayloadToCBOR()
+	marshalled_payload, err := m.MarshalUnsignedToCBOR()
 	if err != nil {
-		return "", err
-	}
-	encoded_payload, err := internal.MultibaseEncode(marshalled_payload)
-	if err != nil {
-		return "", err
+		return ""
 	}
 
-	return encoded_payload, nil
+	payloadHash := blake3.Sum256(marshalled_payload)
+
+	multibaseEncodedPayloadHash, err := internal.MultibaseEncode(payloadHash[:])
+	if err != nil {
+		return ""
+	}
+
+	return multibaseEncodedPayloadHash
+
 }

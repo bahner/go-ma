@@ -1,10 +1,13 @@
-package msg
+package mime
 
 import (
 	"mime"
 
 	log "github.com/sirupsen/logrus"
 )
+
+// A MIME type for a message. Just to implement it for future proofing.
+const MESSAGE_MIME_TYPE = "application/x-ma-message; version=0.0.1"
 
 // For more short names, see
 // https://www.iana.org/assignments/media-types/media-types.xhtml
@@ -15,7 +18,8 @@ var CommonMimeTypes = map[string]string{
 	"ipld":        "application/vnd.ipld.raw",
 	"ipns-record": "application/vnd.ipfs.ipns-record",
 	"json":        "application/json",
-	"message":     MIME_TYPE,
+	"cbor":        "application/cbor",
+	"message":     MESSAGE_MIME_TYPE,
 	"text":        "text/plain",
 }
 

@@ -1,4 +1,4 @@
-package envelope
+package msg
 
 import (
 	"crypto/rand"
@@ -7,14 +7,13 @@ import (
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/key"
-	"github.com/bahner/go-ma/msg"
+	"github.com/bahner/go-ma/msg/envelope"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/curve25519"
 )
 
-func Enclose(m *msg.Message) (*Envelope, error) {
-
+func (m *Message) Enclose() (*envelope.Envelope, error) {
 	// First check the stuff we don't have control over.
 	// Fail fast.
 	msg, err := m.Pack()
@@ -77,5 +76,5 @@ func Enclose(m *msg.Message) (*Envelope, error) {
 	cipherTextWithNonce := append(nonce, cipherText...)
 	log.Debugf("message_encrypt: cipherTextWithNonce: %x", cipherTextWithNonce)
 
-	return New(cipherTextWithNonce, ephemeralPublic)
+	return envelope.New(cipherTextWithNonce, ephemeralPublic)
 }

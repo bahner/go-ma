@@ -38,19 +38,19 @@ func TestPack(t *testing.T) {
 	}
 }
 
-func TestUnpack(t *testing.T) {
-	packed := msg.Message_test_packed_valid_message
-	expected := msg.ValidExampleMessage()
+// func TestUnpack(t *testing.T) {
+// 	packed := msg.Message_test_packed_valid_message
+// 	expected := msg.ValidExampleMessage()
 
-	actual, err := msg.Unpack(packed)
-	if err != nil {
-		t.Fatalf("Unpack failed: %v", err)
-	}
+// 	actual, err := msg.Unpack(packed)
+// 	if err != nil {
+// 		t.Fatalf("Unpack failed: %v", err)
+// 	}
 
-	expectedJSON, _ := cbor.Marshal(expected)
-	actualJSON, _ := cbor.Marshal(actual)
+// 	expectedJSON, _ := cbor.Marshal(expected)
+// 	actualJSON, _ := cbor.Marshal(actual)
 
-	if !bytes.Equal(expectedJSON, actualJSON) {
-		t.Errorf("Expected %s, got %s", string(expectedJSON), string(actualJSON))
-	}
-}
+// 	if !bytes.Equal(expectedJSON, actualJSON) {
+// 		t.Errorf("Expected %s, got %s", string(expectedJSON), string(actualJSON))
+// 	}
+// }

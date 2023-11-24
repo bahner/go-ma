@@ -8,27 +8,12 @@ import (
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/msg/mime"
 	semver "github.com/blang/semver/v4"
 )
 
-// Parses a received message in form of a multibase encoded JSON string
-func Parse(data string) (*Message, error) {
-
-	p, err := Unpack(data)
-	if err != nil {
-		return nil, err
-	}
-
-	err = p.IsValid()
-	if err != nil {
-		return nil, err
-	}
-
-	return p, nil
-}
-
-// IsValid checks if a Message instance is valid
-func (m *Message) IsValid() error {
+// Validate checks if a Message instance is valid
+func (m *Message) Validate() error {
 
 	var err error
 
@@ -36,7 +21,7 @@ func (m *Message) IsValid() error {
 		return errors.New("nil Message provided")
 	}
 
-	if m.MimeType != MIME_TYPE {
+	if m.MimeType != mime.MESSAGE_MIME_TYPE {
 		return errors.New("invalid Message type")
 	}
 
@@ -142,10 +127,10 @@ func (m *Message) VerifyActors() error {
 		return err
 	}
 
-	// // FIXME: Must they?
-	// if from == to {
-	// 	return errors.New("From and To must be different")
-	// }
+	// Must they?
+	if m.From == m.To {
+		return errors.New("actors From and To must be different")
+	}
 
 	return nil
 
@@ -162,4 +147,8 @@ func (m *Message) VerifyID() error {
 	}
 
 	return nil
+}
+
+func (m *Message) IsValid() bool {
+	return m.Validate() == nil
 }
