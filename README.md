@@ -42,7 +42,7 @@ that is used to create messages to be sent on 間. The envelope consists of a an
 
 As noted above the code is the spec for now, but we'll get to that. RSN.
 
-2023-09-18: bahner
+2023-11-25: bahner
 
 [did]: <https://www.w3.org/TR/did-core/> "Decentralized Identifiers (DIDs) v1.0"
 [didcomm]: <https://identity.foundation/didcomm-messaging/spec/> "DIDComm Messaging v1.0"
