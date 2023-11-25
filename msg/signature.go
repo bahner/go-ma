@@ -33,6 +33,7 @@ func (m *Message) Sign(privKey *ed25519.PrivateKey) error {
 
 	log.Debugf("Signed payload with signature: %s", encoded_sig)
 
+	// This is the one place where we actually mutate the Message signature
 	m.Signature = encoded_sig
 
 	return nil
