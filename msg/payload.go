@@ -8,6 +8,7 @@ import (
 )
 
 // Returns a copy of the Message payload
+// This is just meant to be used for signatures.
 func (m *Message) Unsigned() (Message, error) {
 
 	c := *m
