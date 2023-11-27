@@ -4,3 +4,4 @@ main
 .job
 .local
 go-ma.code-workspace
+.env
