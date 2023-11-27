@@ -23,13 +23,4 @@ const (
 	BLAKE3_LABEL                     = "ma"
 	BLAKE3_SUM_SIZE                  = 32 // 256 bits
 
-	// General variable names
-
-	// Thes are just used to define default values for the environment variables.
-	// Applications should use these variables to set the environment variables,
-	// but allow the user to override them.
-
-	// Logging
-	LOGLEVEL_VAR = "GO_MA_LOGLEVEL"
-	LOGFILE_VAR  = "GO_MA_LOGFILE"
 )
