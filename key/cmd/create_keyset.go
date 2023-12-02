@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	doc "github.com/bahner/go-ma/did/doc"
 	keyset "github.com/bahner/go-ma/key/set"
 	log "github.com/sirupsen/logrus"
 )
@@ -19,15 +20,30 @@ func main() {
 	log.SetLevel(log.ErrorLevel)
 
 	name := flag.String("name", "", "Name of the entity to create")
-	forceUpdate := flag.Bool("forceUpdate", false, "Force publish to IPFS")
+	publish := flag.Bool("publish", false, "Publish the entity document to IPFS")
+
 	flag.Parse()
+	log.SetLevel(log.DebugLevel)
 
 	// Create a new keyset for the entity
-	keyset, err := keyset.New(*name, *forceUpdate)
+	keyset, err := keyset.GetOrCreate(*name)
 	if err != nil {
 		panic(err)
 	}
 	log.Debugf("main: keyset: %v", keyset)
+
+	if *publish {
+		d, err := doc.NewFromKeyset(keyset)
+		if err != nil {
+			panic(err)
+		}
+		c, err := d.Publish()
+		if err != nil {
+			panic(err)
+		}
+
+		log.Debugf("main: published document: %v to %v", d, c)
+	}
 
 	packedKeyset, err := keyset.Pack()
 	if err != nil {

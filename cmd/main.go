@@ -22,7 +22,7 @@ func main() {
 
 	os.Setenv("IPFS_API_MULTIADDR", "/ip4/tcp/127.0.0.1/45005")
 
-	bahner, err := keyset.New("bahner", false)
+	bahner, err := keyset.GetOrCreate("bahner")
 	if err != nil {
 		fmt.Printf("error creating new keyset: %v\n", err)
 	}
@@ -38,7 +38,7 @@ func main() {
 		fmt.Printf("error unpacking keyset: %v\n", err)
 	}
 
-	fmt.Println(foo.IPNSKey.DID)
+	fmt.Println(foo.IPFSKey.Name)
 
 	// // shell := internal.GetShell()
 

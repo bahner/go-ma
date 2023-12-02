@@ -17,11 +17,10 @@ func main() {
 	fmt.Fprintln(os.Stderr, "******************************************************************")
 
 	name := flag.String("name", "", "Name of the entity to create")
-	forceUpdate := flag.Bool("force-update", false, "Force publish to IPFS")
 	flag.Parse()
 
 	// Create a new keyset for the entity from the name (fragment)
-	keyset, err := keyset.New(*name, *forceUpdate)
+	keyset, err := keyset.GetOrCreate(*name)
 	if err != nil {
 		panic(err)
 	}

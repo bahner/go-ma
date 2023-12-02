@@ -5,30 +5,48 @@ import (
 
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
+	"github.com/bahner/go-ma/key/ipfs"
 	cbor "github.com/fxamacker/cbor/v2"
-	iface "github.com/ipfs/boxo/coreiface"
+	log "github.com/sirupsen/logrus"
 )
 
+// KeySet struct the encryption and signing keys are actual keys,
+// but the IPFSKey is a reference to the IPFS key and holds names and paths.
+// The key itself resides in IPFS.
 type Keyset struct {
-	IPNSKey       iface.Key
+	IPFSKey       *ipfs.Key
 	EncryptionKey *key.EncryptionKey
 	SigningKey    *key.SigningKey
 }
 
 // Creates new keyset from a name (typically fragment of a DID)
-func New(name string) (*Keyset, error) {
+// This requires that the key is already in IPFS and that IPFS is running.
+func GetOrCreate(name string) (*Keyset, error) {
 
-	IPNSKey, err := ipnskey.New(name)
+	var err error
+
+	k, err := GetByName(name)
 	if err != nil {
-		return nil, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
+		log.Debugf("keyset/get: error message from GetByName: %v", err)
 	}
 
-	return NewFromKey(IPNSKey)
+	var ipfsKey *ipfs.Key
+
+	if k == nil {
+		ipfsKey, err = ipfs.GetOrCreate(name)
+		if err != nil {
+			return nil, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
+		}
+		log.Debugf("keyset/new: created new key in IPFS: %v", ipfsKey)
+	}
+
+	return NewFromKey(ipfsKey)
 }
 
-func NewFromKey(IPNSKey iface.Key) (*Keyset, error) {
+// This creates a new keyset from an existing IPFS key.
+func NewFromKey(k *ipfs.Key) (*Keyset, error) {
 
-	identifier := internal.GetDIDIdentifier(IPNSKey.ID().String())
+	identifier := internal.GetDIDIdentifier(k.DID)
 
 	encryptionKey, err := key.NewEncryptionKey(identifier)
 	if err != nil {
@@ -41,7 +59,7 @@ func NewFromKey(IPNSKey iface.Key) (*Keyset, error) {
 	}
 
 	return &Keyset{
-		IPNSKey:       IPNSKey,
+		IPFSKey:       k,
 		EncryptionKey: encryptionKey,
 		SigningKey:    signatureKey,
 	}, nil
@@ -80,17 +98,6 @@ func Unpack(data string) (*Keyset, error) {
 	return UnmarshalFromCBOR(decoded)
 }
 
-func (k Keyset) GetOrCreateIPNSKeyFromName(name string) iface.Key {
-
-	keys, err := getKeys()
-	if err != nil {
-		return nil
-	}
-
-	for _, key := range keys {
-		if key.Name() == name {
-			return key
-		}
-	}
-
+func (k *Keyset) ID() string {
+	return k.IPFSKey.ID
 }

@@ -11,7 +11,7 @@
       "request": "launch",
       "mode": "auto",
       "program": "${fileDirname}",
-      "args": [] 
+      "args": ["-name", "fubar", "-publish"] 
     }
   ]
 }

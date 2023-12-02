@@ -43,7 +43,7 @@ func (m *Message) Sign(privKey *ed25519.PrivateKey) error {
 // Returns nil if the signature is valid
 func (m *Message) VerifySignature() error {
 
-	did, err := did.NewFromDID(m.From)
+	did, err := did.New(m.From)
 	if err != nil {
 		return fmt.Errorf("message/verify: failed to create did from From: %w", err)
 	}

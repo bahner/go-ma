@@ -23,4 +23,7 @@ const (
 	BLAKE3_LABEL                     = "ma"
 	BLAKE3_SUM_SIZE                  = 32 // 256 bits
 
+	// API
+	ENV_IPFS_API_MULTIADDR     = "IPFS_API_MULTIADDR"
+	DEFAULT_IPFS_API_MULTIADDR = "/ip4/127.0.0.1/tcp/45005" // Default to Brave browser, Kubo is /ip4/127.0.0.1/tcp/5001
 )

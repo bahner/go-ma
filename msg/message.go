@@ -94,11 +94,11 @@ func (m *Message) ExpiresTime() (time.Time, error) {
 }
 
 func (m *Message) Sender() (*did.DID, error) {
-	return did.NewFromDID(m.From)
+	return did.New(m.From)
 }
 
 func (m *Message) Recipient() (*did.DID, error) {
-	return did.NewFromDID(m.To)
+	return did.New(m.To)
 }
 
 func (m *Message) SemVersion() (semver.Version, error) {

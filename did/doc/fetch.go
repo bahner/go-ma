@@ -13,7 +13,7 @@ import (
 // Eg. Fetch("did:ma:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#bahner")
 func FetchFromDID(didStr string) (*Document, error) {
 
-	d, err := did.NewFromDID(didStr)
+	d, err := did.New(didStr)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func Fetch(id string) (*Document, error) {
 
 	var document = &Document{}
 
-	api := internal.GetIPSAPI()
+	api := internal.GetIPFSAPI()
 
 	_cid, err := cid.Decode("/ipns" + id)
 	if err != nil {

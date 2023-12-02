@@ -27,7 +27,7 @@ func New(identifier string, controller string) (*Document, error) {
 
 	log.Debugf("doc/new: identifier: %s", identifier)
 	log.Debugf("doc/new: controller: %s", controller)
-	_, err := did.NewFromDID(identifier)
+	_, err := did.New(identifier)
 	if err != nil {
 		return nil, fmt.Errorf("doc/new: failed to parse DID: %w", err)
 	}
@@ -68,9 +68,9 @@ func (d *Document) JSON() ([]byte, error) {
 }
 
 func (d *Document) CBOR() ([]byte, error) {
-	bytes, err := json.Marshal(d)
+	bytes, err := cbor.Marshal(d)
 	if err != nil {
-		return nil, fmt.Errorf("doc/string: failed to marshal document to JSON: %w", err)
+		return nil, fmt.Errorf("doc/string: failed to marshal document to CBOR: %w", err)
 	}
 
 	return bytes, nil
