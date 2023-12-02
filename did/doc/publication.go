@@ -5,6 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
+	"github.com/ipfs/boxo/path"
 	shell "github.com/ipfs/go-ipfs-api"
 )
 
@@ -17,24 +18,25 @@ import (
 // The function also takes a string, which is the port the IPFS node is listening on.
 // This is because Kubo listens on 5001, but Brave listens on 45005.
 
-func (d *Document) Publish() (*shell.PublishResponse, error) {
+func (d *Document) Publish() error {
+
+	api := internal.GetIPSAPI()
 
 	// First we need to publish the document to IPFS and get the cid.
 
 	// A document is not a DID :-) We need to parse the identifier out of the document.
 	// in order to find the fragment, which *MUST* be the keyname.
 
-	data, err := d.JSON()
+	data, err := d.CBOR()
 	if err != nil {
-		return &shell.PublishResponse{},
-			fmt.Errorf("doc/publish: failed to marshal document to JSON: %w", err)
+		return fmt.Errorf("doc/publish: failed to marshal document to JSON: %w", err)
 	}
 
 	// Publish the document to IPFS first. We need the CID to publish to IPNS.
 	// So without that we ain't going nowhere.
-	cid, err := internal.IPLDPutJSON(data)
+	cid, err := internal.IPFSDagAddCBOR(data)
 	if err != nil {
-		return &shell.PublishResponse{}, fmt.Errorf("doc: failed to publish document to IPFS: %w", err)
+		return fmt.Errorf("doc: failed to publish document to IPFS: %w", err)
 	}
 
 	// Lookup short name of the identifier, ie. the fragment
@@ -44,10 +46,15 @@ func (d *Document) Publish() (*shell.PublishResponse, error) {
 	// having to change the entity name within a given context.
 	docdid, err := did.NewFromDID(d.ID)
 	if err != nil {
-		return &shell.PublishResponse{},
-			fmt.Errorf("doc/publish: failed to parse DID: %w", err)
+		return fmt.Errorf("doc/publish: failed to parse DID: %w", err)
 	}
 
-	return internal.IPNSPublishCID(cid, docdid.Fragment, true)
+	myPath, err := path.NewPath()
+	if err != nil {
+		return fmt.Errorf("doc/publish: failed to create path: %w", err)
+	}
 
+	return api.Name().Publish(internal.GetContext(), cid, shell.Name.Key(docdid.Fragment))
+
+	return nil
 }

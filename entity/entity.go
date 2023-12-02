@@ -6,7 +6,6 @@ import (
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/internal"
-	ipnskey "github.com/bahner/go-ma/key/ipns"
 	keyset "github.com/bahner/go-ma/key/set"
 	cbor "github.com/fxamacker/cbor/v2"
 	log "github.com/sirupsen/logrus"
@@ -99,23 +98,4 @@ func Unpack(data string) (*Entity, error) {
 	}
 
 	return e, nil
-}
-
-// Publishes the entity's DIDDocument and IPNSKey to IPFS.
-// If force is true, it will publish even if the IPNSKey is already published.
-func (e *Entity) Publish(force bool) error {
-
-	// Publish the IPNSKey to IPFS for publication.
-	err := e.Keyset.IPNSKey.ExportToIPFS(force)
-	if err != nil {
-		return fmt.Errorf("new_actor: Failed to export IPNSKey to IPFS: %w", err)
-	}
-
-	// Make sure the DIDDocument is published to IPFS if it's not already.
-	_, err = e.Doc.Publish()
-	if err != nil {
-		return fmt.Errorf("new_actor: Failed to publish DOC: %w", err)
-	}
-
-	return nil
 }

@@ -5,7 +5,6 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/entity"
-	ipnskey "github.com/bahner/go-ma/key/ipns"
 	log "github.com/sirupsen/logrus"
 )
 

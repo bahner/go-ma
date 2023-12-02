@@ -5,6 +5,8 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
+	cbor "github.com/fxamacker/cbor/v2"
+	"github.com/ipfs/go-cid"
 )
 
 // Takes a DID and fetches the document from IPFS.
@@ -26,11 +28,22 @@ func Fetch(id string) (*Document, error) {
 
 	var document = &Document{}
 
-	shell := internal.GetShell()
+	api := internal.GetIPSAPI()
 
-	err = shell.DagGet("/ipns/"+id, document)
+	_cid, err := cid.Decode("/ipns" + id)
+	if err != nil {
+		return nil, fmt.Errorf("doc/fetch: failed to decode cid: %w", err)
+	}
+
+	// err = api.DagGet("/ipns/"+id, document)
+	node, err := api.Dag().Get(internal.GetContext(), _cid)
 	if err != nil {
 		return nil, fmt.Errorf("doc/fetch: failed to get document from IPFS: %w", err)
+	}
+
+	err = cbor.Unmarshal(node.RawData(), document)
+	if err != nil {
+		return nil, fmt.Errorf("doc/fetch: failed to unmarshal document: %w", err)
 	}
 
 	return document, nil

@@ -5,33 +5,30 @@ import (
 
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
-	ipnskey "github.com/bahner/go-ma/key/ipns"
 	cbor "github.com/fxamacker/cbor/v2"
-	log "github.com/sirupsen/logrus"
+	iface "github.com/ipfs/boxo/coreiface"
 )
 
 type Keyset struct {
-	IPNSKey       *ipnskey.Key
+	IPNSKey       iface.Key
 	EncryptionKey *key.EncryptionKey
 	SigningKey    *key.SigningKey
 }
 
 // Creates new keyset from a name (typically fragment of a DID)
-func New(name string, forceUpdate bool) (*Keyset, error) {
-
-	var IPNSKey *ipnskey.Key
+func New(name string) (*Keyset, error) {
 
 	IPNSKey, err := ipnskey.New(name)
 	if err != nil {
 		return nil, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
 	}
 
-	return NewFromIPNSKey(IPNSKey, forceUpdate)
+	return NewFromKey(IPNSKey)
 }
 
-func NewFromIPNSKey(IPNSKey *ipnskey.Key, forceUpdate bool) (*Keyset, error) {
+func NewFromKey(IPNSKey iface.Key) (*Keyset, error) {
 
-	identifier := internal.GetDIDIdentifier(IPNSKey.DID)
+	identifier := internal.GetDIDIdentifier(IPNSKey.ID().String())
 
 	encryptionKey, err := key.NewEncryptionKey(identifier)
 	if err != nil {
@@ -41,11 +38,6 @@ func NewFromIPNSKey(IPNSKey *ipnskey.Key, forceUpdate bool) (*Keyset, error) {
 	signatureKey, err := key.NewSigningKey(identifier)
 	if err != nil {
 		return nil, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
-	}
-
-	err = IPNSKey.ExportToIPFS(forceUpdate)
-	if err != nil {
-		log.Errorf("keyset/new: failed to export IPNS key to IPFS: %v", err)
 	}
 
 	return &Keyset{
@@ -86,4 +78,19 @@ func Unpack(data string) (*Keyset, error) {
 	}
 
 	return UnmarshalFromCBOR(decoded)
+}
+
+func (k Keyset) GetOrCreateIPNSKeyFromName(name string) iface.Key {
+
+	keys, err := getKeys()
+	if err != nil {
+		return nil
+	}
+
+	for _, key := range keys {
+		if key.Name() == name {
+			return key
+		}
+	}
+
 }
