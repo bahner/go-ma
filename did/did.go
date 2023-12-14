@@ -62,3 +62,15 @@ func (d *DID) IsIdenticalTo(did DID) bool {
 
 	return AreIdentical(d, &did)
 }
+
+func GetOrCreate(didStr string) (*DID, error) {
+
+	// We don't care if the DID exists or not, we just want to create it.
+	d, _ := Get(didStr)
+	if d != nil {
+		return d, nil
+	}
+
+	return New(didStr)
+
+}

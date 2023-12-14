@@ -7,15 +7,15 @@ import (
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/key/ipfs/key"
 	cbor "github.com/fxamacker/cbor/v2"
-	"github.com/ipfs/boxo/ipns"
+	"github.com/ipfs/boxo/path"
 	coreiface "github.com/ipfs/kubo/core/coreiface"
+	log "github.com/sirupsen/logrus"
 )
 
 type Key struct {
-	Name string   `cbor:"name"`
-	ID   string   `cbor:"id"`
-	Path string   `cbor:"path"`
-	DID  *did.DID `cbor:"did"`
+	ID   string `cbor:"id"`
+	Name string `cbor:"name"`
+	Path string `cbor:"path"`
 }
 
 // UnmarshalCBOR customizes the CBOR unmarshaling for Key.
@@ -88,23 +88,42 @@ func NewFromDID(d *did.DID) (*Key, error) {
 		ID:   ik.ID().String(),
 		Name: ik.Name(),
 		Path: ik.Path().String(),
-		DID:  d,
 	}, nil
 }
 
 func NewFromIPFSKey(k coreiface.Key) (*Key, error) {
 
-	didStr := ma.DID_PREFIX + ipns.NameFromPeer(k.ID()).String() + "#" + k.Name()
-
-	d, err := did.New(didStr)
-	if err != nil {
-		return nil, fmt.Errorf("ipfs: failed to create DID from name %s: %w", k.Name(), err)
-	}
-
 	return &Key{
 		ID:   k.ID().String(),
 		Name: k.Name(),
 		Path: k.Path().String(),
-		DID:  d,
 	}, nil
+}
+
+func (k *Key) RootCID() (string, error) {
+
+	p, err := path.NewPath(k.Path)
+	if err != nil {
+		return "", fmt.Errorf("keyset/new: failed to create path from key: %w", err)
+	}
+
+	ip, err := path.NewImmutablePath(p)
+	if err != nil {
+		return "", fmt.Errorf("keyset/new: failed to create immutable path from key: %w", err)
+	}
+
+	identifier := ip.RootCid().String()
+	log.Debugf("keyset/new: identifier: %s", identifier)
+
+	return identifier, nil
+}
+
+func (k *Key) DID() string {
+
+	identifier, err := k.RootCID()
+	if err != nil {
+		return ""
+	}
+
+	return ma.DID_PREFIX + identifier + "#" + k.Name
 }

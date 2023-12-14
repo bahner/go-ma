@@ -9,7 +9,8 @@ import (
 
 func NewFromKeyset(keyset *keyset.Keyset) (*Entity, error) {
 
-	id, err := did.New(string(keyset.IPFSKey.ID))
+	id, err := did.New(keyset.DID.String())
+
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create did from ipnsKey: %s", err)
 	}

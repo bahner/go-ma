@@ -3,6 +3,7 @@ package set
 import (
 	"fmt"
 
+	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
 	"github.com/bahner/go-ma/key/ipfs"
@@ -14,6 +15,7 @@ import (
 // but the IPFSKey is a reference to the IPFS key and holds names and paths.
 // The key itself resides in IPFS.
 type Keyset struct {
+	DID           *did.DID
 	IPFSKey       *ipfs.Key
 	EncryptionKey *key.EncryptionKey
 	SigningKey    *key.SigningKey
@@ -46,7 +48,10 @@ func GetOrCreate(name string) (*Keyset, error) {
 // This creates a new keyset from an existing IPFS key.
 func NewFromKey(k *ipfs.Key) (*Keyset, error) {
 
-	identifier := internal.GetDIDIdentifier(k.DID.Identifier)
+	identifier, err := k.RootCID()
+	if err != nil {
+		return nil, fmt.Errorf("keyset/new: failed to get root CID from IPFS key: %w", err)
+	}
 
 	encryptionKey, err := key.NewEncryptionKey(identifier)
 	if err != nil {
@@ -58,7 +63,13 @@ func NewFromKey(k *ipfs.Key) (*Keyset, error) {
 		return nil, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
 	}
 
+	d, err := did.GetOrCreate(k.DID())
+	if err != nil {
+		return nil, fmt.Errorf("keyset/new: failed to get or create DID: %w", err)
+	}
+
 	return &Keyset{
+		DID:           d,
 		IPFSKey:       k,
 		EncryptionKey: encryptionKey,
 		SigningKey:    signatureKey,
