@@ -10,7 +10,6 @@ require (
 	github.com/ipfs/go-cid v0.4.1
 	github.com/ipfs/go-ipld-cbor v0.0.6
 	github.com/ipfs/kubo v0.24.1-0.20231129114216-2864f63d9db2
-	github.com/libp2p/go-libp2p v0.32.1
 	github.com/libp2p/go-libp2p-pubsub v0.10.0
 	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/multiformats/go-multiaddr v0.12.0
@@ -61,6 +60,7 @@ require (
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
 	github.com/libp2p/go-cidranger v1.1.0 // indirect
+	github.com/libp2p/go-libp2p v0.32.1 // indirect
 	github.com/libp2p/go-libp2p-asn-util v0.3.0 // indirect
 	github.com/libp2p/go-libp2p-kad-dht v0.24.4 // indirect
 	github.com/libp2p/go-libp2p-kbucket v0.6.3 // indirect

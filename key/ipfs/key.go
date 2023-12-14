@@ -5,18 +5,17 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key/ipfs/key"
 	cbor "github.com/fxamacker/cbor/v2"
-	"github.com/ipfs/boxo/path"
-	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/ipfs/boxo/ipns"
+	coreiface "github.com/ipfs/kubo/core/coreiface"
 )
 
 type Key struct {
-	ID   string    `cbor:"id"`
-	Name string    `cbor:"name"`
-	Path path.Path `cbor:"path"`
-	DID  string    `cbor:"did"`
+	Name string   `cbor:"name"`
+	ID   string   `cbor:"id"`
+	Path string   `cbor:"path"`
+	DID  *did.DID `cbor:"did"`
 }
 
 // UnmarshalCBOR customizes the CBOR unmarshaling for Key.
@@ -59,13 +58,14 @@ func GetOrCreate(name string) (*Key, error) {
 		}
 	}
 
-	return New(ma.DID_PREFIX + ik.ID().String() + "#" + name)
+	return NewFromIPFSKey(ik)
 }
 
 // Creates a new key in IPFS and returns a Key struct.
 // This does not check that the key already exists, so
 // the provided DID must be verified by the caller.
 // Use GetOrCreate to create a key if it doesn't exist.
+
 func New(didStr string) (*Key, error) {
 
 	// This becomes a validator function
@@ -73,23 +73,38 @@ func New(didStr string) (*Key, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ipfs: failed to create DID from name %s: %w", didStr, err)
 	}
+	return NewFromDID(keyDID)
+}
 
-	// This becomes a validator function
-	pid, err := peer.Decode(internal.GetDIDIdentifier(didStr))
-	if err != nil {
-		return nil, fmt.Errorf("ipfs: failed to decode peer ID %s: %w", didStr, err)
-	}
+// This takes an actual *DID as input, not just the string.
+func NewFromDID(d *did.DID) (*Key, error) {
 
-	// Path functions both as a validator and a cleaner.
-	keyPath, err := path.NewPathFromSegments(path.IPNSNamespace, pid.String())
+	ik, err := key.LookupName(d.Fragment)
 	if err != nil {
-		return nil, fmt.Errorf("ipfs: failed to create path from key identifier %s: %w", keyDID.Identifier, err)
+		return nil, fmt.Errorf("ipfs: failed to lookup key %s: %w", d.Fragment, err)
 	}
 
 	return &Key{
-		ID:   pid.String(),
-		Name: keyDID.Fragment,
-		Path: keyPath,
-		DID:  didStr,
+		ID:   ik.ID().String(),
+		Name: ik.Name(),
+		Path: ik.Path().String(),
+		DID:  d,
+	}, nil
+}
+
+func NewFromIPFSKey(k coreiface.Key) (*Key, error) {
+
+	didStr := ma.DID_PREFIX + ipns.NameFromPeer(k.ID()).String() + "#" + k.Name()
+
+	d, err := did.New(didStr)
+	if err != nil {
+		return nil, fmt.Errorf("ipfs: failed to create DID from name %s: %w", k.Name(), err)
+	}
+
+	return &Key{
+		ID:   k.ID().String(),
+		Name: k.Name(),
+		Path: k.Path().String(),
+		DID:  d,
 	}, nil
 }

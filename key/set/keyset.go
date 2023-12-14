@@ -46,7 +46,7 @@ func GetOrCreate(name string) (*Keyset, error) {
 // This creates a new keyset from an existing IPFS key.
 func NewFromKey(k *ipfs.Key) (*Keyset, error) {
 
-	identifier := internal.GetDIDIdentifier(k.DID)
+	identifier := internal.GetDIDIdentifier(k.DID.Identifier)
 
 	encryptionKey, err := key.NewEncryptionKey(identifier)
 	if err != nil {
