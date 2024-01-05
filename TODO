@@ -1,0 +1,12 @@
+split envelope in key, body and headers.
+
+the headers will have a pretty recurring size, where as the body is totally unpredictable.
+since the headers are signed, the sender can be verified before proceeding. after that the mimetype, which can be pretty well trusted can be evaluated.
+if its a movie, which isnt supported it can be rejected before unpacking gigs of data.
+the size should be included in the headers, maybe.
+MimeType and Size cant be trusted, but you might trust them, if you trust the actor.
+
+This should avoid resource starcation ddos vectors from unknown actors.
+it should also alleviate dijudication of the content and if and how it should be dispatched.
+
+Obviously headers are used "everywhere" and is good practise. Splitting them out in an encrypted field of its own - with a size limit - makes evaluating the incoming message much more stable.
