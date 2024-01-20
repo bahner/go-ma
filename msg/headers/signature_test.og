@@ -1,4 +1,4 @@
-package message_test
+package headers_test
 
 import (
 	"testing"

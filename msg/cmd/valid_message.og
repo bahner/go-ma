@@ -11,12 +11,14 @@ import (
 func main() {
 
 	m := msg.ValidExampleMessage()
-	packed, err := m.Pack()
+	// packed, err := m.Pack()
+	packed, err := "", error(nil)
 	if err != nil {
 		log.Fatalf("Error packing message: %s", err)
 	}
 
-	json_message, _ := m.MarshalToCBOR()
+	//	json_message, _ := m.MarshalToCBOR()
+	json_message, _ := "m.MarshalToCBOR()", m.Body.ContentHash()
 	json_message_string := string(json_message)
 	fmt.Println(json_message_string)
 	fmt.Println(packed)

@@ -54,7 +54,7 @@ type Headers struct {
 func New(
 	from string,
 	to string,
-	body body.Body) (*Headers, error) {
+	body *body.Body) (*Headers, error) {
 
 	id, err := nanoid.New()
 	if err != nil {
@@ -86,7 +86,7 @@ func New(
 func Signed(
 	from string,
 	to string,
-	body body.Body,
+	body *body.Body,
 	priv_key *ed25519.PrivateKey) (*Headers, error) {
 
 	m, err := New(from, to, body)

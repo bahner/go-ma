@@ -1,106 +1,89 @@
 package msg
 
 import (
-	"crypto/ed25519"
-	"time"
+	"encoding/json"
+	"fmt"
 
-	"github.com/bahner/go-ma"
-	"github.com/bahner/go-ma/did"
-	mime "github.com/bahner/go-ma/msg/mime"
-	semver "github.com/blang/semver/v4"
-	nanoid "github.com/matoous/go-nanoid/v2"
+	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/msg/body"
+	"github.com/bahner/go-ma/msg/headers"
+	cbor "github.com/fxamacker/cbor/v2"
 )
 
-const (
-
-	// Messages which are older than a day should be ignored
-	MESSAGE_TTL = time.Hour * 24
-
-	// How we identify the messages we support
-	MESSAGE_ENCRYPTION_LABEL = mime.MESSAGE_MIME_TYPE
-)
-
-// This struct mimicks the Message format, but it's *not* Message.
-// It should enable using Message later, if that's a good idea.
+// Bask the encrypted message and the encrypted symmetric key in a JSON envelope.
 type Message struct {
-	_            struct{} `cbor:",toarray"`
-	ID           string   `cbor:"id" json:"id"`
-	MimeType     string   `cbor:"type" json:"type"`
-	From         string   `cbor:"from" json:"from"`
-	To           string   `cbor:"to" json:"to"`
-	Created      int64    `cbor:"created_time,keyasint64" json:"created_time"`
-	Expires      int64    `cbor:"expires_time,keyasint64" json:"expires_time"`
-	BodyMimeType string   `cbor:"body_mime_type" json:"body_mime_type"`
-	Body         []byte   `cbor:"body" json:"body"`
-	Version      string   `cbor:"versionId" json:"versionId"`
-	Signature    string   `cbor:"signature" json:"signature"`
+	Headers *headers.Headers `cbor:"headers" json:"headers"`
+	Body    *body.Body       `cbor:"body" json:"body"`
 }
 
-// New creates a new Message instance
-// Message is a string for now, but it should be JSON.
-func New(
-	from string,
+// Use a pointer here, this might be arbitrarily big.
+// from, to, content are required, but content_type defaults to text/plain
+func New(from string,
 	to string,
-	body []byte,
-	mime_type string) (*Message, error) {
+	content []byte,
+	content_type string) (*Message, error) {
 
-	id, err := nanoid.New()
-	if err != nil {
-		return nil, err
+	// A little sugar goes a long way
+	if content_type == "" {
+		content_type = MESSAGE_DEFAULT_CONTENT_TYPE
 	}
 
-	now := time.Now().UTC()
-	created := now.Unix()
-	expires := now.Add(MESSAGE_TTL).Unix()
+	msgBody, err := body.New(content, content_type)
+	if err != nil {
+		return nil, fmt.Errorf("msg_new: error creating body: %w", err)
+	}
+
+	msgHeaders, err := headers.New(from, to, msgBody)
+	if err != nil {
+		return nil, fmt.Errorf("msg_new: error creating headers: %w", err)
+	}
 
 	return &Message{
-		ID:           id,
-		MimeType:     mime.MESSAGE_MIME_TYPE,
-		Version:      ma.VERSION,
-		From:         from,
-		To:           to,
-		Created:      created,
-		Expires:      expires,
-		BodyMimeType: mime_type,
-		Body:         body,
-		Signature:    "",
+		Headers: msgHeaders,
+		Body:    msgBody,
 	}, nil
 }
 
-func Signed(
-	from string,
-	to string,
-	body []byte,
-	mime_type string,
-	priv_key *ed25519.PrivateKey) (*Message, error) {
+func (e *Message) MarshalToCBOR() ([]byte, error) {
+	return cbor.Marshal(e)
+}
 
-	m, err := New(from, to, body, mime_type)
+func (e *Message) MarshalToJSON() ([]byte, error) {
+	return json.Marshal(e)
+}
+
+func UnmarshalFromCBOR(data []byte) (*Message, error) {
+
+	e := &Message{}
+
+	err := cbor.Unmarshal(data, e)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("envelope: error unmarshalling envelope: %s", err)
 	}
 
-	m.Sign(priv_key)
-
-	return m, nil
-
+	return e, nil
 }
 
-func (m *Message) CreatedTime() (time.Time, error) {
-	return time.Unix(m.Created, 0), nil
+// Simply the CBOR encoded envelope, but a generic named function.
+// Returns nil if an error occurs
+func (e *Message) Bytes() []byte {
+
+	bytes, err := e.MarshalToCBOR()
+	if err != nil {
+		return nil
+	}
+
+	return bytes
 }
 
-func (m *Message) ExpiresTime() (time.Time, error) {
-	return time.Unix(m.Expires, 0), nil
-}
+// Returns the multibase-encoded hash of the entire envelope
+// Returns empty string if an error occurs
+func (e *Message) String() string {
 
-func (m *Message) Sender() (*did.DID, error) {
-	return did.New(m.From)
-}
+	str, err := internal.MultibaseEncode(e.Bytes())
+	if err != nil {
+		return ""
+	}
 
-func (m *Message) Recipient() (*did.DID, error) {
-	return did.New(m.To)
-}
-
-func (m *Message) SemVersion() (semver.Version, error) {
-	return semver.Make(m.Version)
+	return str
 }

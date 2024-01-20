@@ -1,55 +1,68 @@
 package msg
 
 import (
+	"encoding/json"
 	"fmt"
 
-	"github.com/bahner/go-ma"
-	"github.com/bahner/go-ma/key"
-	"github.com/bahner/go-ma/msg/envelope"
-	log "github.com/sirupsen/logrus"
-	"golang.org/x/crypto/chacha20poly1305"
-	"golang.org/x/crypto/curve25519"
+	"github.com/bahner/go-ma/internal"
+	cbor "github.com/fxamacker/cbor/v2"
 )
 
-// Takes an envelope an an x25519 privkey byte[] and returns a decrypted message
-func OpenEnvelope(e *envelope.Envelope, privKey []byte) (*Message, error) {
+// Bask the encrypted message and the encrypted symmetric key in a JSON envelope.
+type Envelope struct {
+	EphemeralKey []byte `cbor:"ephemeralKey" json:"ephemeralKey"`
+	Content      []byte `cbor:"body" json:"body"`
+	Headers      []byte `cbor:"headers" json:"headers"`
+}
 
-	// Derive the shared secret using recipient's private key and ephemeral public key
-	shared, err := curve25519.X25519(privKey, e.EphemeralKey)
+func (e *Envelope) MarshalToCBOR() ([]byte, error) {
+	return cbor.Marshal(e)
+}
+
+func (e *Envelope) MarshalToJSON() ([]byte, error) {
+	return json.Marshal(e)
+}
+
+// Takes the envelope as a byte array and returns a pointer to an Envelope struct
+// Basically this is what you do with a receieved message envelope, eg. in an Open() function.
+func UnmarshalEnvelopeFromCBOR(data []byte) (*Envelope, error) {
+
+	e := &Envelope{}
+
+	err := cbor.Unmarshal(data, e)
 	if err != nil {
-		return nil, fmt.Errorf("message_decrypt: error deriving shared secret: %w", err)
+		return nil, fmt.Errorf("envelope: error unmarshalling envelope: %s", err)
 	}
-	log.Debugf("message_decrypt: shared: %x", shared)
 
-	symmetricKey := key.GenerateSymmetricKey(shared, ma.BLAKE3_SUM_SIZE)
-	log.Debugf("message_decrypt: symmetricKey: %x", symmetricKey)
+	return e, nil
+}
 
-	// Split the nonce from the ciphertext
-	if len(e.Message) < chacha20poly1305.NonceSizeX {
-		return nil, fmt.Errorf("message_decrypt: ciphertext too short")
-	}
-	nonce, cipherText := e.Message[:chacha20poly1305.NonceSizeX], e.Message[chacha20poly1305.NonceSizeX:]
-	log.Debugf("message_decrypt: nonce: %x", nonce)
-	log.Debugf("message_decrypt: cipherText: %x", cipherText)
-
-	// Decrypt the message with ChaCha20-Poly1305
-	aead, err := chacha20poly1305.NewX(symmetricKey)
+// Returns the contents as a multibase encoded string
+// Returns empty string if an error occurs
+func (e *Envelope) String() string {
+	data, err := e.MarshalToCBOR()
 	if err != nil {
-		return nil, fmt.Errorf("message_decrypt: error creating AEAD: %w", err)
+		return ""
 	}
-	log.Debugf("message_decrypt: aead: %x", aead)
 
-	m, err := aead.Open(nil, nonce, cipherText, nil)
-	log.Debugf("message_decrypt: msg: %x", m)
+	str, err := internal.MultibaseEncode(data)
 	if err != nil {
-		return nil, fmt.Errorf("message_decrypt: error decrypting message: %w", err)
+		return ""
 	}
 
-	// Unpack the decrypted message
-	unpackedMsg, err := Parse(string(m))
-	if err != nil {
-		return nil, err
-	}
+	return str
+}
 
-	return unpackedMsg, nil
+// Returns the contents as a byte array
+// Returns nil if an error occurs
+func (e *Envelope) Bytes() ([]byte, error) {
+
+	return e.MarshalToCBOR()
+}
+
+func (e *Envelope) GetContent(privkey []byte) ([]byte, error) {
+	return decrypt(e.Content, e.EphemeralKey, privkey)
+}
+func (e *Envelope) GetHeaders(privkey []byte) ([]byte, error) {
+	return decrypt(e.Headers, e.EphemeralKey, privkey)
 }

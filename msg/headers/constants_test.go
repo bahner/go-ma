@@ -1,4 +1,4 @@
-package msg_test
+package headers_test
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/bahner/go-ma"
-	"github.com/bahner/go-ma/msg"
+	"github.com/bahner/go-ma/msg/headers"
 	"github.com/bahner/go-ma/msg/mime"
 )
 
@@ -20,8 +20,8 @@ func TestConstants(t *testing.T) {
 		t.Errorf("Expected type to be 'ma/message', got %s", mime.MESSAGE_MIME_TYPE)
 	}
 
-	if msg.MESSAGE_TTL != time.Hour*24 {
-		t.Errorf("Expected TTL to be 24 hours, got %s", msg.MESSAGE_TTL)
+	if headers.MESSAGE_TTL != time.Hour*24 {
+		t.Errorf("Expected TTL to be 24 hours, got %s", headers.MESSAGE_TTL)
 	}
 
 }
