@@ -58,7 +58,7 @@ func NewFromKey(k *ipfs.Key) (*Keyset, error) {
 		return nil, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
 	}
 
-	d, err := did.GetOrCreate(k.DID())
+	d, err := did.GetOrCreate(k.DID)
 	if err != nil {
 		return nil, fmt.Errorf("keyset/new: failed to get or create DID: %w", err)
 	}
