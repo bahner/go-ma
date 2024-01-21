@@ -41,21 +41,6 @@ func New(identifier string, controller string) (*Document, error) {
 	return &doc, nil
 }
 
-func (d *Document) AddController(controller string) {
-	d.Controller = append(d.Controller, controller)
-}
-
-func (d *Document) DeleteController(controller string) error {
-	for i, c := range d.Controller {
-		if c == controller {
-			d.Controller = append(d.Controller[:i], d.Controller[i+1:]...)
-			return nil
-		}
-	}
-
-	return fmt.Errorf("doc: error deleting controller: %s", controller)
-}
-
 func (d *Document) MarshalToCBOR() ([]byte, error) {
 	bytes, err := cbor.Marshal(d)
 	if err != nil {
@@ -63,4 +48,22 @@ func (d *Document) MarshalToCBOR() ([]byte, error) {
 	}
 
 	return bytes, nil
+}
+
+func GetOrCreate(identifier string) (*Document, error) {
+
+	if exists(identifier) {
+		log.Debugf("doc/new: document %s found in cache", identifier)
+		return get(identifier)
+	}
+
+	doc, err := New(identifier, identifier)
+	if err != nil {
+		return nil, fmt.Errorf("doc/new: failed to create new document: %w", err)
+	}
+
+	// Add document to cache
+	cache(doc)
+
+	return doc, nil
 }

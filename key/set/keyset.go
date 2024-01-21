@@ -4,10 +4,8 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
 	"github.com/bahner/go-ma/key/ipfs"
-	cbor "github.com/fxamacker/cbor/v2"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -27,79 +25,24 @@ func GetOrCreate(name string) (*Keyset, error) {
 
 	var err error
 
-	k, err := GetByName(name)
+	if exists(name) {
+		log.Debugf("keyset/new: keyset %s found in cache", name)
+		return get(name)
+	}
+
+	ipfsKey, err := ipfs.GetOrCreate(name)
 	if err != nil {
-		log.Debugf("keyset/get: not found in cache: %v", err)
+		return nil, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
 	}
+	log.Debugf("keyset/new: created new key in IPFS: %v", ipfsKey)
 
-	var ipfsKey *ipfs.Key
-
-	if k == nil {
-		ipfsKey, err = ipfs.GetOrCreate(name)
-		if err != nil {
-			return nil, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
-		}
-		log.Debugf("keyset/new: created new key in IPFS: %v", ipfsKey)
-	}
-
-	return NewFromKey(ipfsKey)
-}
-
-// This creates a new keyset from an existing IPFS key.
-func NewFromKey(k *ipfs.Key) (*Keyset, error) {
-
-	encryptionKey, err := key.NewEncryptionKey(k.IPNSName)
+	ks, err := newFromIPFSKey(ipfsKey)
 	if err != nil {
-		return nil, fmt.Errorf("keyset/new: failed to generate encryption key: %w", err)
+		return nil, fmt.Errorf("keyset/new: failed to create new keyset: %w", err)
 	}
 
-	signatureKey, err := key.NewSigningKey(k.IPNSName)
-	if err != nil {
-		return nil, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
-	}
+	// Add key to cache
+	cache(ks)
 
-	d, err := did.GetOrCreate(k.DID)
-	if err != nil {
-		return nil, fmt.Errorf("keyset/new: failed to get or create DID: %w", err)
-	}
-
-	return &Keyset{
-		DID:           d,
-		IPFSKey:       k,
-		EncryptionKey: encryptionKey,
-		SigningKey:    signatureKey,
-	}, nil
-}
-
-func (k Keyset) MarshalToCBOR() ([]byte, error) {
-	return cbor.Marshal(k)
-}
-func UnmarshalFromCBOR(data []byte) (*Keyset, error) {
-	var k *Keyset
-	err := cbor.Unmarshal(data, &k)
-	if err != nil {
-		return nil, fmt.Errorf("keyset/unmarshal: failed to unmarshal keyset: %w", err)
-	}
-
-	return k, nil
-}
-
-func (k Keyset) Pack() (string, error) {
-
-	data, err := k.MarshalToCBOR()
-	if err != nil {
-		return "", fmt.Errorf("keyset/pack: failed to marshal keyset: %w", err)
-	}
-
-	return internal.MultibaseEncode(data)
-}
-
-func Unpack(data string) (*Keyset, error) {
-
-	decoded, err := internal.MultibaseDecode(data)
-	if err != nil {
-		return nil, fmt.Errorf("keyset/unpack: failed to decode keyset: %w", err)
-	}
-
-	return UnmarshalFromCBOR(decoded)
+	return ks, nil
 }

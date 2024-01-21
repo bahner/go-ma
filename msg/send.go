@@ -35,7 +35,7 @@ func (m *Message) enclose() (*Envelope, error) {
 
 	// AT this point we *need* to fetch the recipient's document, otherwise we can't encrypt the message.
 	// But this fetch should probably have a timeout, so we don't get stuck here - or a caching function.
-	to, err := doc.FetchFromDID(m.To)
+	to, err := doc.Fetch(m.To)
 	if err != nil {
 		return nil, fmt.Errorf("msg_enclose: error fetching recipient document: %s", err)
 	}
