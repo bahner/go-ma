@@ -32,3 +32,8 @@ func (d *Document) Verify() error {
 
 	return nil
 }
+
+func (d *Document) IsValid() bool {
+
+	return d.Verify() == nil
+}

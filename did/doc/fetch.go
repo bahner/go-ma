@@ -42,6 +42,10 @@ func Fetch(id string) (*Document, error) {
 		return nil, fmt.Errorf("doc/fetch: failed to unmarshal document: %w", err)
 	}
 
+	if !document.IsValid() {
+		return nil, fmt.Errorf("doc/fetch: fetched document is not valid")
+	}
+
 	// Add fetched document to cache
 	cache(document)
 
