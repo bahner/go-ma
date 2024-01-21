@@ -89,19 +89,19 @@ func IPFSDagPutWithOptions(data []byte, inputCodec string, storeCodec string, pi
 	if err != nil {
 		return cid.Cid{}, err
 	}
+	log.Debugf("doc/publish: unmarshalled response to: %s", ipfsResp)
 
 	c, err := cid.Decode(ipfsResp.Cid.CidString)
 	if err != nil {
 		return cid.Cid{}, fmt.Errorf("doc/publish: failed to decode CID: %w", err)
 	}
+	log.Debugf("doc/publish: decoded CID: %s", c)
 
 	return c, nil
 }
 
-func IPFSDagPutCBOR(data []byte) (cid.Cid, error) {
-	return IPFSDagPutWithOptions(data, "dag-cbor", "dag-cbor", false, "sha2-256", false)
-}
-
-func IPFSDagPutCBORAndPin(data []byte) (cid.Cid, error) {
-	return IPFSDagPutWithOptions(data, "dag-cbor", "dag-cbor", true, "sha2-256", false)
+// Publish publishes a simple CBOR struct to IPFS and returns the CID.
+// The parameters are the data, a  flag whether to pin the data and a flag whether to allow big blocks.
+func IPFSDagPutCBOR(data []byte, pin bool, bb bool) (cid.Cid, error) {
+	return IPFSDagPutWithOptions(data, "dag-cbor", "dag-cbor", pin, "sha2-256", bb)
 }

@@ -1,18 +1,20 @@
 package doc
 
-import "fmt"
-
 func (d *Document) AddController(controller string) {
-	d.Controller = append(d.Controller, controller)
-}
-
-func (d *Document) DeleteController(controller string) error {
-	for i, c := range d.Controller {
+	// Check if the controller is already in the slice
+	for _, c := range d.Controller {
 		if c == controller {
-			d.Controller = append(d.Controller[:i], d.Controller[i+1:]...)
-			return nil
+			return // Controller already exists, do nothing
 		}
 	}
 
-	return fmt.Errorf("doc: error deleting controller: %s", controller)
+	// Append the new controller since it's not already present
+	d.Controller = append(d.Controller, controller)
+}
+func (d *Document) DeleteController(controller string) {
+	for i, c := range d.Controller {
+		if c == controller {
+			d.Controller = append(d.Controller[:i], d.Controller[i+1:]...)
+		}
+	}
 }

@@ -41,7 +41,7 @@ func (m *Message) Verify() error {
 		return fmt.Errorf("message/verify: failed to create did from From: %w", err)
 	}
 
-	senderDoc, err := doc.Fetch(did.Identifier)
+	senderDoc, err := doc.GetOrFetch(did.Identifier)
 	if err != nil {
 		return fmt.Errorf("message/verify: failed to fetch sender document")
 	}

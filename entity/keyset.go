@@ -5,6 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	keyset "github.com/bahner/go-ma/key/set"
+	log "github.com/sirupsen/logrus"
 )
 
 func NewFromKeyset(keyset *keyset.Keyset) (*Entity, error) {
@@ -15,11 +16,12 @@ func NewFromKeyset(keyset *keyset.Keyset) (*Entity, error) {
 		return nil, fmt.Errorf("entity: failed to create did from ipnsKey: %s", err)
 	}
 
-	myDoc, err := CreateDocument(id, id, keyset)
+	myDoc, err := CreateDocument(id.String(), id.String(), keyset)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create document: %s", err)
 	}
 
+	log.Infof("Created new entity for %s", id.String())
 	return &Entity{
 		DID:    id,
 		Doc:    myDoc,

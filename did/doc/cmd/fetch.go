@@ -24,7 +24,7 @@ func main() {
 	log.Debugf("main: log level set to %v", _level)
 
 	// Create a new keyset for the entity
-	d, err := doc.GetOrCreate(*id)
+	d, err := doc.GetOrCreate(*id, *id)
 	if err != nil {
 		log.Errorf("main: failed to create document: %v", err)
 	} else {

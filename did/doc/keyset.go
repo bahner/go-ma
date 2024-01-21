@@ -35,10 +35,7 @@ func NewFromKeysetWithController(k *set.Keyset, controller string) (*Document, e
 	if err != nil {
 		return nil, fmt.Errorf("new_actor: Failed to create encryption verification method: %w", err)
 	}
-	err = d.AddVerificationMethod(encVm)
-	if err != nil {
-		return nil, fmt.Errorf("new_actor: Failed to add encryption verification method to DOC: %w", err)
-	}
+	d.AddVerificationMethod(encVm)
 	d.KeyAgreement = encVm.ID
 
 	assertVm, err := NewVerificationMethod(
@@ -50,10 +47,7 @@ func NewFromKeysetWithController(k *set.Keyset, controller string) (*Document, e
 	if err != nil {
 		return nil, fmt.Errorf("new_actor: Failed to create assertion verification method: %w", err)
 	}
-	err = d.AddVerificationMethod(assertVm)
-	if err != nil {
-		return nil, fmt.Errorf("new_actor: Failed to add assertion verification method to DOC: %w", err)
-	}
+	d.AddVerificationMethod(assertVm)
 	d.AssertionMethod = assertVm.ID
 
 	d.Sign(k.SigningKey, assertVm)

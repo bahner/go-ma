@@ -58,3 +58,9 @@ func (d *DID) IsIdenticalTo(did DID) bool {
 
 	return AreIdentical(d, &did)
 }
+
+func (d *DID) Path(space string) string {
+
+	return "/" + space + "/" + d.Identifier
+
+}

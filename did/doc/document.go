@@ -3,6 +3,7 @@ package doc
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
@@ -30,7 +31,7 @@ func New(identifier string, controller string) (*Document, error) {
 		return nil, fmt.Errorf("doc/new: failed to parse DID: %w", err)
 	}
 
-	ctrller := []string{controller}
+	ctrller := []string{identifier}
 
 	doc := Document{
 		Context:    DID_CONTEXT,
@@ -38,7 +39,8 @@ func New(identifier string, controller string) (*Document, error) {
 		ID:         identifier,
 		Controller: ctrller,
 	}
-	log.Debugf("doc/new: doc: %v", doc)
+	doc.AddController(controller)
+	log.Infof("doc/new: created new document for %s", identifier)
 	return &doc, nil
 }
 
@@ -65,20 +67,21 @@ func (d *Document) String() string {
 
 // GetOrCreate document from cache or fetch from IPFS
 // identifier is a did string, eg. "did:ma:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#foo"
-func GetOrCreate(identifier string) (*Document, error) {
+func GetOrCreate(identifier string, controller string) (*Document, error) {
 
 	if exists(identifier) {
 		log.Debugf("doc/GetOrCreate: document %s found in cache", identifier)
 		return get(identifier)
 	}
 
-	doc, err := FetchFromDID(identifier)
+	doc, err := fetch(identifier)
 	if err == nil {
+		doc.AddController(controller)
 		log.Debugf("doc/GetOrCreate: found previously published document for: %s", identifier)
 		return doc, nil
 	}
 
-	doc, err = New(identifier, identifier)
+	doc, err = New(identifier, controller)
 	if err != nil {
 		return nil, fmt.Errorf("doc/GetOrCreate: failed to create new document: %w", err)
 	}
@@ -87,4 +90,45 @@ func GetOrCreate(identifier string) (*Document, error) {
 	cache(doc)
 
 	return doc, nil
+}
+
+func (d *Document) Equal(other *Document) bool {
+	if d.ID != other.ID {
+		return false
+	}
+
+	if d.Version != other.Version {
+		return false
+	}
+
+	if d.KeyAgreement != other.KeyAgreement {
+		return false
+	}
+
+	if d.AssertionMethod != other.AssertionMethod {
+		return false
+	}
+
+	if !compareSlices(d.Context, other.Context) {
+		return false
+	}
+
+	if !compareSlices(d.Controller, other.Controller) {
+		return false
+	}
+
+	if d.Proof != other.Proof {
+		return false
+	}
+
+	return true
+
+}
+
+func compareSlices(a []string, b []string) bool {
+
+	slices.Sort(a)
+	slices.Sort(b)
+
+	return slices.Compare(a, b) == 0
 }

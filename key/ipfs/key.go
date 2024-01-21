@@ -23,11 +23,11 @@ func GetOrCreate(name string) (*Key, error) {
 		return get(name)
 	}
 
-	return Fetch(name)
+	return fetch(name)
 }
 
 // Fetches the key from IPFS and updates the cache.
-func Fetch(name string) (*Key, error) {
+func fetch(name string) (*Key, error) {
 	// Get or create the key in IPFS
 	ik, err := getOrCreateIPFSKey(name)
 	if err != nil {
