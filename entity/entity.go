@@ -39,7 +39,7 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	}
 	log.Debugf("entity: myKeyset: %v", myKeyset)
 
-	myDoc, err := CreateEntityDocument(id, controller, myKeyset)
+	myDoc, err := CreateDocument(id, controller, myKeyset)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create document: %s", err)
 	}

@@ -21,9 +21,15 @@ func main() {
 
 	name := flag.String("name", "", "Name of the entity to create")
 	publish := flag.Bool("publish", false, "Publish the entity document to IPFS")
+	logLevel := flag.String("loglevel", "error", "Set the log level (debug, info, warn, error, fatal, panic)")
 
 	flag.Parse()
-	log.SetLevel(log.DebugLevel)
+	_level, err := log.ParseLevel(*logLevel)
+	if err != nil {
+		panic(err)
+	}
+	log.SetLevel(_level)
+	log.Debugf("main: log level set to %v", _level)
 
 	// Create a new keyset for the entity
 	keyset, err := keyset.GetOrCreate(*name)
@@ -37,7 +43,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		c, err := d.Publish()
+		c, err := d.Publish(false)
 		if err != nil {
 			panic(err)
 		}

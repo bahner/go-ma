@@ -93,7 +93,7 @@ func createSubjectFromPackedKeyset(keyset string) (*entity.Entity, error) {
 		return nil, fmt.Errorf("error signing new identity in ma: %v", err)
 	}
 
-	_, err = DIDDoc.Publish()
+	_, err = DIDDoc.Publish(false)
 	if err != nil {
 		return nil, fmt.Errorf("error publishing new identity in ma: %v", err)
 	}

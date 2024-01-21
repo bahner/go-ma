@@ -11,7 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func CreateEntityDocument(id *did.DID, controller *did.DID, keyset *keyset.Keyset) (*doc.Document, error) {
+func CreateDocument(id *did.DID, controller *did.DID, keyset *keyset.Keyset) (*doc.Document, error) {
 	// Initialize a new DID Document
 	myDoc, err := doc.New(id.String(), id.String())
 	if err != nil {
@@ -54,10 +54,15 @@ func CreateEntityDocument(id *did.DID, controller *did.DID, keyset *keyset.Keyse
 	return myDoc, nil
 }
 
-func (e *Entity) PublishEntityDocument() error {
-	_, err := e.Doc.Publish()
+// Publish entity document. This needs to be done, when the keyset is new.
+// Maybe we can check the assertionMethod and keyAgreement fields to see if
+// the document is already published corretly.
+func (e *Entity) PublishDocument() error {
+
+	id, err := e.Doc.Publish(false)
 	if err != nil {
 		return fmt.Errorf("entity: failed to publish document: %s", err)
 	}
+	log.Debugf("entity: published document: %v to %s", e.Doc, id)
 	return nil
 }

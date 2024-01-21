@@ -15,7 +15,7 @@ func NewFromKeyset(keyset *keyset.Keyset) (*Entity, error) {
 		return nil, fmt.Errorf("entity: failed to create did from ipnsKey: %s", err)
 	}
 
-	myDoc, err := CreateEntityDocument(id, id, keyset)
+	myDoc, err := CreateDocument(id, id, keyset)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create document: %s", err)
 	}

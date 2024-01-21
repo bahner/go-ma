@@ -33,7 +33,7 @@ func (d *Document) Verify() error {
 	return nil
 }
 
-func (d *Document) IsValid() bool {
+func (d *Document) isValid() bool {
 
 	return d.Verify() == nil
 }
