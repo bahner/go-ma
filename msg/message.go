@@ -1,89 +1,115 @@
 package msg
 
 import (
-	"encoding/json"
+	"crypto/ed25519"
 	"fmt"
+	"time"
 
-	"github.com/bahner/go-ma/internal"
-	"github.com/bahner/go-ma/msg/body"
-	"github.com/bahner/go-ma/msg/headers"
-	cbor "github.com/fxamacker/cbor/v2"
+	"github.com/bahner/go-ma"
+	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
-// Bask the encrypted message and the encrypted symmetric key in a JSON envelope.
+const (
+
+	// Messages which are older than a day should be ignored
+	MESSAGE_TTL = ma.MESSAGE_DEFAULT_TTL
+)
+
+// This struct mimicks the Message format, but it's *not* Message.
+// It should enable using Message later, if that's a good idea.
 type Message struct {
-	Headers *headers.Headers `cbor:"headers" json:"headers"`
-	Body    *body.Body       `cbor:"body" json:"body"`
+	_ struct{} `cbor:",toarray"`
+	// Version of the message format
+	Version string `cbor:"versionId"`
+	// Unique identifier of the message
+	ID string `cbor:"id"`
+	// MIME type of the message
+	MimeType string `cbor:"type"`
+	// Creation time of the message in seconds since Unix epoch
+	Created int64 `cbor:"created_time,keyasint64"`
+	// Expiration time of the message in seconds since Unix epoch
+	Expires int64 `cbor:"expires_time,keyasint64"`
+	// Sender of the message
+	From string `cbor:"from"`
+	// Recipient of the message
+	To string `cbor:"to"`
+	// MIME type of the message body
+	ContentType string `cbor:"content_type"`
+	// Hexadecimal string representation of the SHA-256 hash of the message body
+	Content []byte `cbor:"content"`
+	// Signature of the message headers. NB! This includes the ContentHash field,
+	// which can be used to verify the integrity of the message body.
+	Signature []byte `cbor:"signature"`
 }
 
-// Use a pointer here, this might be arbitrarily big.
-// from, to, content are required, but content_type defaults to text/plain
-func New(from string,
+// New creates a new Message instance
+// Message is a string for now, but it should be JSON.
+func New(
+	from string,
 	to string,
 	content []byte,
-	content_type string) (*Message, error) {
+	contentType string,
+	priv_key *ed25519.PrivateKey) (*Message, error) {
 
-	// A little sugar goes a long way
-	if content_type == "" {
-		content_type = MESSAGE_DEFAULT_CONTENT_TYPE
-	}
-
-	msgBody, err := body.New(content, content_type)
+	id, err := nanoid.New()
 	if err != nil {
-		return nil, fmt.Errorf("msg_new: error creating body: %w", err)
+		return nil, err
 	}
 
-	msgHeaders, err := headers.New(from, to, msgBody)
+	now := time.Now().UTC()
+	created := now.Unix()
+	expires := now.Add(MESSAGE_TTL).Unix()
+
+	m := &Message{
+		// Message meta data
+		ID:       id,
+		MimeType: ma.MESSAGE_MIME_TYPE,
+		Version:  ma.VERSION,
+		// Recipients
+		From: from,
+		To:   to,
+		// Timestamps
+		Created: created,
+		Expires: expires,
+		// Body
+		ContentType: contentType,
+		// The content is not signed as such, but the hash is.
+		Content: content,
+	}
+
+	err = m.Sign(priv_key)
 	if err != nil {
-		return nil, fmt.Errorf("msg_new: error creating headers: %w", err)
+		return nil, fmt.Errorf("msg_new: failed to sign message: %w", err)
 	}
 
-	return &Message{
-		Headers: msgHeaders,
-		Body:    msgBody,
-	}, nil
+	return m, nil
 }
 
-func (e *Message) MarshalToCBOR() ([]byte, error) {
-	return cbor.Marshal(e)
-}
+// Create a new Message from the headers
+// Validate the headers (sinature) before adding the content. This is to be lazy
+// about decrypting the content, in case we don't need it.
+func NewFromHeaders(h *Headers) (*Message, error) {
 
-func (e *Message) MarshalToJSON() ([]byte, error) {
-	return json.Marshal(e)
-}
-
-func UnmarshalFromCBOR(data []byte) (*Message, error) {
-
-	e := &Message{}
-
-	err := cbor.Unmarshal(data, e)
+	err := h.validate()
 	if err != nil {
-		return nil, fmt.Errorf("envelope: error unmarshalling envelope: %s", err)
+		return nil, fmt.Errorf("msg_new_from_headers: failed to validate headers: %w", err)
 	}
 
-	return e, nil
-}
-
-// Simply the CBOR encoded envelope, but a generic named function.
-// Returns nil if an error occurs
-func (e *Message) Bytes() []byte {
-
-	bytes, err := e.MarshalToCBOR()
-	if err != nil {
-		return nil
+	m := &Message{
+		// Message meta data
+		ID:       h.ID,
+		MimeType: h.MimeType,
+		Version:  h.Version,
+		// Recipients
+		From: h.From,
+		To:   h.To,
+		// Timestamps
+		Created: h.Created,
+		Expires: h.Expires,
+		// Body
+		ContentType: h.ContentType,
+		// Signature
+		Signature: h.Signature,
 	}
-
-	return bytes
-}
-
-// Returns the multibase-encoded hash of the entire envelope
-// Returns empty string if an error occurs
-func (e *Message) String() string {
-
-	str, err := internal.MultibaseEncode(e.Bytes())
-	if err != nil {
-		return ""
-	}
-
-	return str
+	return m, nil
 }

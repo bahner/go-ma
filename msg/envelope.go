@@ -1,31 +1,45 @@
 package msg
 
 import (
-	"encoding/json"
 	"fmt"
 
-	"github.com/bahner/go-ma/internal"
 	cbor "github.com/fxamacker/cbor/v2"
 )
 
-// Bask the encrypted message and the encrypted symmetric key in a JSON envelope.
+// Bask the encrypted message and the encrypted symmetric key in a CBOR envelope.
 type Envelope struct {
-	EphemeralKey []byte `cbor:"ephemeralKey" json:"ephemeralKey"`
-	Content      []byte `cbor:"body" json:"body"`
-	Headers      []byte `cbor:"headers" json:"headers"`
+	EphemeralKey     []byte `cbor:"ephemeralKey"`
+	EncryptedContent []byte `cbor:"body"`
+	EncryptedHeaders []byte `cbor:"headers"`
 }
 
-func (e *Envelope) MarshalToCBOR() ([]byte, error) {
+func (e *Envelope) marshalToCBOR() ([]byte, error) {
 	return cbor.Marshal(e)
 }
 
-func (e *Envelope) MarshalToJSON() ([]byte, error) {
-	return json.Marshal(e)
+func (e *Envelope) getContent(privkey []byte) ([]byte, error) {
+	return decrypt(e.EncryptedContent, e.EphemeralKey, privkey)
+}
+func (e *Envelope) getHeaders(privkey []byte) (*Headers, error) {
+
+	bytes, err := decrypt(e.EncryptedHeaders, e.EphemeralKey, privkey)
+	if err != nil {
+		return nil, fmt.Errorf("envelope: error decrypting headers: %w", err)
+	}
+
+	var hdrs *Headers = new(Headers)
+
+	err = cbor.Unmarshal(bytes, hdrs)
+	if err != nil {
+		return nil, fmt.Errorf("envelope: error unmarshalling headers: %w", err)
+	}
+
+	return hdrs, nil
 }
 
 // Takes the envelope as a byte array and returns a pointer to an Envelope struct
 // Basically this is what you do with a receieved message envelope, eg. in an Open() function.
-func UnmarshalEnvelopeFromCBOR(data []byte) (*Envelope, error) {
+func unmarshalEnvelopeFromCBOR(data []byte) (*Envelope, error) {
 
 	e := &Envelope{}
 
@@ -35,34 +49,4 @@ func UnmarshalEnvelopeFromCBOR(data []byte) (*Envelope, error) {
 	}
 
 	return e, nil
-}
-
-// Returns the contents as a multibase encoded string
-// Returns empty string if an error occurs
-func (e *Envelope) String() string {
-	data, err := e.MarshalToCBOR()
-	if err != nil {
-		return ""
-	}
-
-	str, err := internal.MultibaseEncode(data)
-	if err != nil {
-		return ""
-	}
-
-	return str
-}
-
-// Returns the contents as a byte array
-// Returns nil if an error occurs
-func (e *Envelope) Bytes() ([]byte, error) {
-
-	return e.MarshalToCBOR()
-}
-
-func (e *Envelope) GetContent(privkey []byte) ([]byte, error) {
-	return decrypt(e.Content, e.EphemeralKey, privkey)
-}
-func (e *Envelope) GetHeaders(privkey []byte) ([]byte, error) {
-	return decrypt(e.Headers, e.EphemeralKey, privkey)
 }
