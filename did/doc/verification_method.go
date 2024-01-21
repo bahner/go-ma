@@ -11,17 +11,16 @@ import (
 
 // VerificationMethod defines the structure of a Verification Method
 type VerificationMethod struct {
-	_ struct{} `cbor:",toarray"`
 	// The full name of the verification method, eg. did:ma:123456789abcdefghi#signature-key-id
-	ID string
+	ID string `cbor:"id"`
 	// The type of verification method. We only use MultiKey. It's unofficial, but it works.
 	// https://w3c-ccg.github.io/did-method-key/
-	Type string
+	Type string `cbor:"type"`
 	// The controller of the verification method. This is the DID of the entity that controls the key.
 	// Should probably always be the DID itself, but maybe the DID controller.
-	Controller string
+	Controller []string `cbor:"controller,toarray"`
 	// Created is the time the verification method was created
-	PublicKeyMultibase string
+	PublicKeyMultibase string `cbor:"publicKeyMultibase"`
 }
 
 // NewVerificationMethod creates a new VerificationMethod
@@ -64,10 +63,25 @@ func NewVerificationMethod(
 
 	return VerificationMethod{
 		ID:                 ma.DID_PREFIX + identifier + fragment,
-		Controller:         controller,
+		Controller:         []string{controller},
 		Type:               vmType,
 		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
+}
+
+func (v *VerificationMethod) AddController(controller string) {
+	v.Controller = append(v.Controller, controller)
+}
+
+func (v *VerificationMethod) DeleteController(controller string) error {
+	for i, c := range v.Controller {
+		if c == controller {
+			v.Controller = append(v.Controller[:i], v.Controller[i+1:]...)
+			return nil
+		}
+	}
+
+	return fmt.Errorf("doc/vm: error deleting controller: %s", controller)
 }
 
 func (d *Document) AddVerificationMethod(method VerificationMethod) error {
@@ -79,6 +93,16 @@ func (d *Document) AddVerificationMethod(method VerificationMethod) error {
 	d.VerificationMethod = append(d.VerificationMethod, method)
 
 	return nil
+}
+
+func (d *Document) DeleteVerificationMethod(method VerificationMethod) error {
+	for i, m := range d.VerificationMethod {
+		if m.ID == method.ID {
+			d.VerificationMethod = append(d.VerificationMethod[:i], d.VerificationMethod[i+1:]...)
+			return nil
+		}
+	}
+	return fmt.Errorf("doc/vm: error deleting verification method: %s", method.ID)
 }
 
 func (d *Document) GetVerificationMethodbyID(vmid string) (VerificationMethod, error) {

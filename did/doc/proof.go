@@ -14,12 +14,11 @@ const (
 )
 
 type Proof struct {
-	_                  struct{} `cbor:",toarray"`
-	Created            string
-	Type               string
-	VerificationMethod string
-	ProofPurpose       string
-	ProofValue         string
+	Created            string `cbor:"created"`
+	Type               string `cbor:"type"`
+	VerificationMethod string `cbor:"verificationMethod"`
+	ProofPurpose       string `cbor:"proofPurpose"`
+	ProofValue         string `cbor:"proofValue"`
 }
 
 func (d *Document) Sign(signKey *key.SigningKey, vm VerificationMethod) error {

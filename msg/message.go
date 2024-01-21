@@ -18,28 +18,27 @@ const (
 // This struct mimicks the Message format, but it's *not* Message.
 // It should enable using Message later, if that's a good idea.
 type Message struct {
-	_ struct{} `cbor:",toarray"`
 	// Version of the message format
 	Version string
 	// Unique identifier of the message
-	ID string
+	ID string `cbor:"id"`
 	// MIME type of the message
-	MimeType string
+	MimeType string `cbor:"mimeType"`
 	// Creation time of the message in seconds since Unix epoch
 	Created int64 `cbor:"keyasint64"`
 	// Expiration time of the message in seconds since Unix epoch
 	Expires int64 `cbor:"keyasint64"`
 	// Sender of the message
-	From string
+	From string `cbor:"from"`
 	// Recipient of the message
-	To string
+	To string `cbor:"to"`
 	// MIME type of the message body
-	ContentType string
+	ContentType string `cbor:"contentType"`
 	// Hexadecimal string representation of the SHA-256 hash of the message body
-	Content []byte
+	Content []byte `cbor:"content"`
 	// Signature of the message headers. NB! This includes the ContentHash field,
 	// which can be used to verify the integrity of the message body.
-	Signature []byte
+	Signature []byte `cbor:"signature"`
 }
 
 // New creates a new Message instance

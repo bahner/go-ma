@@ -5,21 +5,19 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/internal"
 	cbor "github.com/fxamacker/cbor/v2"
 	log "github.com/sirupsen/logrus"
 )
 
 type Document struct {
-	_                  struct{} `cbor:",toarray"`
-	Context            []string `cbor:"@context,toarray" json:"@context"`
-	Version            string
-	ID                 string
-	Controller         []string             `cbor:"controller,omitempty,toarray"`
-	VerificationMethod []VerificationMethod `cbor:"verificationMethod,omitempty,toarray"`
-	AssertionMethod    string               `cbor:"assertionMethod,omitempty"`
-	KeyAgreement       string               `cbor:"keyAgreement,omitempty"`
-	Proof              Proof                `cbor:"proof,omitempty"`
+	Context            []string             `cbor:"@context,toarray"`
+	Version            string               `cbor:"version"`
+	ID                 string               `cbor:"id"`
+	Controller         []string             `cbor:"controller,toarray"`
+	VerificationMethod []VerificationMethod `cbor:"verificationMethod,toarray"`
+	AssertionMethod    string               `cbor:"assertionMethod"`
+	KeyAgreement       string               `cbor:"keyAgreement"`
+	Proof              Proof                `cbor:"proof"`
 }
 
 func New(identifier string, controller string) (*Document, error) {
@@ -43,18 +41,19 @@ func New(identifier string, controller string) (*Document, error) {
 	return &doc, nil
 }
 
-func (d *Document) String() (string, error) {
-	bytes, err := cbor.Marshal(d)
-	if err != nil {
-		return "", fmt.Errorf("doc/string: failed to marshal document to CBOR: %w", err)
+func (d *Document) AddController(controller string) {
+	d.Controller = append(d.Controller, controller)
+}
+
+func (d *Document) DeleteController(controller string) error {
+	for i, c := range d.Controller {
+		if c == controller {
+			d.Controller = append(d.Controller[:i], d.Controller[i+1:]...)
+			return nil
+		}
 	}
 
-	doc, err := internal.MultibaseEncode(bytes)
-	if err != nil {
-		return "", fmt.Errorf("doc/string: failed to multibase encode document: %w", err)
-	}
-
-	return doc, nil
+	return fmt.Errorf("doc: error deleting controller: %s", controller)
 }
 
 func (d *Document) MarshalToCBOR() ([]byte, error) {
