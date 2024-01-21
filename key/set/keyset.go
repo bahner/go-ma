@@ -108,7 +108,3 @@ func Unpack(data string) (*Keyset, error) {
 
 	return UnmarshalFromCBOR(decoded)
 }
-
-func (k *Keyset) ID() string {
-	return k.IPFSKey.ID
-}

@@ -13,9 +13,10 @@ import (
 )
 
 type Key struct {
-	ID   string `cbor:"id"`
-	Name string `cbor:"name"`
-	Path string `cbor:"path"`
+	IPNSName string `cbor:"ipns_name"`
+	ID       string `cbor:"id"`
+	Name     string `cbor:"name"`
+	Path     string `cbor:"path"`
 }
 
 // UnmarshalCBOR customizes the CBOR unmarshaling for Key.
@@ -94,9 +95,10 @@ func NewFromDID(d *did.DID) (*Key, error) {
 func NewFromIPFSKey(k coreiface.Key) (*Key, error) {
 
 	return &Key{
-		ID:   k.ID().String(),
-		Name: k.Name(),
-		Path: k.Path().String(),
+		IPNSName: k.Path().Segments()[1],
+		ID:       k.ID().String(),
+		Name:     k.Name(),
+		Path:     k.Path().String(),
 	}, nil
 }
 
@@ -107,13 +109,12 @@ func (k *Key) RootCID() (string, error) {
 		return "", fmt.Errorf("keyset/new: failed to create path from key: %w", err)
 	}
 
-	ip, err := path.NewImmutablePath(p)
-	if err != nil {
-		return "", fmt.Errorf("keyset/new: failed to create immutable path from key: %w", err)
-	}
-
-	identifier := ip.RootCid().String()
+	identifier := p.Segments()[1]
 	log.Debugf("keyset/new: identifier: %s", identifier)
+
+	if identifier == p.Namespace() {
+		return p.Segments()[1], nil
+	}
 
 	return identifier, nil
 }
