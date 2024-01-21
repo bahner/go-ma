@@ -29,7 +29,7 @@ func GetOrCreate(name string) (*Keyset, error) {
 
 	k, err := GetByName(name)
 	if err != nil {
-		log.Debugf("keyset/get: error message from GetByName: %v", err)
+		log.Debugf("keyset/get: not found in cache: %v", err)
 	}
 
 	var ipfsKey *ipfs.Key
@@ -48,17 +48,12 @@ func GetOrCreate(name string) (*Keyset, error) {
 // This creates a new keyset from an existing IPFS key.
 func NewFromKey(k *ipfs.Key) (*Keyset, error) {
 
-	identifier, err := k.RootCID()
-	if err != nil {
-		return nil, fmt.Errorf("keyset/new: failed to get root CID from IPFS key: %w", err)
-	}
-
-	encryptionKey, err := key.NewEncryptionKey(identifier)
+	encryptionKey, err := key.NewEncryptionKey(k.IPNSName)
 	if err != nil {
 		return nil, fmt.Errorf("keyset/new: failed to generate encryption key: %w", err)
 	}
 
-	signatureKey, err := key.NewSigningKey(identifier)
+	signatureKey, err := key.NewSigningKey(k.IPNSName)
 	if err != nil {
 		return nil, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
 	}

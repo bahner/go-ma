@@ -115,7 +115,3 @@ func IPFSDagPutCBOR(data []byte) (string, error) {
 func IPFSDagPutCBORAndPin(data []byte) (string, error) {
 	return IPFSDagPutWithOptions(data, "dag-cbor", "dag-cbor", true, "sha2-256", false)
 }
-
-func IPFSDagPutJSON(data []byte) (string, error) {
-	return IPFSDagPutWithOptions(data, "dag-json", "dag-cbor", true, "sha2-256", false)
-}

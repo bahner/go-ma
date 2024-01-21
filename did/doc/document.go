@@ -1,7 +1,6 @@
 package doc
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/bahner/go-ma"
@@ -12,15 +11,15 @@ import (
 )
 
 type Document struct {
-	_                  struct{}             `cbor:",toarray"`
-	Context            []string             `cbor:"@context,toarray" json:"@context"`
-	Version            string               `cbor:"versionId" json:"versionId"`
-	ID                 string               `cbor:"id" json:"id"`
-	Controller         []string             `cbor:"controller,omitempty,toarray" json:"controller,omitempty"`
-	VerificationMethod []VerificationMethod `cbor:"verificationMethod,omitempty,toarray" json:"verificationMethod,omitempty"`
-	AssertionMethod    string               `cbor:"assertionMethod,omitempty" json:"assertionMethod,omitempty"`
-	KeyAgreement       string               `cbor:"keyAgreement,omitempty" json:"keyAgreement,omitempty"`
-	Proof              Proof                `cbor:"proof,omitempty" json:"proof,omitempty"`
+	_                  struct{} `cbor:",toarray"`
+	Context            []string `cbor:"@context,toarray" json:"@context"`
+	Version            string
+	ID                 string
+	Controller         []string             `cbor:"controller,omitempty,toarray"`
+	VerificationMethod []VerificationMethod `cbor:"verificationMethod,omitempty,toarray"`
+	AssertionMethod    string               `cbor:"assertionMethod,omitempty"`
+	KeyAgreement       string               `cbor:"keyAgreement,omitempty"`
+	Proof              Proof                `cbor:"proof,omitempty"`
 }
 
 func New(identifier string, controller string) (*Document, error) {
@@ -47,7 +46,7 @@ func New(identifier string, controller string) (*Document, error) {
 func (d *Document) String() (string, error) {
 	bytes, err := cbor.Marshal(d)
 	if err != nil {
-		return "", fmt.Errorf("doc/string: failed to marshal document to JSON: %w", err)
+		return "", fmt.Errorf("doc/string: failed to marshal document to CBOR: %w", err)
 	}
 
 	doc, err := internal.MultibaseEncode(bytes)
@@ -58,16 +57,7 @@ func (d *Document) String() (string, error) {
 	return doc, nil
 }
 
-func (d *Document) JSON() ([]byte, error) {
-	bytes, err := json.Marshal(d)
-	if err != nil {
-		return nil, fmt.Errorf("doc/string: failed to marshal document to JSON: %w", err)
-	}
-
-	return bytes, nil
-}
-
-func (d *Document) CBOR() ([]byte, error) {
+func (d *Document) MarshalToCBOR() ([]byte, error) {
 	bytes, err := cbor.Marshal(d)
 	if err != nil {
 		return nil, fmt.Errorf("doc/string: failed to marshal document to CBOR: %w", err)

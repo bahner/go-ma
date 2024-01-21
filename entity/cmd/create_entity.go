@@ -37,13 +37,6 @@ func main() {
 	}
 	fmt.Fprintln(os.Stderr, " done.")
 
-	document, err := myEntity.Doc.JSON()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Fprintln(os.Stderr, "Published the following Entity DIDDocument: ")
-	fmt.Fprintln(os.Stderr, string(document))
-
 	packedEntity, err := myEntity.Pack()
 	if err != nil {
 		panic(err)

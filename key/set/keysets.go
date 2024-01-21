@@ -39,7 +39,7 @@ func Clear() {
 
 func GetByName(name string) (*Keyset, error) {
 	for _, k := range keysets {
-		if k.IPFSKey.Name == name {
+		if k.IPFSKey.Fragment == name {
 			return k, nil
 		}
 	}

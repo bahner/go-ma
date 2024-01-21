@@ -14,27 +14,24 @@ import (
 type Headers struct {
 	_ struct{} `cbor:",toarray"`
 	// Version of the message format
-	Version string `cbor:"version"`
+	Version string
 	// Unique identifier of the message
-	ID string `cbor:"id"`
+	ID string
 	// MIME type of the message
-	MimeType string `cbor:"type"`
+	MimeType string
 	// Creation time of the message in seconds since Unix epoch
-	Created int64 `cbor:"created_time,keyasint64"`
+	Created int64 `cbor:"keyasint64"`
 	// Expiration time of the message in seconds since Unix epoch
-	Expires int64 `cbor:"expires_time,keyasint64"`
+	Expires int64 `cbor:"keyasint64"`
 	// Sender of the message
-	From string `cbor:"from"`
+	From string
 	// Recipient of the message
-	To string `cbor:"to"`
+	To string
 	// MIME type of the message body
-	ContentType string `cbor:"content_type"`
+	ContentType string
 	// Hexadecimal string representation of the SHA-256 hash of the message body
-	Signature []byte `cbor:"signature"`
+	Signature []byte
 }
-
-// New creates a new Message instance
-// Message is a string for now, but it should be JSON.
 
 func (m *Message) baseHeaders() *Headers {
 

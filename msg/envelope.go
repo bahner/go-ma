@@ -8,9 +8,9 @@ import (
 
 // Bask the encrypted message and the encrypted symmetric key in a CBOR envelope.
 type Envelope struct {
-	EphemeralKey     []byte `cbor:"ephemeralKey"`
-	EncryptedContent []byte `cbor:"body"`
-	EncryptedHeaders []byte `cbor:"headers"`
+	EphemeralKey     []byte
+	EncryptedContent []byte
+	EncryptedHeaders []byte
 }
 
 func (e *Envelope) marshalToCBOR() ([]byte, error) {

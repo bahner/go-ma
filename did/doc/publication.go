@@ -8,19 +8,9 @@ import (
 	caopts "github.com/ipfs/kubo/core/coreiface/options"
 )
 
-// Assuming the JSON response has the following structure:
-//
-//	{
-//	  "Cid": {
-//	    "/": "<cid-string>"
-//	  }
-//	}
-//
-// Define a struct that matches this structure
-
 // Publish publishes the document to IPFS and returns the CID
 func (d *Document) Publish() (string, error) {
-	data, err := d.CBOR()
+	data, err := d.MarshalToCBOR()
 	if err != nil {
 		return "", err
 	}

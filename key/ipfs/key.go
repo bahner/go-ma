@@ -7,16 +7,16 @@ import (
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/key/ipfs/key"
 	cbor "github.com/fxamacker/cbor/v2"
-	"github.com/ipfs/boxo/path"
 	coreiface "github.com/ipfs/kubo/core/coreiface"
-	log "github.com/sirupsen/logrus"
 )
 
 type Key struct {
-	IPNSName string `cbor:"ipns_name"`
-	ID       string `cbor:"id"`
-	Name     string `cbor:"name"`
-	Path     string `cbor:"path"`
+	// The IPNS name of the key, not the local name
+	IPNSName string
+	// The ID used by kubo to identify the key
+	ID string
+	// Fragment is the local name of the key, which we use as the DID fragment
+	Fragment string
 }
 
 // UnmarshalCBOR customizes the CBOR unmarshaling for Key.
@@ -33,7 +33,7 @@ func UnmarshalCBOR(data []byte) (*Key, error) {
 
 func (k *Key) Exists() bool {
 
-	nk, err := key.LookupName(k.Name)
+	nk, err := key.LookupName(k.Fragment)
 	if err != nil {
 		return false
 	}
@@ -43,7 +43,7 @@ func (k *Key) Exists() bool {
 		return false
 	}
 
-	return nk.Name() == k.Name && ik.ID().String() == k.ID
+	return nk.Name() == k.Fragment && ik.ID().String() == k.ID
 }
 
 func GetOrCreate(name string) (*Key, error) {
@@ -86,9 +86,8 @@ func NewFromDID(d *did.DID) (*Key, error) {
 	}
 
 	return &Key{
-		ID:   ik.ID().String(),
-		Name: ik.Name(),
-		Path: ik.Path().String(),
+		ID:       ik.ID().String(),
+		Fragment: ik.Name(),
 	}, nil
 }
 
@@ -97,34 +96,11 @@ func NewFromIPFSKey(k coreiface.Key) (*Key, error) {
 	return &Key{
 		IPNSName: k.Path().Segments()[1],
 		ID:       k.ID().String(),
-		Name:     k.Name(),
-		Path:     k.Path().String(),
+		Fragment: k.Name(),
 	}, nil
-}
-
-func (k *Key) RootCID() (string, error) {
-
-	p, err := path.NewPath(k.Path)
-	if err != nil {
-		return "", fmt.Errorf("keyset/new: failed to create path from key: %w", err)
-	}
-
-	identifier := p.Segments()[1]
-	log.Debugf("keyset/new: identifier: %s", identifier)
-
-	if identifier == p.Namespace() {
-		return p.Segments()[1], nil
-	}
-
-	return identifier, nil
 }
 
 func (k *Key) DID() string {
 
-	identifier, err := k.RootCID()
-	if err != nil {
-		return ""
-	}
-
-	return ma.DID_PREFIX + identifier + "#" + k.Name
+	return ma.DID_PREFIX + k.IPNSName + "#" + k.Fragment
 }

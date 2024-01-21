@@ -1,7 +1,6 @@
 package doc
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/bahner/go-ma"
@@ -31,24 +30,13 @@ func (d *Document) MarshalPayloadToCBOR() ([]byte, error) {
 	return cbor.Marshal(p)
 }
 
-// Marshals the payload to JSON for inspection.
-func (d *Document) MarshalPayloadToJSON() ([]byte, error) {
-	p, err := Payload(*d)
-	if err != nil {
-		return nil, err
-	}
-
-	return json.Marshal(p)
-}
-
 func (d *Document) PayloadHash() ([]byte, error) {
-	// Etxract the payload from the document as a JSON string
 	p, err := d.MarshalPayloadToCBOR()
 	if err != nil {
-		return nil, fmt.Errorf("doc hashing: Error marshalling payload to JSON: %s", err)
+		return nil, fmt.Errorf("doc hashing: Error marshalling payload to CBOR: %s", err)
 	}
 
-	// Hash the JSON string
+	// Hash the payload
 	hashed := blake3.Sum256(p)
 	multicodecHashed, err := internal.MulticodecEncode(ma.HASH_ALGORITHM_MULTICODEC_STRING, hashed[:])
 	if err != nil {
