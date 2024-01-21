@@ -39,7 +39,7 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	}
 	log.Debugf("entity: myKeyset: %v", myKeyset)
 
-	myDoc, err := CreateEntityDocument(id, controller, myKeyset)
+	myDoc, err := CreateDocument(id, controller, myKeyset)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create document: %s", err)
 	}
@@ -53,7 +53,7 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 
 func NewFromIPFSKey(ipfsKey *ipfs.Key) (*Entity, error) {
 
-	id, err := did.New(string(ipfsKey.ID))
+	id, err := did.New(ipfsKey.IPNSName)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create did from ipnsKey: %s", err)
 	}
@@ -63,7 +63,7 @@ func NewFromIPFSKey(ipfsKey *ipfs.Key) (*Entity, error) {
 
 func NewFromIPFSKeyWithController(ipfsKey *ipfs.Key, controller *did.DID) (*Entity, error) {
 
-	id, err := did.New(string(ipfsKey.ID))
+	id, err := did.New(ipfsKey.IPNSName)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create did from ipnsKey: %s", err)
 	}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/bahner/go-ma/entity"
 	keyset "github.com/bahner/go-ma/key/set"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -17,8 +18,15 @@ func main() {
 	fmt.Fprintln(os.Stderr, "******************************************************************")
 
 	name := flag.String("name", "", "Name of the entity to create")
-	flag.Parse()
+	logLevel := flag.String("loglevel", "error", "Set the log level (debug, info, warn, error, fatal, panic)")
 
+	flag.Parse()
+	_level, err := log.ParseLevel(*logLevel)
+	if err != nil {
+		panic(err)
+	}
+	log.SetLevel(_level)
+	log.Debugf("main: log level set to %v", _level)
 	// Create a new keyset for the entity from the name (fragment)
 	keyset, err := keyset.GetOrCreate(*name)
 	if err != nil {
@@ -31,18 +39,11 @@ func main() {
 	}
 
 	fmt.Fprint(os.Stderr, "Publishing Entity DIDDocument to IPFS. Please wait ...")
-	err = myEntity.PublishEntityDocument()
+	err = myEntity.PublishDocument()
 	if err != nil {
 		panic(err)
 	}
 	fmt.Fprintln(os.Stderr, " done.")
-
-	document, err := myEntity.Doc.JSON()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Fprintln(os.Stderr, "Published the following Entity DIDDocument: ")
-	fmt.Fprintln(os.Stderr, string(document))
 
 	packedEntity, err := myEntity.Pack()
 	if err != nil {

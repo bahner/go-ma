@@ -10,7 +10,7 @@ import (
 // IPFSDagAddCBOR takes a CBOR encoded byte array and adds it to IPFS.
 func (d *Document) Node() (*cbor.Node, error) {
 
-	dCBOR, err := d.CBOR()
+	dCBOR, err := d.MarshalToCBOR()
 	if err != nil {
 		return nil, fmt.Errorf("doc/Node: failed to marshal document to CBOR: %w", err)
 	}

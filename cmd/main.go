@@ -38,54 +38,7 @@ func main() {
 		fmt.Printf("error unpacking keyset: %v\n", err)
 	}
 
-	fmt.Println(foo.IPFSKey.Name)
-
-	// // shell := internal.GetShell()
-
-	// // Create a new person, object - an entity
-	// // id, _ := nanoid.New()
-	// // bahner, err := entity.NewFromPackedKeyset(bahnerKeyset)
-	// bahner, err := createSubjectFromPackedKeyset(bahnerKeyset)
-	// if err != nil {
-	// 	fmt.Printf("Error creating new identity in ma: %v\n", err)
-	// }
-	// // job, err := entity.NewFromPackedKeyset(jobKeyset)
-	// job, err := createSubjectFromPackedKeyset(jobKeyset)
-	// if err != nil {
-	// 	fmt.Printf("Error creating new identity in ma: %v\n", err)
-	// }
-
-	// msgBody := "Share and enjoy!"
-	// msgMimeType := "text/plain"
-
-	// myMessage, err := msg.New(
-	// 	bahner.DID.String(),
-	// 	job.DID.String(),
-	// 	msgBody,
-	// 	msgMimeType)
-	// if err != nil {
-	// 	fmt.Printf("Error creating new message: %v\n", err)
-	// }
-
-	// fmt.Println(myMessage)
-
-	// msgEnvelope, err := envelope.Seal(myMessage)
-	// if err != nil {
-	// 	fmt.Printf("Error creating new envelope: %v\n", err)
-	// }
-	// messageJSON, err := msgEnvelope.MarshalToJSON()
-	// if err != nil {
-	// 	fmt.Printf("Error marshalling message to JSON: %v\n", err)
-	// }
-
-	// fmt.Println(string(messageJSON))
-
-	// letter, err := msgEnvelope.Open(job.Keyset.EncryptionKey.PrivKey)
-	// if err != nil {
-	// 	fmt.Printf("Error unsealing envelope: %v\n", err)
-	// }
-
-	// fmt.Println(letter)
+	fmt.Println(foo.IPFSKey.Fragment)
 
 }
 
@@ -140,7 +93,7 @@ func createSubjectFromPackedKeyset(keyset string) (*entity.Entity, error) {
 		return nil, fmt.Errorf("error signing new identity in ma: %v", err)
 	}
 
-	_, err = DIDDoc.Publish()
+	_, err = DIDDoc.Publish(false)
 	if err != nil {
 		return nil, fmt.Errorf("error publishing new identity in ma: %v", err)
 	}

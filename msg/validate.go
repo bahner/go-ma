@@ -8,48 +8,47 @@ import (
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
-	"github.com/bahner/go-ma/msg/mime"
 	semver "github.com/blang/semver/v4"
 )
 
-// Validate checks if a Message instance is valid
-func (m *Message) Validate() error {
+// check if a Message headers are valid
+func (h *Headers) validate() error {
 
 	var err error
 
-	if m == nil {
+	if h == nil {
 		return errors.New("nil Message provided")
 	}
 
-	if m.MimeType != mime.MESSAGE_MIME_TYPE {
+	if h.MimeType != ma.MESSAGE_MIME_TYPE {
 		return errors.New("invalid Message type")
 	}
 
-	// Check that message body is not empty
-	if m.Body == nil {
-		return errors.New("body must be non-empty")
+	// Check that message body headers are valid
+	if h.ContentType == "" {
+		return errors.New("ContentType must be non-empty")
 	}
 
 	// Verify ID
-	err = m.VerifyID()
+	err = h.verifyID()
 	if err != nil {
 		return err
 	}
 
 	// Verify actors
-	err = m.VerifyActors()
+	err = h.verifyActors()
 	if err != nil {
 		return err
 	}
 
 	// Message version check
-	err = m.VerifyTimestamps()
+	err = h.verifyTimestamps()
 	if err != nil {
 		return err
 	}
 
 	// Message version check
-	err = m.VerifyMessageVersion()
+	err = h.verifyMessageVersion()
 	if err != nil {
 		return err
 	}
@@ -58,9 +57,9 @@ func (m *Message) Validate() error {
 }
 
 // Compare messageVersion.  Return nil if ok else an error
-func (m *Message) VerifyMessageVersion() error {
+func (h *Headers) verifyMessageVersion() error {
 
-	messageSemver, err := m.SemVersion()
+	messageSemver, err := h.SemVersion()
 	if err != nil {
 		return err
 	}
@@ -79,33 +78,27 @@ func (m *Message) VerifyMessageVersion() error {
 	// If they are not the same, we need to check if the message version is greater or less than the supported verion.
 	// For know this is just for informational purposes.
 	if messageSemver.GT(supportedSemver) {
-		return fmt.Errorf("Message version %s is greater than supported version %s", messageSemver, supportedSemver)
+		return fmt.Errorf("message version %s is greater than supported version %s", messageSemver, supportedSemver)
 	}
 
 	if messageSemver.LT(supportedSemver) {
-		return fmt.Errorf("Message version %s is less than supported version %s", messageSemver, supportedSemver)
+		return fmt.Errorf("message version %s is less than supported version %s", messageSemver, supportedSemver)
 	}
 
-	return fmt.Errorf("Message version %s is not supported", messageSemver)
+	return fmt.Errorf("message version %s is not supported", messageSemver)
 }
 
-func (m *Message) VerifyTimestamps() error {
+func (h *Headers) verifyTimestamps() error {
 	// Time-based checks
 	now := time.Now()
 
-	created_time, err := m.CreatedTime()
-	if err != nil {
-		return fmt.Errorf("invalid CreatedTime: %w", err)
-	}
+	created_time := h.CreatedTime()
 
 	if created_time.After(now) {
 		return errors.New("CreatedTime must be in the past")
 	}
 
-	expires_time, err := m.ExpiresTime()
-	if err != nil {
-		return fmt.Errorf("invalid CreatedTime: %w", err)
-	}
+	expires_time := h.ExpiresTime()
 
 	if expires_time.Before(created_time) {
 		return errors.New("ExpiresTime must be after CreatedTime")
@@ -114,41 +107,36 @@ func (m *Message) VerifyTimestamps() error {
 	return nil
 }
 
-func (m *Message) VerifyActors() error {
+func (h *Headers) verifyActors() error {
 
 	var err error
 
-	_, err = did.New(m.From)
+	_, err = did.New(h.From)
 	if err != nil {
 		return err
 	}
-	_, err = did.New(m.To)
+	_, err = did.New(h.To)
 	if err != nil {
 		return err
 	}
 
 	// Must they?
-	if m.From == m.To {
+	if h.From == h.To {
 		return errors.New("actors From and To must be different")
 	}
 
 	return nil
-
 }
 
 // Check that ID is valid
-func (m *Message) VerifyID() error {
-	if m.ID == "" {
+func (h *Headers) verifyID() error {
+	if h.ID == "" {
 		return errors.New("ID must be non-empty")
 	}
 
-	if !internal.IsValidNanoID(m.ID) {
+	if !internal.IsValidNanoID(h.ID) {
 		return errors.New("ID must be a valid NanoID")
 	}
 
 	return nil
-}
-
-func (m *Message) IsValid() bool {
-	return m.Validate() == nil
 }

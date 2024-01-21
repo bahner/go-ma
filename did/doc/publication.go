@@ -4,40 +4,37 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma/internal"
+	"github.com/ipfs/boxo/ipns"
 	"github.com/ipfs/boxo/path"
+	"github.com/ipfs/go-cid"
 	caopts "github.com/ipfs/kubo/core/coreiface/options"
 )
 
-// Assuming the JSON response has the following structure:
-//
-//	{
-//	  "Cid": {
-//	    "/": "<cid-string>"
-//	  }
-//	}
-//
-// Define a struct that matches this structure
-
 // Publish publishes the document to IPFS and returns the CID
-func (d *Document) Publish() (string, error) {
-	data, err := d.CBOR()
-	if err != nil {
-		return "", err
-	}
-
-	cid, err := internal.IPFSDagPutWithOptions(data, "dag-cbor", "dag-cbor", true, "sha2-256", false)
-	if err != nil {
-		return "", fmt.Errorf("doc/publish: failed to put document to IPFS: %w", err)
-	}
+func (d *Document) Publish(pin bool) (ipns.Name, error) {
 
 	ipfsAPI := internal.GetIPFSAPI()
 	ctx := internal.GetContext()
-	p, err := path.NewPathFromSegments(path.IPFSNamespace, cid)
+
+	data, err := d.MarshalToCBOR()
 	if err != nil {
-		return "", err
+		return ipns.Name{}, fmt.Errorf("doc/publish: failed to marshal document to CBOR: %w", err)
 	}
 
-	ipfsAPI.Name().Publish(ctx, p, caopts.Name.Key(internal.GetDIDFragment(d.ID)))
+	// Actually add the document to IPFS and possibly pins it.
+	var c cid.Cid
+	if pin {
+		c, err = internal.IPFSDagPutCBORAndPin(data)
+	} else {
+		c, err = internal.IPFSDagPutCBOR(data)
+	}
+	if err != nil {
+		return ipns.Name{}, fmt.Errorf("doc/publish: failed to add document to IPFS: %w", err)
+	}
 
-	return cid, nil
+	// Creates an immutable path from the CID
+	p := path.FromCid(c)
+
+	return ipfsAPI.Name().Publish(ctx, p, caopts.Name.Key(internal.GetDIDFragment(d.ID)))
+
 }

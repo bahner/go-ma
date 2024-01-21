@@ -1,5 +1,7 @@
 package ma
 
+import "time"
+
 const (
 
 	// Just our name
@@ -22,6 +24,15 @@ const (
 	HASH_ALGORITHM_MULTICODEC_STRING = "blake3"
 	BLAKE3_LABEL                     = "ma"
 	BLAKE3_SUM_SIZE                  = 32 // 256 bits
+
+	// MIME types
+
+	// A MIME type for a message. Just to implement it for future proofing.
+	MESSAGE_MIME_TYPE  = "application/x-ma-message; version=" + VERSION
+	ENVELOPE_MIME_TYPE = "application/x-ma-envelope; version=" + VERSION
+
+	MESSAGE_DEFAULT_CONTENT_TYPE = "text/plain"
+	MESSAGE_DEFAULT_TTL          = time.Hour * 24
 
 	// API
 	ENV_IPFS_API_MULTIADDR     = "IPFS_API_MULTIADDR"

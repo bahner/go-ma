@@ -1,0 +1,2 @@
+* Add unit tests
+* Check if document is already published with same CID before publishing

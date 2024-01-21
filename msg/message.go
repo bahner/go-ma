@@ -2,47 +2,52 @@ package msg
 
 import (
 	"crypto/ed25519"
+	"fmt"
 	"time"
 
 	"github.com/bahner/go-ma"
-	"github.com/bahner/go-ma/did"
-	mime "github.com/bahner/go-ma/msg/mime"
-	semver "github.com/blang/semver/v4"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
 const (
 
 	// Messages which are older than a day should be ignored
-	MESSAGE_TTL = time.Hour * 24
-
-	// How we identify the messages we support
-	MESSAGE_ENCRYPTION_LABEL = mime.MESSAGE_MIME_TYPE
+	MESSAGE_TTL = ma.MESSAGE_DEFAULT_TTL
 )
 
 // This struct mimicks the Message format, but it's *not* Message.
 // It should enable using Message later, if that's a good idea.
 type Message struct {
-	_            struct{} `cbor:",toarray"`
-	ID           string   `cbor:"id" json:"id"`
-	MimeType     string   `cbor:"type" json:"type"`
-	From         string   `cbor:"from" json:"from"`
-	To           string   `cbor:"to" json:"to"`
-	Created      int64    `cbor:"created_time,keyasint64" json:"created_time"`
-	Expires      int64    `cbor:"expires_time,keyasint64" json:"expires_time"`
-	BodyMimeType string   `cbor:"body_mime_type" json:"body_mime_type"`
-	Body         []byte   `cbor:"body" json:"body"`
-	Version      string   `cbor:"versionId" json:"versionId"`
-	Signature    string   `cbor:"signature" json:"signature"`
+	// Version of the message format
+	Version string
+	// Unique identifier of the message
+	ID string `cbor:"id"`
+	// MIME type of the message
+	MimeType string `cbor:"mimeType"`
+	// Creation time of the message in seconds since Unix epoch
+	Created int64 `cbor:"keyasint64"`
+	// Expiration time of the message in seconds since Unix epoch
+	Expires int64 `cbor:"keyasint64"`
+	// Sender of the message
+	From string `cbor:"from"`
+	// Recipient of the message
+	To string `cbor:"to"`
+	// MIME type of the message body
+	ContentType string `cbor:"contentType"`
+	// Hexadecimal string representation of the SHA-256 hash of the message body
+	Content []byte `cbor:"content"`
+	// Signature of the message headers. NB! This includes the ContentHash field,
+	// which can be used to verify the integrity of the message body.
+	Signature []byte `cbor:"signature"`
 }
 
 // New creates a new Message instance
-// Message is a string for now, but it should be JSON.
 func New(
 	from string,
 	to string,
-	body []byte,
-	mime_type string) (*Message, error) {
+	content []byte,
+	contentType string,
+	priv_key *ed25519.PrivateKey) (*Message, error) {
 
 	id, err := nanoid.New()
 	if err != nil {
@@ -53,54 +58,56 @@ func New(
 	created := now.Unix()
 	expires := now.Add(MESSAGE_TTL).Unix()
 
-	return &Message{
-		ID:           id,
-		MimeType:     mime.MESSAGE_MIME_TYPE,
-		Version:      ma.VERSION,
-		From:         from,
-		To:           to,
-		Created:      created,
-		Expires:      expires,
-		BodyMimeType: mime_type,
-		Body:         body,
-		Signature:    "",
-	}, nil
-}
-
-func Signed(
-	from string,
-	to string,
-	body []byte,
-	mime_type string,
-	priv_key *ed25519.PrivateKey) (*Message, error) {
-
-	m, err := New(from, to, body, mime_type)
-	if err != nil {
-		return nil, err
+	m := &Message{
+		// Message meta data
+		ID:       id,
+		MimeType: ma.MESSAGE_MIME_TYPE,
+		Version:  ma.VERSION,
+		// Recipients
+		From: from,
+		To:   to,
+		// Timestamps
+		Created: created,
+		Expires: expires,
+		// Body
+		ContentType: contentType,
+		// The content is not signed as such, but the hash is.
+		Content: content,
 	}
 
-	m.Sign(priv_key)
+	err = m.Sign(priv_key)
+	if err != nil {
+		return nil, fmt.Errorf("msg_new: failed to sign message: %w", err)
+	}
 
 	return m, nil
-
 }
 
-func (m *Message) CreatedTime() (time.Time, error) {
-	return time.Unix(m.Created, 0), nil
-}
+// Create a new Message from the headers
+// Validate the headers (sinature) before adding the content. This is to be lazy
+// about decrypting the content, in case we don't need it.
+func NewFromHeaders(h *Headers) (*Message, error) {
 
-func (m *Message) ExpiresTime() (time.Time, error) {
-	return time.Unix(m.Expires, 0), nil
-}
+	err := h.validate()
+	if err != nil {
+		return nil, fmt.Errorf("msg_new_from_headers: failed to validate headers: %w", err)
+	}
 
-func (m *Message) Sender() (*did.DID, error) {
-	return did.New(m.From)
-}
-
-func (m *Message) Recipient() (*did.DID, error) {
-	return did.New(m.To)
-}
-
-func (m *Message) SemVersion() (semver.Version, error) {
-	return semver.Make(m.Version)
+	m := &Message{
+		// Message meta data
+		ID:       h.ID,
+		MimeType: h.MimeType,
+		Version:  h.Version,
+		// Recipients
+		From: h.From,
+		To:   h.To,
+		// Timestamps
+		Created: h.Created,
+		Expires: h.Expires,
+		// Body
+		ContentType: h.ContentType,
+		// Signature
+		Signature: h.Signature,
+	}
+	return m, nil
 }

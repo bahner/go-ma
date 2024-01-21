@@ -9,13 +9,10 @@ import (
 )
 
 type DID struct {
-	// The identifier is the IPNS name and the fragment, as
-	// provided as input to this function.
+	// The identifier is the IPNS name without the /ipns/ prefix
 	Identifier string
 	// The Fragment is the key shortname and internal name for the key
 	Fragment string
-	// Name is just Identifier#Fragment it's a convenience
-	Name string
 }
 
 // This creates a new DID from an identifier.
@@ -42,13 +39,12 @@ func New(didStr string) (*DID, error) {
 	return &DID{
 		Identifier: identifier,
 		Fragment:   fragment,
-		Name:       name,
 	}, nil
 }
 
 func (d *DID) String() string {
 
-	return ma.DID_PREFIX + d.Name
+	return ma.DID_PREFIX + d.Identifier + "#" + d.Fragment
 
 }
 
@@ -61,16 +57,4 @@ func (d *DID) IsValid() bool {
 func (d *DID) IsIdenticalTo(did DID) bool {
 
 	return AreIdentical(d, &did)
-}
-
-func GetOrCreate(didStr string) (*DID, error) {
-
-	// We don't care if the DID exists or not, we just want to create it.
-	d, _ := Get(didStr)
-	if d != nil {
-		return d, nil
-	}
-
-	return New(didStr)
-
 }
