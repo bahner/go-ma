@@ -1,6 +1,7 @@
 package doc
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/bahner/go-ma"
@@ -10,14 +11,14 @@ import (
 )
 
 type Document struct {
-	Context            []string             `cbor:"@context,toarray"`
-	Version            string               `cbor:"version"`
-	ID                 string               `cbor:"id"`
-	Controller         []string             `cbor:"controller,toarray"`
-	VerificationMethod []VerificationMethod `cbor:"verificationMethod,toarray"`
-	AssertionMethod    string               `cbor:"assertionMethod"`
-	KeyAgreement       string               `cbor:"keyAgreement"`
-	Proof              Proof                `cbor:"proof"`
+	Context            []string             `cbor:"@context,toarray" json:"@context"`
+	Version            string               `cbor:"version" json:"version"`
+	ID                 string               `cbor:"id" json:"id"`
+	Controller         []string             `cbor:"controller,toarray" json:"controller"`
+	VerificationMethod []VerificationMethod `cbor:"verificationMethod,toarray" json:"verificationMethod"`
+	AssertionMethod    string               `cbor:"assertionMethod" json:"assertionMethod"`
+	KeyAgreement       string               `cbor:"keyAgreement" json:"keyAgreement"`
+	Proof              Proof                `cbor:"proof" json:"proof"`
 }
 
 func New(identifier string, controller string) (*Document, error) {
@@ -48,6 +49,18 @@ func (d *Document) MarshalToCBOR() ([]byte, error) {
 	}
 
 	return bytes, nil
+}
+
+// Simple string representation of the document
+// JSON or empty string on error
+func (d *Document) String() string {
+
+	bytes, err := json.Marshal(d)
+	if err != nil {
+		return ""
+	}
+
+	return string(bytes)
 }
 
 func GetOrCreate(identifier string) (*Document, error) {

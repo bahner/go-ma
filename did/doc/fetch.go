@@ -27,7 +27,7 @@ func Fetch(id string) (*Document, error) {
 
 	api := internal.GetIPFSAPI()
 
-	_cid, err := internal.RootCID("/ipns" + id)
+	_cid, err := internal.RootCID("/ipns/" + id)
 	if err != nil {
 		return nil, fmt.Errorf("doc/fetch: failed to get CID from IPNS name: %w", err)
 	}

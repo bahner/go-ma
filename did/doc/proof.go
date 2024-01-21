@@ -14,11 +14,11 @@ const (
 )
 
 type Proof struct {
-	Created            string `cbor:"created"`
-	Type               string `cbor:"type"`
-	VerificationMethod string `cbor:"verificationMethod"`
-	ProofPurpose       string `cbor:"proofPurpose"`
-	ProofValue         string `cbor:"proofValue"`
+	Created            string `cbor:"created" json:"created"`
+	Type               string `cbor:"type" json:"type"`
+	VerificationMethod string `cbor:"verificationMethod" json:"verificationMethod"`
+	ProofPurpose       string `cbor:"proofPurpose" json:"proofPurpose"`
+	ProofValue         string `cbor:"proofValue" json:"proofValue"`
 }
 
 func (d *Document) Sign(signKey *key.SigningKey, vm VerificationMethod) error {
