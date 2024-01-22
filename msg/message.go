@@ -86,7 +86,7 @@ func New(
 // Create a new Message from the headers
 // Validate the headers (sinature) before adding the content. This is to be lazy
 // about decrypting the content, in case we don't need it.
-func NewFromHeaders(h *Headers) (*Message, error) {
+func newFromHeaders(h *Headers) (*Message, error) {
 
 	err := h.validate()
 	if err != nil {
