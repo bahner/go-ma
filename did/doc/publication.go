@@ -32,6 +32,10 @@ func DefaultPublishOptions() *PublishOptions {
 // If the opts is nil, the default options are used.
 func (d *Document) Publish(opts *PublishOptions) (ipns.Name, error) {
 
+	if opts == nil {
+		opts = DefaultPublishOptions()
+	}
+
 	if opts.Force {
 		log.Debugf("doc/publish: force flag is set")
 	}
