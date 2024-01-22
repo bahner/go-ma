@@ -8,11 +8,7 @@ import (
 // validating an doing decision making on the message envelope.
 // Eg. validate headers before processing the content
 
-func Open(data []byte, privateKey []byte) (*Message, error) {
-	e, err := unmarshalEnvelopeFromCBOR(data)
-	if err != nil {
-		return nil, fmt.Errorf("open: error unmarshalling envelope: %w", err)
-	}
+func (e *Envelope) Open(privateKey []byte) (*Message, error) {
 
 	// Extract headers before decrypting the content
 	hdrs, err := e.getHeaders(privateKey)
@@ -26,7 +22,7 @@ func Open(data []byte, privateKey []byte) (*Message, error) {
 	}
 
 	// Create message from the extracted headers sans content
-	m, err := NewFromHeaders(hdrs)
+	m, err := newFromHeaders(hdrs)
 	if err != nil {
 		return nil, fmt.Errorf("open: error creating message from headers: %w", err)
 	}
