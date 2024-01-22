@@ -65,10 +65,7 @@ func createSubjectFromPackedKeyset(keyset string) (*entity.Entity, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
-	err = DIDDoc.AddVerificationMethod(encVM)
-	if err != nil {
-		return nil, fmt.Errorf("error adding new verification method: %v", err)
-	}
+	DIDDoc.AddVerificationMethod(encVM)
 	DIDDoc.KeyAgreement = encVM.ID
 	log.Debugf("Added keyAgreement verification method: %s", DIDDoc.KeyAgreement)
 
@@ -81,10 +78,7 @@ func createSubjectFromPackedKeyset(keyset string) (*entity.Entity, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error creating new verification method: %v", err)
 	}
-	err = DIDDoc.AddVerificationMethod(signvm)
-	if err != nil {
-		return nil, fmt.Errorf("error adding new verification method: %v", err)
-	}
+	DIDDoc.AddVerificationMethod(signvm)
 	DIDDoc.AssertionMethod = signvm.ID
 	log.Debugf("Created new assertion method: %s", DIDDoc.AssertionMethod)
 
@@ -93,7 +87,7 @@ func createSubjectFromPackedKeyset(keyset string) (*entity.Entity, error) {
 		return nil, fmt.Errorf("error signing new identity in ma: %v", err)
 	}
 
-	_, err = DIDDoc.Publish(false)
+	_, err = DIDDoc.Publish(doc.DefaultPublishOptions())
 	if err != nil {
 		return nil, fmt.Errorf("error publishing new identity in ma: %v", err)
 	}

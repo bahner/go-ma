@@ -26,7 +26,7 @@ func GetOrCreate(name string) (*Keyset, error) {
 	var err error
 
 	if exists(name) {
-		log.Debugf("keyset/new: keyset %s found in cache", name)
+		log.Debugf("Keyset %s found in cache", name)
 		return get(name)
 	}
 
@@ -34,7 +34,7 @@ func GetOrCreate(name string) (*Keyset, error) {
 	if err != nil {
 		return nil, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
 	}
-	log.Debugf("keyset/new: created new key in IPFS: %v", ipfsKey)
+	log.Infof("Created new key in IPFS: %v", ipfsKey)
 
 	ks, err := newFromIPFSKey(ipfsKey)
 	if err != nil {

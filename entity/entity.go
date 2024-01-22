@@ -37,13 +37,14 @@ func New(id *did.DID, controller *did.DID) (*Entity, error) {
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create key from ipnsKey: %s", err)
 	}
-	log.Debugf("entity: myKeyset: %v", myKeyset)
+	log.Debugf("entity/new: myKeyset: %v", myKeyset)
 
-	myDoc, err := CreateDocument(id, controller, myKeyset)
+	myDoc, err := CreateDocument(id.String(), controller.String(), myKeyset)
 	if err != nil {
 		return nil, fmt.Errorf("entity: failed to create document: %s", err)
 	}
 
+	log.Infof("Created new entity for %s", id.String())
 	return &Entity{
 		DID:    id,
 		Doc:    myDoc,
