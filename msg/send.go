@@ -25,7 +25,8 @@ func (m *Message) Send(ctx context.Context, t *pubsub.Topic) error {
 		return fmt.Errorf("send: envelope serialization error: %w", err)
 	}
 
-	t.Publish(ctx, eBytes, nil)
+	// t.Publish(ctx, eBytes, nil)
+	t.Publish(ctx, eBytes)
 
 	return nil
 }
