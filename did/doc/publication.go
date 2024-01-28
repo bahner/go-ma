@@ -23,7 +23,7 @@ func DefaultPublishOptions() *PublishOptions {
 	return &PublishOptions{
 		Ctx:           internal.GetContext(),
 		Pin:           false,
-		Force:         true,
+		Force:         false,
 		AllowBigBlock: false,
 	}
 }
