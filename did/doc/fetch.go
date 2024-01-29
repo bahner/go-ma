@@ -11,25 +11,28 @@ import (
 )
 
 // Takes a DID and fetches the document from IPFS.
-// Eg. fetch("did:ma:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#bahner")
-func fetch(didStr string) (*Document, error) {
+// Eg. Fetch("did:ma:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#bahner")
+// The cached flag determines whether the document should be fetched from IPNS cache or not.
+func Fetch(didStr string, cached bool) (*Document, error) {
 
 	d, err := did.New(didStr)
 	if err != nil {
 		return nil, err
 	}
 
-	return fetchFromDID(d)
+	return FetchFromDID(d, cached)
 
 }
 
-func fetchFromDID(d *did.DID) (*Document, error) {
+// Fetched the document from IPFS using the DID object.
+// The cached flag determines whether the document should be fetched from IPNS cache or not.
+func FetchFromDID(d *did.DID, cached bool) (*Document, error) {
 
 	var document = &Document{}
 
 	api := internal.GetIPFSAPI()
 
-	_cid, err := internal.RootCID(d.Path(path.IPNSNamespace), false) // NB! Cached = false
+	_cid, err := internal.RootCID(d.Path(path.IPNSNamespace), cached)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get CID from IPNS name: %w", err)
 	}
@@ -49,29 +52,7 @@ func fetchFromDID(d *did.DID) (*Document, error) {
 		return nil, fmt.Errorf("document is invalid")
 	}
 
-	// Add fetched document to cache
-	cache(document)
-
 	log.Debugf("Fetched and cached document for : %s", d.String())
 	return document, nil
-
-}
-
-func GetOrFetch(id string) (*Document, error) {
-
-	doc, err := get(id)
-	if err == nil {
-		log.Debugf("doc/getorfetch: found document for %s in cache", id)
-		return doc, err
-	}
-	log.Debugf("doc/getorfetch: failed to get document for %s from cache", id)
-
-	// Then try to fetch from IPFS
-	if doc == nil {
-		return fetch(id)
-	}
-	log.Debugf("doc/getorfetch: failed to fetch document for %s from IPFS", id)
-
-	return nil, fmt.Errorf("doc/getorfetch: failed to get document from cache or IPFS")
 
 }

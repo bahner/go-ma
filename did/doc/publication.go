@@ -101,7 +101,7 @@ func (d *Document) PublishGoroutine(wg *sync.WaitGroup, cancel context.CancelFun
 
 func (d *Document) isPublished() bool {
 
-	maybeDoc, err := fetch(d.ID)
+	maybeDoc, err := Fetch(d.ID, false) // Don't accept cached document
 	if err != nil {
 		log.Debugf("Failed to fetch document: %s", err)
 		return false

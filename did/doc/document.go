@@ -66,16 +66,11 @@ func (d *Document) String() string {
 	return string(bytes)
 }
 
-// GetOrCreate document from cache or fetch from IPFS
+// GetOrCreate document from cache or create a new one
 // identifier is a did string, eg. "did:ma:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#foo"
 func GetOrCreate(identifier string, controller string) (*Document, error) {
 
-	if exists(identifier) {
-		log.Debugf("doc/GetOrCreate: document %s found in cache", identifier)
-		return get(identifier)
-	}
-
-	doc, err := fetch(identifier)
+	doc, err := Fetch(identifier, true) // Accept cached document
 	if err == nil {
 		doc.AddController(controller)
 		log.Debugf("doc/GetOrCreate: found previously published document for: %s", identifier)
@@ -86,9 +81,6 @@ func GetOrCreate(identifier string, controller string) (*Document, error) {
 	if err != nil {
 		return nil, fmt.Errorf("doc/GetOrCreate: failed to create new document: %w", err)
 	}
-
-	// Add document to cache
-	cache(doc)
 
 	return doc, nil
 }
