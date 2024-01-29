@@ -29,7 +29,7 @@ func fetchFromDID(d *did.DID) (*Document, error) {
 
 	api := internal.GetIPFSAPI()
 
-	_cid, err := internal.RootCID(d.Path(path.IPNSNamespace))
+	_cid, err := internal.RootCID(d.Path(path.IPNSNamespace), false) // NB! Cached = false
 	if err != nil {
 		return nil, fmt.Errorf("failed to get CID from IPNS name: %w", err)
 	}
