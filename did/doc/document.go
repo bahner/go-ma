@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"slices"
+	"time"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	cbor "github.com/fxamacker/cbor/v2"
 	log "github.com/sirupsen/logrus"
@@ -13,12 +13,13 @@ import (
 
 type Document struct {
 	Context            []string             `cbor:"@context,toarray" json:"@context"`
-	Version            string               `cbor:"version" json:"version"`
+	Version            int64                `cbor:"version" json:"version"`
 	ID                 string               `cbor:"id" json:"id"`
 	Controller         []string             `cbor:"controller,toarray" json:"controller"`
 	VerificationMethod []VerificationMethod `cbor:"verificationMethod,toarray" json:"verificationMethod"`
 	AssertionMethod    string               `cbor:"assertionMethod" json:"assertionMethod"`
 	KeyAgreement       string               `cbor:"keyAgreement" json:"keyAgreement"`
+	LastKnownLocation  string               `cbor:"lastKnownLocation,omitempty" json:"lastKnownLocation,omitempty"`
 	Proof              Proof                `cbor:"proof" json:"proof"`
 }
 
@@ -35,7 +36,7 @@ func New(identifier string, controller string) (*Document, error) {
 
 	doc := Document{
 		Context:    DID_CONTEXT,
-		Version:    ma.VERSION,
+		Version:    time.Now().Unix(),
 		ID:         identifier,
 		Controller: ctrller,
 	}
