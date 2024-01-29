@@ -13,7 +13,7 @@ import (
 
 type Document struct {
 	Context            []string             `cbor:"@context,toarray" json:"@context"`
-	Version            int64                `cbor:"version" json:"version"`
+	Version            int64                `cbor:"version,keyasint64" json:"version"`
 	ID                 string               `cbor:"id" json:"id"`
 	Controller         []string             `cbor:"controller,toarray" json:"controller"`
 	VerificationMethod []VerificationMethod `cbor:"verificationMethod,toarray" json:"verificationMethod"`
