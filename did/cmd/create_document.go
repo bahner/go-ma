@@ -12,7 +12,7 @@ func main() {
 
 	log.SetLevel(log.ErrorLevel)
 
-	ipfsKey, err := ipfskey.GetOrCreate("bahner")
+	ipfsKey, err := ipfskey.Fetch("bahner")
 	if err != nil {
 		fmt.Printf("failed to create new IPNS key: %v\n", err)
 	}

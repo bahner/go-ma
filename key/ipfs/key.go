@@ -15,19 +15,8 @@ type Key struct {
 	Fragment string
 }
 
-// Get or create a key with the given name in the IPFS node.
-func GetOrCreate(name string) (*Key, error) {
-
-	// If cached simply return the key
-	if exists(name) {
-		return get(name)
-	}
-
-	return fetch(name)
-}
-
 // Fetches the key from IPFS and updates the cache.
-func fetch(name string) (*Key, error) {
+func Fetch(name string) (*Key, error) {
 	// Get or create the key in IPFS
 	ik, err := getOrCreateIPFSKey(name)
 	if err != nil {
@@ -41,9 +30,6 @@ func fetch(name string) (*Key, error) {
 		Fragment: name,
 		IPNSName: ipnsName,
 	}
-
-	// Add key to cache
-	cache(k)
 
 	return k, nil
 }
