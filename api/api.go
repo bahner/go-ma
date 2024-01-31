@@ -1,31 +1,24 @@
-package internal
+package api
 
 import (
 	"fmt"
 	"strings"
 	"sync"
 
-	"github.com/bahner/go-ma"
 	"github.com/ipfs/kubo/client/rpc"
 	maddr "github.com/multiformats/go-multiaddr"
 	log "github.com/sirupsen/logrus"
-	"go.deanishe.net/env"
+	"github.com/spf13/viper"
 )
-
-func init() {
-	IPFSAPIMultiAddrString = env.Get(ma.ENV_IPFS_API_MULTIADDR, ma.DEFAULT_IPFS_API_MULTIADDR)
-}
 
 var (
-	once                   sync.Once
-	IPFSAPIMultiAddrString string
-	ipfsAPI                *rpc.HttpApi
+	once    sync.Once
+	ipfsAPI *rpc.HttpApi
 )
 
-// initializeApi sets up the ipfsAPI and ipfsAPISocket.
 func initializeApi() {
 
-	ipfsAPIMultiAddr, err := maddr.NewMultiaddr(IPFSAPIMultiAddrString)
+	ipfsAPIMultiAddr, err := maddr.NewMultiaddr(viper.GetString("api.maddr"))
 	if err != nil {
 		log.Fatalf("ipfs: failed to parse IPFS API socket: %v", err)
 	}
@@ -50,7 +43,7 @@ func GetIPFSAPIUrl() string {
 	)
 
 	// Split the multiaddr into components
-	parts := strings.Split(IPFSAPIMultiAddrString, "/")
+	parts := strings.Split(viper.GetString("api.maddr"), "/")
 
 	// Extract IP and port
 	ip := parts[2]

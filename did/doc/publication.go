@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/bahner/go-ma/api"
 	"github.com/bahner/go-ma/internal"
 	"github.com/ipfs/boxo/ipns"
 	"github.com/ipfs/boxo/path"
@@ -21,7 +22,7 @@ type PublishOptions struct {
 
 func DefaultPublishOptions() *PublishOptions {
 	return &PublishOptions{
-		Ctx:           internal.GetContext(),
+		Ctx:           context.Background(),
 		Pin:           false,
 		Force:         false,
 		AllowBigBlock: false,
@@ -60,7 +61,7 @@ func (d *Document) Publish(opts *PublishOptions) (ipns.Name, error) {
 		opts = DefaultPublishOptions()
 	}
 
-	ipfsAPI := internal.GetIPFSAPI()
+	ipfsAPI := api.GetIPFSAPI()
 
 	data, err := d.MarshalToCBOR()
 	if err != nil {
@@ -68,7 +69,7 @@ func (d *Document) Publish(opts *PublishOptions) (ipns.Name, error) {
 	}
 
 	// Actually add the document to IPFS and possibly pin it and allow bib blocks.
-	c, err := internal.IPFSDagPutCBOR(data, opts.Pin, opts.AllowBigBlock)
+	c, err := api.IPFSDagPutCBOR(data, opts.Pin, opts.AllowBigBlock)
 	if err != nil {
 		return ipns.Name{}, fmt.Errorf("doc/publish: failed to add document to IPFS: %w", err)
 	}

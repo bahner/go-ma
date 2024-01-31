@@ -10,7 +10,6 @@ import (
 
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/entity"
-	"github.com/bahner/go-ma/internal"
 	keyset "github.com/bahner/go-ma/key/set"
 	log "github.com/sirupsen/logrus"
 )
@@ -44,7 +43,7 @@ func main() {
 	}
 
 	// Set options for proper timeout of IPNS publish
-	ctx, cancel := context.WithTimeout(internal.GetContext(), time.Duration(600)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(600)*time.Second)
 	opts := doc.DefaultPublishOptions()
 	opts.Ctx = ctx
 

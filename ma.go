@@ -35,6 +35,6 @@ const (
 	MESSAGE_DEFAULT_TTL          = time.Hour * 24
 
 	// API
-	ENV_IPFS_API_MULTIADDR     = "IPFS_API_MULTIADDR"
 	DEFAULT_IPFS_API_MULTIADDR = "/ip4/127.0.0.1/tcp/45005" // Default to Brave browser, Kubo is /ip4/127.0.0.1/tcp/5001
+  ENV_PREFIX = "GO_MA"
 )

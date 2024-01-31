@@ -1,9 +1,10 @@
 package ipfs
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/api"
 	iface "github.com/ipfs/kubo/core/coreiface"
 	log "github.com/sirupsen/logrus"
 )
@@ -16,7 +17,7 @@ func getOrCreateIPFSKey(name string) (iface.Key, error) {
 	ik, _ := lookupIPFSKey(name)
 
 	if ik == nil {
-		ik, err = internal.GetIPFSAPI().Key().Generate(internal.GetContext(), name)
+		ik, err = api.GetIPFSAPI().Key().Generate(context.Background(), name)
 		if err != nil {
 			return nil, fmt.Errorf("ipfs: failed to create key %s: %w", name, err)
 		}
@@ -30,7 +31,7 @@ func getOrCreateIPFSKey(name string) (iface.Key, error) {
 // List all keys in the IPFS node.
 func listIPFSKeys() ([]iface.Key, error) {
 
-	return internal.GetIPFSAPI().Key().List(internal.GetContext())
+	return api.GetIPFSAPI().Key().List(context.Background())
 }
 
 // Looks up a key by name in the IPFS node.

@@ -1,10 +1,11 @@
 package doc
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/bahner/go-ma/api"
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/internal"
 	cbor "github.com/fxamacker/cbor/v2"
 	"github.com/ipfs/boxo/path"
 	log "github.com/sirupsen/logrus"
@@ -30,15 +31,15 @@ func FetchFromDID(d *did.DID, cached bool) (*Document, error) {
 
 	var document = &Document{}
 
-	api := internal.GetIPFSAPI()
+	ipfsAPI := api.GetIPFSAPI()
 
-	_cid, err := internal.RootCID(d.Path(path.IPNSNamespace), cached)
+	_cid, err := api.RootCID(d.Path(path.IPNSNamespace), cached)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get CID from IPNS name: %w", err)
 	}
 	log.Debugf("Fetching CID: %s", _cid)
 
-	node, err := api.Dag().Get(internal.GetContext(), _cid)
+	node, err := ipfsAPI.Dag().Get(context.Background(), _cid)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get document from IPFS: %w", err)
 	}

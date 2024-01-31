@@ -1,6 +1,7 @@
-package internal
+package api
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/ipfs/boxo/path"
@@ -19,7 +20,7 @@ func RootCID(name string, cached bool) (cid.Cid, error) {
 		return nil
 	}
 
-	p, err := api.Name().Resolve(GetContext(), name, opts)
+	p, err := api.Name().Resolve(context.Background(), name, opts)
 	if err != nil {
 		return cid.Cid{}, fmt.Errorf("doc/fetch: failed to decode cid: %w", err)
 	}
