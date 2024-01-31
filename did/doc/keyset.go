@@ -3,7 +3,7 @@ package doc
 import (
 	"fmt"
 
-	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/key/set"
 )
 
@@ -30,7 +30,7 @@ func NewFromKeysetWithController(k *set.Keyset, controller string) (*Document, e
 		id,
 		id,
 		"MultiKey",
-		internal.GetDIDFragment(k.EncryptionKey.DID),
+		did.GetFragment(k.EncryptionKey.DID),
 		k.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("new_actor: Failed to create encryption verification method: %w", err)
@@ -42,7 +42,7 @@ func NewFromKeysetWithController(k *set.Keyset, controller string) (*Document, e
 		id,
 		id,
 		"MultiKey",
-		internal.GetDIDFragment(k.SigningKey.DID),
+		did.GetFragment(k.SigningKey.DID),
 		k.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("new_actor: Failed to create assertion verification method: %w", err)

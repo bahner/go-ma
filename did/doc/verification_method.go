@@ -5,7 +5,6 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/internal"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -48,7 +47,7 @@ func NewVerificationMethod(
 		return VerificationMethod{}, did.ErrInvalidID
 	}
 
-	identifier := internal.GetDIDIdentifier(id)
+	identifier := did.GetIdentifier(id)
 
 	// Create a random fragment if none is provided
 	if fragment == "" {
@@ -133,7 +132,7 @@ func (d *Document) isUniqueVerificationMethod(newMethod VerificationMethod) bool
 }
 
 func (vm VerificationMethod) Fragment() string {
-	return internal.GetDIDFragment(vm.ID)
+	return did.GetFragment(vm.ID)
 }
 
 func (vm VerificationMethod) Equal(other VerificationMethod) bool {

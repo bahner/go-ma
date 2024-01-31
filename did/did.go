@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/bahner/go-ma"
-	"github.com/bahner/go-ma/internal"
 )
 
 type DID struct {
@@ -33,8 +32,8 @@ func New(didStr string) (*DID, error) {
 	name := strings.TrimPrefix(didStr, ma.DID_PREFIX)
 
 	// Extract the identifier and fragment
-	identifier := internal.GetDIDIdentifier(name)
-	fragment := internal.GetDIDFragment(name)
+	identifier := GetIdentifier(name)
+	fragment := GetFragment(name)
 
 	return &DID{
 		Identifier: identifier,
