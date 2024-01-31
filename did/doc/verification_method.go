@@ -5,6 +5,7 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
+	mb "github.com/multiformats/go-multibase"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -68,16 +69,30 @@ func NewVerificationMethod(
 	}, nil
 }
 
-func (v *VerificationMethod) AddController(controller string) {
+// Add a controller to the verification method. The DID will be
+// checked for validity before adding it to the slice.
+func (v *VerificationMethod) AddController(controller string) error {
+
+	// Check if the controller is empty
+	if controller == "" {
+		return fmt.Errorf("doc/vm: controller is empty")
+	}
+
+	// Make sure the controller is a valid DID
+	if !did.IsValidDID(controller) {
+		return fmt.Errorf("doc/vm: controller is not a valid DID")
+	}
+
 	// Check if the controller is already in the slice
 	for _, c := range v.Controller {
 		if c == controller {
-			return // Controller already exists, do nothing
+			return nil
 		}
 	}
 
-	// Append the new controller since it's not already present
 	v.Controller = append(v.Controller, controller)
+
+	return nil
 }
 
 func (v *VerificationMethod) DeleteController(controller string) {
@@ -88,11 +103,20 @@ func (v *VerificationMethod) DeleteController(controller string) {
 	}
 }
 
-func (d *Document) AddVerificationMethod(method VerificationMethod) {
+func (d *Document) AddVerificationMethod(method VerificationMethod) error {
+
+	// Make sure the verification method is valid
+	err := method.Verify()
+	if err != nil {
+		return fmt.Errorf("doc/vm: %w", err)
+	}
+
 	// Before appending the method, check if id or publicKeyMultibase is unique
 	if d.isUniqueVerificationMethod(method) {
 		d.VerificationMethod = append(d.VerificationMethod, method)
 	}
+
+	return nil
 }
 
 func (d *Document) DeleteVerificationMethod(method VerificationMethod) error {
@@ -157,4 +181,55 @@ func (vm VerificationMethod) Equal(other VerificationMethod) bool {
 	}
 
 	return true
+}
+
+// Simply verify that the verification method seems valid
+func (vm VerificationMethod) Verify() error {
+	if vm.ID == "" {
+		return fmt.Errorf("vm/Verify: ID is empty")
+	}
+
+	if !did.IsValidDID(vm.ID) {
+		return fmt.Errorf("vm/Verify: ID is not a valid DID")
+	}
+
+	if vm.Type == "" {
+		return fmt.Errorf("vm/Verify: Type is empty")
+	}
+
+	err := vm.ValidateControllers()
+	if err != nil {
+		return fmt.Errorf("vm/Verify: %w", err)
+	}
+
+	if vm.PublicKeyMultibase == "" {
+		return fmt.Errorf("vm/Verify: PublicKeyMultibase is empty")
+	}
+
+	_, _, err = mb.Decode(vm.PublicKeyMultibase)
+	if err != nil {
+		return fmt.Errorf("vm/Verify: %w", err)
+	}
+
+	return nil
+
+}
+
+func (vm VerificationMethod) IsValid() bool {
+
+	return vm.Verify() == nil
+}
+
+func (vm VerificationMethod) ValidateControllers() error {
+
+	if len(vm.Controller) == 0 {
+		return fmt.Errorf("vm/ValidateControllers: Controller is empty")
+	}
+
+	for _, c := range vm.Controller {
+		if !did.IsValidDID(c) {
+			return fmt.Errorf("vm/ValidateControllers: Controller is not a valid DID")
+		}
+	}
+	return nil
 }
