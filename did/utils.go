@@ -12,11 +12,7 @@ import (
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
-var (
-	fragment           = regexp.MustCompile("^#[a-zA-Z0-9_-]*$")
-	ErrInvalidID       = errors.New("invalid ID")
-	ErrInvalidFragment = errors.New("invalid fragment")
-)
+var fragment = regexp.MustCompile("^#[a-zA-Z0-9_-]*$")
 
 func IsValidDID(didStr string) bool {
 
