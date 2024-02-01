@@ -20,8 +20,7 @@ var (
 
 func IsValidDID(didStr string) bool {
 
-	err := ValidateDID(didStr)
-	return err == nil
+	return ValidateDID(didStr) == nil
 }
 
 func ValidateDID(didStr string) error {
