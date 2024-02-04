@@ -5,7 +5,6 @@ import (
 
 	"github.com/multiformats/go-multicodec"
 	"github.com/multiformats/go-varint"
-	log "github.com/sirupsen/logrus"
 )
 
 func MulticodecEncode(codecName string, payload []byte) ([]byte, error) {
@@ -27,7 +26,7 @@ func MulticodecDecode(encoded []byte) (string, []byte, error) {
 		return "", nil, fmt.Errorf("error decoding: insufficient data")
 	}
 
-	log.Debugf("mutlticodecdecode: encoded: %x", encoded)
+	// log.Debugf("mutlticodecdecode: encoded: %x", encoded)
 
 	code, n, err := varint.FromUvarint(encoded)
 	if err != nil {
@@ -36,13 +35,13 @@ func MulticodecDecode(encoded []byte) (string, []byte, error) {
 	if n < 1 || n >= len(encoded) {
 		return "", nil, fmt.Errorf("error decoding: invalid varint size")
 	}
-	log.Debugf("mutlticodecdecode: code %d", code)
+	// log.Debugf("mutlticodecdecode: code %d", code)
 
 	codecName := multicodec.Code(code).String()
 	if codecName == "" {
 		return "", nil, fmt.Errorf("error obtaining codec name: unknown codec")
 	}
 
-	log.Debugf("mutlticodecdecode: codecName: %s", codecName)
+	// log.Debugf("mutlticodecdecode: codecName: %s", codecName)
 	return codecName, encoded[n:], nil
 }

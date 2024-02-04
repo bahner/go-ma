@@ -29,6 +29,7 @@ const (
 
 	// A MIME type for a message. Just to implement it for future proofing.
 	MESSAGE_MIME_TYPE  = "application/x-ma-message; version=" + VERSION
+	BROADCAST_MIME_TYPE  = "application/x-ma-broadcast; version=" + VERSION
 	ENVELOPE_MIME_TYPE = "application/x-ma-envelope; version=" + VERSION
 
 	MESSAGE_DEFAULT_CONTENT_TYPE = "text/plain"

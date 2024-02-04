@@ -56,7 +56,7 @@ func encrypt(data []byte, symmetricKey []byte, recipientPublicKeyBytes []byte) (
 	if err != nil {
 		return nil, fmt.Errorf("msg_encrypt: error creating AEAD: %w", err)
 	}
-	log.Debugf("msg_encrypt: aead: %x", aead)
+	// log.Debugf("msg_encrypt: aead: %x", aead)
 
 	// Create a random nonce to make the encryption probabilistically unique
 	nonce := make([]byte, chacha20poly1305.NonceSizeX)
@@ -64,14 +64,14 @@ func encrypt(data []byte, symmetricKey []byte, recipientPublicKeyBytes []byte) (
 	if err != nil {
 		return nil, fmt.Errorf("msg_encrypt: error generating nonce: %w", err)
 	}
-	log.Debugf("msg_encrypt: nonce: %x", nonce)
-	log.Debugf("msg_encrypt: nonce size: %x", len(nonce))
+	// log.Debugf("msg_encrypt: nonce: %x", nonce)
+	// log.Debugf("msg_encrypt: nonce size: %x", len(nonce))
 
 	// Seal the generated cipher text
 	cipherText := aead.Seal(nil, nonce, []byte(data), nil)
-	log.Debugf("msg_encrypt: cipherText: %x", cipherText)
+	// log.Debugf("msg_encrypt: cipherText: %x", cipherText)
 	cipherTextWithNonce := append(nonce, cipherText...)
-	log.Debugf("msg_encrypt: cipherTextWithNonce: %x", cipherTextWithNonce)
+	// log.Debugf("msg_encrypt: cipherTextWithNonce: %x", cipherTextWithNonce)
 
 	return cipherTextWithNonce, nil
 }
@@ -99,11 +99,11 @@ func generateEphemeralKeys(recipientPublicKeyBytes []byte) ([]byte, []byte, erro
 	if err != nil {
 		return nil, nil, fmt.Errorf("msg_encrypt: error deriving shared secret: %w", err)
 	}
-	log.Debugf("msg_encrypt: shared: %x", shared)
+	// log.Debugf("msg_encrypt: shared: %x", shared)
 
 	// Generate a symmetric key from the shared secret using blake3
 	symmetricKey := key.GenerateSymmetricKey(shared, ma.BLAKE3_SUM_SIZE, []byte(ma.BLAKE3_LABEL))
-	log.Debugf("msg_encrypt: symmetricKey: %x", symmetricKey)
+	// log.Debugf("msg_encrypt: symmetricKey: %x", symmetricKey)
 
 	return ephemeralPublic, symmetricKey, nil
 

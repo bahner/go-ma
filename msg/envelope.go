@@ -3,6 +3,7 @@ package msg
 import (
 	"fmt"
 
+	"github.com/bahner/go-ma/did/doc"
 	cbor "github.com/fxamacker/cbor/v2"
 )
 
@@ -11,10 +12,6 @@ type Envelope struct {
 	EphemeralKey     []byte
 	EncryptedContent []byte
 	EncryptedHeaders []byte
-}
-
-func (e *Envelope) marshalToCBOR() ([]byte, error) {
-	return cbor.Marshal(e)
 }
 
 // Takes the envelope as a byte array and returns a pointer to an Envelope struct
@@ -49,4 +46,47 @@ func (e *Envelope) getHeaders(privkey []byte) (*Headers, error) {
 	}
 
 	return hdrs, nil
+}
+
+// Use a pointer here, this might be arbitrarily big.
+func (m *Message) enclose() (*Envelope, error) {
+
+	// AT this point we *need* to fetch the recipient's document, otherwise we can't encrypt the message.
+	// But this fetch should probably have a timeout, so we don't get stuck here - or a caching function.
+	to, err := doc.Fetch(m.To, true) // Accept cached document
+	if err != nil {
+		return nil, fmt.Errorf("msg_enclose: error fetching recipient document: %s", err)
+	}
+
+	recipientPublicKeyBytes, err := to.KeyAgreementPublicKeyBytes()
+	if err != nil {
+		return nil, fmt.Errorf("msg_enclose: error getting recipient public key: %w", err)
+	}
+
+	// Generate ephemeral keys to be used for his message
+	ephemeralPublic, symmetricKey, err := generateEphemeralKeys(recipientPublicKeyBytes)
+	if err != nil {
+		return nil, fmt.Errorf("msg_enclose: failed to generate ephemeral keys: %w", err)
+	}
+
+	msgHeaders, err := m.marshalHeadersToCBOR()
+	if err != nil {
+		return nil, fmt.Errorf("msg_enclose: error marshalling headers: %w", err)
+	}
+
+	encryptedMsgHeaders, err := encrypt(msgHeaders, symmetricKey, recipientPublicKeyBytes)
+	if err != nil {
+		return nil, fmt.Errorf("msg_enclose: error encrypting headers: %w", err)
+	}
+
+	encryptedContent, err := encrypt(m.Content, symmetricKey, recipientPublicKeyBytes)
+	if err != nil {
+		return nil, fmt.Errorf("msg_enclose: error encrypting content: %w", err)
+	}
+
+	return &Envelope{
+		EphemeralKey:     ephemeralPublic,
+		EncryptedHeaders: encryptedMsgHeaders,
+		EncryptedContent: encryptedContent,
+	}, nil
 }

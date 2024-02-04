@@ -20,7 +20,7 @@ func (h *Headers) validate() error {
 		return errors.New("nil Message provided")
 	}
 
-	if h.MimeType != ma.MESSAGE_MIME_TYPE {
+	if h.MimeType != ma.MESSAGE_MIME_TYPE && h.MimeType != ma.BROADCAST_MIME_TYPE {
 		return errors.New("invalid Message type")
 	}
 
