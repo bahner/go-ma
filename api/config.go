@@ -8,8 +8,8 @@ import (
 
 func init() {
 
-	pflag.String("api_maddr", ma.DEFAULT_IPFS_API_MULTIADDR, "Multiaddr of the IPFS API.")
+	pflag.String("api-maddr", ma.DEFAULT_IPFS_API_MULTIADDR, "Multiaddr of the IPFS API.")
 	viper.SetDefault("api.maddr", ma.DEFAULT_IPFS_API_MULTIADDR)
-	viper.BindPFlag("api.maddr", pflag.Lookup("api_maddr"))
+	viper.BindPFlag("api.maddr", pflag.Lookup("api-maddr"))
 
 }
