@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/bahner/go-ma"
+	cbor "github.com/fxamacker/cbor/v2"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
@@ -109,5 +110,30 @@ func newFromHeaders(h *Headers) (*Message, error) {
 		// Signature
 		Signature: h.Signature,
 	}
+	return m, nil
+}
+
+// UnmarshalMessageFromCBOR unmarshals a Message from a CBOR byte slice
+// and verifies the signature
+func UnmarshalMessageFromCBOR(b []byte) (*Message, error) {
+	var m *Message = new(Message)
+	err := cbor.Unmarshal(b, m)
+	if err != nil {
+		return nil, fmt.Errorf("msg_unmarshal_message_from_cbor: failed to unmarshal message: %w", err)
+	}
+	return m, nil
+}
+
+func UnmarshalAndVerifyMessageFromCBOR(b []byte) (*Message, error) {
+	m, err := UnmarshalMessageFromCBOR(b)
+	if err != nil {
+		return nil, fmt.Errorf("msg_unmarshal_message_from_cbor_and_verify_signature: failed to unmarshal message: %w", err)
+	}
+
+	err = m.Verify()
+	if err != nil {
+		return nil, fmt.Errorf("msg_unmarshal_message_from_cbor_and_verify_signature: failed to verify message: %w", err)
+	}
+
 	return m, nil
 }

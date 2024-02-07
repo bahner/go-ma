@@ -28,6 +28,37 @@ func UnmarshalEnvelopeFromCBOR(data []byte) (*Envelope, error) {
 	return e, nil
 }
 
+func UnmarshalAndVerifyEnvelopeFromCBOR(data []byte) (*Envelope, error) {
+
+	e, err := UnmarshalEnvelopeFromCBOR(data)
+	if err != nil {
+		return nil, fmt.Errorf("envelope: error unmarshalling envelope: %s", err)
+	}
+
+	err = e.Verify()
+	if err != nil {
+		return nil, fmt.Errorf("envelope: error verifying envelope: %s", err)
+	}
+
+	return e, nil
+}
+
+func (e *Envelope) Verify() error {
+	if e.EphemeralKey == nil || e.EncryptedContent == nil || e.EncryptedHeaders == nil {
+		return fmt.Errorf("envelope: missing fields in envelope")
+	}
+
+	if len(e.EphemeralKey) != 32 {
+		return fmt.Errorf("envelope: invalid ephemeral key length")
+	}
+
+	return nil
+}
+
+func (e *Envelope) IsValid() bool {
+	return e.Verify() == nil
+}
+
 func (e *Envelope) getContent(privkey []byte) ([]byte, error) {
 	return decrypt(e.EncryptedContent, e.EphemeralKey, privkey)
 }
