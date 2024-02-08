@@ -5,6 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did/doc"
 	cbor "github.com/fxamacker/cbor/v2"
+	"golang.org/x/crypto/curve25519"
 )
 
 // Bask the encrypted message and the encrypted symmetric key in a CBOR envelope.
@@ -52,8 +53,16 @@ func (e *Envelope) Verify() error {
 		return fmt.Errorf("envelope: missing fields in envelope")
 	}
 
-	if len(e.EphemeralKey) != 32 {
+	if len(e.EphemeralKey) != curve25519.PointSize {
 		return fmt.Errorf("envelope: invalid ephemeral key length")
+	}
+
+	if e.EncryptedContent == nil {
+		return fmt.Errorf("envelope: missing encrypted content")
+	}
+
+	if e.EncryptedHeaders == nil {
+		return fmt.Errorf("envelope: missing encrypted headers")
 	}
 
 	return nil

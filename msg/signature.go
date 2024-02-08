@@ -35,6 +35,18 @@ func (m *Message) Sign(privKey *ed25519.PrivateKey) error {
 // Returns nil if the signature is valid
 func (m *Message) Verify() error {
 
+	if m == nil {
+		return fmt.Errorf("message/verify: nil message")
+	}
+
+	if m.From == "" {
+		return fmt.Errorf("message/verify: missing From")
+	}
+
+	if m.Signature == nil {
+		return fmt.Errorf("message/verify: missing signature")
+	}
+
 	// Sender document
 	did, err := did.New(m.From)
 	if err != nil {
