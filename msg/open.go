@@ -28,7 +28,10 @@ func (e *Envelope) Open(privateKey []byte) (*Message, error) {
 	}
 
 	// Verify the signature before proceeding
-	m.Verify()
+	err = m.Verify()
+	if err != nil {
+		return nil, fmt.Errorf("open: error verifying message: %w", err)
+	}
 
 	m.Content, err = e.getContent(privateKey)
 	if err != nil {

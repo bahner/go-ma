@@ -35,6 +35,10 @@ func UnmarshalAndVerifyEnvelopeFromCBOR(data []byte) (*Envelope, error) {
 		return nil, fmt.Errorf("envelope: error unmarshalling envelope: %s", err)
 	}
 
+	if e == nil {
+		return nil, fmt.Errorf("envelope: error unmarshalling envelope: nil envelope")
+	}
+
 	err = e.Verify()
 	if err != nil {
 		return nil, fmt.Errorf("envelope: error verifying envelope: %s", err)
