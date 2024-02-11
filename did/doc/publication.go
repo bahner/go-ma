@@ -57,10 +57,6 @@ func (d *Document) Publish(opts *PublishOptions) (ipns.Name, error) {
 		}
 	}
 
-	if opts == nil {
-		opts = DefaultPublishOptions()
-	}
-
 	ipfsAPI := api.GetIPFSAPI()
 
 	data, err := d.MarshalToCBOR()
