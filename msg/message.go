@@ -3,7 +3,6 @@ package msg
 import (
 	"crypto/ed25519"
 	"fmt"
-	"time"
 
 	"github.com/bahner/go-ma"
 	cbor "github.com/fxamacker/cbor/v2"
@@ -20,15 +19,11 @@ const (
 // It should enable using Message later, if that's a good idea.
 type Message struct {
 	// Version of the message format
-	Version string
+	Version string `cbor:"version"`
 	// Unique identifier of the message
 	ID string `cbor:"id"`
 	// MIME type of the message
 	MimeType string `cbor:"mimeType"`
-	// Creation time of the message in seconds since Unix epoch
-	Created int64 `cbor:"keyasint64"`
-	// Expiration time of the message in seconds since Unix epoch
-	Expires int64 `cbor:"keyasint64"`
 	// Sender of the message
 	From string `cbor:"from"`
 	// Recipient of the message
@@ -55,21 +50,14 @@ func New(
 		return nil, err
 	}
 
-	now := time.Now().UTC()
-	created := now.Unix()
-	expires := now.Add(MESSAGE_TTL).Unix()
-
 	m := &Message{
 		// Message meta data
 		ID:       id,
 		MimeType: ma.MESSAGE_MIME_TYPE,
 		Version:  ma.VERSION,
-		// Recipients
+		// Recipient
 		From: from,
 		To:   to,
-		// Timestamps
-		Created: created,
-		Expires: expires,
 		// Body
 		ContentType: contentType,
 		// The content is not signed as such, but the hash is.
@@ -99,12 +87,9 @@ func newFromHeaders(h *Headers) (*Message, error) {
 		ID:       h.ID,
 		MimeType: h.MimeType,
 		Version:  h.Version,
-		// Recipients
+		// Recipient
 		From: h.From,
 		To:   h.To,
-		// Timestamps
-		Created: h.Created,
-		Expires: h.Expires,
 		// Body
 		ContentType: h.ContentType,
 		// Signature

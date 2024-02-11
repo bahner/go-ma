@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/ed25519"
 	"fmt"
-	"time"
 
 	"github.com/bahner/go-ma"
 	cbor "github.com/fxamacker/cbor/v2"
@@ -24,10 +23,6 @@ func NewBroadcast(
 		return nil, err
 	}
 
-	now := time.Now().UTC()
-	created := now.Unix()
-	expires := now.Add(MESSAGE_TTL).Unix()
-
 	m := &Message{
 		// Message meta data
 		ID:       id,
@@ -36,9 +31,6 @@ func NewBroadcast(
 		// Recipients
 		From: from,
 		To:   to,
-		// Timestamps
-		Created: created,
-		Expires: expires,
 		// Body
 		ContentType: contentType,
 		// The content is not signed as such, but the hash is.

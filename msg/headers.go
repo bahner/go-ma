@@ -41,8 +41,6 @@ func (m *Message) baseHeaders() *Headers {
 		Version:     m.Version,
 		From:        m.From,
 		To:          m.To,
-		Created:     m.Created,
-		Expires:     m.Expires,
 		ContentType: m.ContentType,
 	}
 }
