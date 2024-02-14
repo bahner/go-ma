@@ -22,20 +22,23 @@ const (
 
 	// BLAKE3 label for symmetric key generation.
 	HASH_ALGORITHM_MULTICODEC_STRING = "blake3"
-	BLAKE3_LABEL                     = "ma"
+	BLAKE3_LABEL                     = NAME
 	BLAKE3_SUM_SIZE                  = 32 // 256 bits
 
 	// MIME types
 
 	// A MIME type for a message. Just to implement it for future proofing.
 	MESSAGE_MIME_TYPE  = "application/x-ma-message; version=" + VERSION
-	BROADCAST_MIME_TYPE  = "application/x-ma-broadcast; version=" + VERSION
 	ENVELOPE_MIME_TYPE = "application/x-ma-envelope; version=" + VERSION
+
+	// Broadcasts
+	BROADCAST_MIME_TYPE = "application/x-ma-broadcast; version=" + VERSION
+	BROADCAST_TOPIC     = "/" + NAME + "/broadcast/" + VERSION
 
 	MESSAGE_DEFAULT_CONTENT_TYPE = "text/plain"
 	MESSAGE_DEFAULT_TTL          = time.Hour * 24
 
 	// API
 	DEFAULT_IPFS_API_MULTIADDR = "/ip4/127.0.0.1/tcp/45005" // Default to Brave browser, Kubo is /ip4/127.0.0.1/tcp/5001
-  ENV_PREFIX = "GO_MA"
+	ENV_PREFIX                 = "GO_MA"
 )
