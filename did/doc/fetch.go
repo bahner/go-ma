@@ -27,7 +27,7 @@ func Fetch(didStr string, cached bool) (*Document, error) {
 
 // Fetched the document from IPFS using the DID object.
 // The cached flag determines whether the document should be fetched from IPNS cache or not.
-func FetchFromDID(d *did.DID, cached bool) (*Document, error) {
+func FetchFromDID(d did.DID, cached bool) (*Document, error) {
 
 	var document = &Document{}
 

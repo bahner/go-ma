@@ -9,24 +9,24 @@ import (
 )
 
 // This creates a new keyset from an existing IPFS key.
-func newFromIPFSKey(k *ipfs.Key) (*Keyset, error) {
+func newFromIPFSKey(k ipfs.Key) (Keyset, error) {
 
 	encryptionKey, err := key.NewEncryptionKey(k.IPNSName)
 	if err != nil {
-		return nil, fmt.Errorf("keyset/new: failed to generate encryption key: %w", err)
+		return Keyset{}, fmt.Errorf("keyset/new: failed to generate encryption key: %w", err)
 	}
 
 	signatureKey, err := key.NewSigningKey(k.IPNSName)
 	if err != nil {
-		return nil, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
+		return Keyset{}, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
 	}
 
 	d, err := did.New(k.DID)
 	if err != nil {
-		return nil, fmt.Errorf("keyset/new: failed to get or create DID: %w", err)
+		return Keyset{}, fmt.Errorf("keyset/new: failed to get or create DID: %w", err)
 	}
 
-	return &Keyset{
+	return Keyset{
 		DID:           d,
 		IPFSKey:       k,
 		EncryptionKey: encryptionKey,

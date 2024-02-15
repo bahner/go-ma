@@ -16,16 +16,16 @@ type Key struct {
 }
 
 // Fetches the key from IPFS and updates the cache.
-func Fetch(name string) (*Key, error) {
+func Fetch(name string) (Key, error) {
 	// Get or create the key in IPFS
 	ik, err := getOrCreateIPFSKey(name)
 	if err != nil {
-		return nil, fmt.Errorf("ipfs: failed to create key %s: %w", name, err)
+		return Key{}, fmt.Errorf("ipfs: failed to create key %s: %w", name, err)
 	}
 
 	ipnsName := ik.Path().Segments()[1]
 	// Create a new Key struct
-	k := &Key{
+	k := Key{
 		DID:      ma.DID_PREFIX + ipnsName + "#" + name,
 		Fragment: name,
 		IPNSName: ipnsName,

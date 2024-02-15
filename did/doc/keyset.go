@@ -11,13 +11,13 @@ import (
 // which is the DID of the controller of the keyset. This is used to set the
 // controller of the DID Document.
 // It's OK to set it as the DID of the keyset.IPNSKey.DID, but it's not required.
-func NewFromKeyset(k *set.Keyset) (*Document, error) {
+func NewFromKeyset(k set.Keyset) (*Document, error) {
 
 	return NewFromKeysetWithController(k, k.DID.String())
 
 }
 
-func NewFromKeysetWithController(k *set.Keyset, controller string) (*Document, error) {
+func NewFromKeysetWithController(k set.Keyset, controller string) (*Document, error) {
 
 	id := k.DID.String()
 

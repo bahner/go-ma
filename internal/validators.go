@@ -21,8 +21,8 @@ func IsValidNanoID(str string) bool {
 	return nanoId.MatchString(str)
 }
 
-func IsValidEd25519PrivateKey(privKey *ed25519.PrivateKey) bool {
-	if privKey == nil || len(*privKey) != ed25519.PrivateKeySize {
+func IsValidEd25519PrivateKey(privKey ed25519.PrivateKey) bool {
+	if privKey == nil || len(privKey) != ed25519.PrivateKeySize {
 		return false
 	}
 	return true

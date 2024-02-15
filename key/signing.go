@@ -19,8 +19,8 @@ const (
 type SigningKey struct {
 	DID                string
 	Type               string
-	PrivKey            *ed25519.PrivateKey
-	PubKey             *ed25519.PublicKey
+	PrivKey            ed25519.PrivateKey
+	PubKey             ed25519.PublicKey
 	PublicKeyMultibase string
 }
 
@@ -29,36 +29,36 @@ func (k *SigningKey) Sign(data []byte) ([]byte, error) {
 		return nil, fmt.Errorf("keyset/ed25519: invalid private key")
 	}
 
-	return ed25519.Sign(*k.PrivKey, data), nil
+	return ed25519.Sign(k.PrivKey, data), nil
 }
 
 // Generates a signing key for the given identifier, ie. IPNS name
-func NewSigningKey(identifier string) (*SigningKey, error) {
+func NewSigningKey(identifier string) (SigningKey, error) {
 
 	if !internal.IsValidIPNSName(identifier) {
-		return nil, fmt.Errorf("key/ed25519: invalid identifier: %s", identifier)
+		return SigningKey{}, fmt.Errorf("key/ed25519: invalid identifier: %s", identifier)
 	}
 
 	publicKey, privKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
-		return nil, fmt.Errorf("key/signing: error generating key pair: %w", err)
+		return SigningKey{}, fmt.Errorf("key/signing: error generating key pair: %w", err)
 	}
 
 	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, ASSERTION_METHOD_KEY_MULTICODEC_STRING)
 	if err != nil {
-		return nil, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
+		return SigningKey{}, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
 	}
 
 	name, err := nanoid.New()
 	if err != nil {
-		return nil, fmt.Errorf("key/ed25519: error generating nanoid: %w", err)
+		return SigningKey{}, fmt.Errorf("key/ed25519: error generating nanoid: %w", err)
 	}
 
-	return &SigningKey{
+	return SigningKey{
 		DID:                ma.DID_PREFIX + identifier + "#" + name,
 		Type:               ASSERTION_METHOD_KEY_TYPE,
-		PrivKey:            &privKey,
-		PubKey:             &publicKey,
+		PrivKey:            privKey,
+		PubKey:             publicKey,
 		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
 }

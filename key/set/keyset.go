@@ -13,27 +13,27 @@ import (
 // but the IPFSKey is a reference to the IPFS key and holds names and paths.
 // The key itself resides in IPFS.
 type Keyset struct {
-	DID           *did.DID
-	IPFSKey       *ipfs.Key
-	EncryptionKey *key.EncryptionKey
-	SigningKey    *key.SigningKey
+	DID           did.DID
+	IPFSKey       ipfs.Key
+	EncryptionKey key.EncryptionKey
+	SigningKey    key.SigningKey
 }
 
 // Creates new keyset from a name (typically fragment of a DID)
 // This requires that the key is already in IPFS and that IPFS is running.
-func GetOrCreate(name string) (*Keyset, error) {
+func GetOrCreate(name string) (Keyset, error) {
 
 	var err error
 
 	ipfsKey, err := ipfs.Fetch(name)
 	if err != nil {
-		return nil, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
+		return Keyset{}, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
 	}
 	log.Infof("Created new key in IPFS: %v", ipfsKey)
 
 	ks, err := newFromIPFSKey(ipfsKey)
 	if err != nil {
-		return nil, fmt.Errorf("keyset/new: failed to create new keyset: %w", err)
+		return Keyset{}, fmt.Errorf("keyset/new: failed to create new keyset: %w", err)
 	}
 	return ks, nil
 }

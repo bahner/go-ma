@@ -32,9 +32,9 @@ type Headers struct {
 	Signature []byte `cbor:"signature"`
 }
 
-func (m *Message) baseHeaders() *Headers {
+func (m *Message) baseHeaders() Headers {
 
-	return &Headers{
+	return Headers{
 		// Message Headers
 		ID:          m.ID,
 		MimeType:    m.MimeType,
@@ -45,7 +45,7 @@ func (m *Message) baseHeaders() *Headers {
 	}
 }
 
-func (m *Message) unsignedHeaders() *Headers {
+func (m *Message) unsignedHeaders() Headers {
 
 	return m.baseHeaders()
 }
@@ -55,7 +55,7 @@ func (m *Message) marshalUnsignedHeadersToCBOR() ([]byte, error) {
 }
 
 // Returns the all the imprimatur headers
-func (m *Message) Headers() *Headers {
+func (m *Message) Headers() Headers {
 
 	hdrs := m.baseHeaders()
 	hdrs.Signature = m.Signature
@@ -75,11 +75,11 @@ func (h *Headers) ExpiresTime() time.Time {
 	return time.Unix(h.Expires, 0)
 }
 
-func (h *Headers) Sender() (*did.DID, error) {
+func (h *Headers) Sender() (did.DID, error) {
 	return did.New(h.From)
 }
 
-func (h *Headers) Recipient() (*did.DID, error) {
+func (h *Headers) Recipient() (did.DID, error) {
 	return did.New(h.To)
 }
 

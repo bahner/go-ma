@@ -20,12 +20,12 @@ type DID struct {
 // did:ma:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#bahner
 //
 // Remember that is needs to pre-exist in IPFS or be published to IPFS to be useful.
-func New(didStr string) (*DID, error) {
+func New(didStr string) (DID, error) {
 
 	// Firstly validate the DID
 	err := ValidateDID(didStr)
 	if err != nil {
-		return &DID{}, fmt.Errorf("did/new: failed to validate DID: %w", err)
+		return DID{}, fmt.Errorf("did/new: failed to validate DID: %w", err)
 	}
 
 	// Remove the prefix
@@ -35,7 +35,7 @@ func New(didStr string) (*DID, error) {
 	identifier := GetIdentifier(name)
 	fragment := GetFragment(name)
 
-	return &DID{
+	return DID{
 		Identifier: identifier,
 		Fragment:   fragment,
 	}, nil
