@@ -8,12 +8,9 @@ import (
 
 func (d *Document) AddController(controller string) error {
 
-	if d.Controller == nil {
-		return fmt.Errorf("controller slice is nil")
-	}
-
-	if !did.IsValidDID(controller) {
-		return fmt.Errorf("controller is not a valid DID: %s", controller)
+	err := verifyController(controller)
+	if err != nil {
+		return fmt.Errorf("doc/AddController: %w", err)
 	}
 
 	// Check if the controller is already in the slice
@@ -34,4 +31,29 @@ func (d *Document) DeleteController(controller string) {
 			d.Controller = append(d.Controller[:i], d.Controller[i+1:]...)
 		}
 	}
+}
+
+func (vm VerificationMethod) ValidateControllers() error {
+
+	if len(vm.Controller) == 0 {
+		return ErrControllersIsEmpty
+	}
+
+	for _, c := range vm.Controller {
+		if !isValidController(c) {
+			return did.ErrInvalidDID
+		}
+	}
+	return nil
+}
+
+func verifyController(controller string) error {
+	if !did.IsValidDID(controller) {
+		return fmt.Errorf("controller is not a valid DID: %s. %w", controller, did.ErrInvalidDID)
+	}
+	return nil
+}
+
+func isValidController(controller string) bool {
+	return verifyController(controller) == nil
 }

@@ -1,8 +1,6 @@
 package doc
 
 import (
-	"fmt"
-
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
 	cbor "github.com/fxamacker/cbor/v2"
@@ -33,14 +31,14 @@ func (d *Document) MarshalPayloadToCBOR() ([]byte, error) {
 func (d *Document) PayloadHash() ([]byte, error) {
 	p, err := d.MarshalPayloadToCBOR()
 	if err != nil {
-		return nil, fmt.Errorf("doc hashing: Error marshalling payload to CBOR: %s", err)
+		return nil, ErrPayloadMarshal
 	}
 
 	// Hash the payload
 	hashed := blake3.Sum256(p)
 	multicodecHashed, err := internal.MulticodecEncode(ma.HASH_ALGORITHM_MULTICODEC_STRING, hashed[:])
 	if err != nil {
-		return nil, fmt.Errorf("doc sign: Error multiencoding hashed payload: %s", err)
+		return nil, ErrPayloadMultiencode
 	}
 
 	return multicodecHashed, nil

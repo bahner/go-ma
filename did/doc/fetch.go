@@ -50,10 +50,10 @@ func FetchFromDID(d did.DID, cached bool) (*Document, error) {
 	}
 
 	if !document.isValid() {
-		return nil, fmt.Errorf("document is invalid")
+		return nil, ErrDocumentInvalid
 	}
 
-	log.Debugf("Fetched and cached document for : %s", d.DID)
+	log.Debugf("Fetched and cached document for : %s", d.DID())
 	return document, nil
 
 }

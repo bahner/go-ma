@@ -2,8 +2,8 @@ package doc
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
 	"github.com/multiformats/go-multibase"
 )
@@ -24,7 +24,7 @@ type Proof struct {
 func (d *Document) Sign(signKey key.SigningKey, vm VerificationMethod) error {
 
 	if signKey.PublicKeyMultibase != vm.PublicKeyMultibase {
-		return fmt.Errorf("doc sign: signKey.PublicKeyMultibase != vm.PublicKeyMultibase")
+		return fmt.Errorf("doc sign: signKey.PublicKeyMultibase != vm.PublicKeyMultibase. %w", ErrPublicKeyMultibaseMismatch)
 	}
 
 	multicodecHashed, err := d.PayloadHash()
@@ -35,13 +35,13 @@ func (d *Document) Sign(signKey key.SigningKey, vm VerificationMethod) error {
 	// Sign the hashed payload with an ed25519 key
 	signature, err := signKey.Sign(multicodecHashed)
 	if err != nil {
-		return fmt.Errorf("doc sign: Error signing payload: %s", err)
+		return fmt.Errorf("doc sign: %w", err)
 	}
 
 	// Multibase encode the signed data for public consumption
 	proofValue, err := multibase.Encode(multibase.Base58BTC, signature)
 	if err != nil {
-		return fmt.Errorf("doc sign: Error encoding signature: %s", err)
+		return fmt.Errorf("doc sign: Error encoding signature: %w", err)
 	}
 
 	d.Proof = NewProof(proofValue, vm.ID)
@@ -51,10 +51,8 @@ func (d *Document) Sign(signKey key.SigningKey, vm VerificationMethod) error {
 
 func NewProof(proofValue string, vm string) Proof {
 
-	created := internal.NowIsoString()
-
 	return Proof{
-		Created:            created,
+		Created:            time.Now().Format(time.RFC3339),
 		Type:               proofType,
 		ProofPurpose:       proofPurpose,
 		ProofValue:         proofValue,

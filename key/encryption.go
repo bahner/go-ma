@@ -18,7 +18,7 @@ const (
 )
 
 type EncryptionKey struct {
-	DID                string
+	DID                did.DID
 	Type               string
 	PrivKey            [32]byte // Private key
 	PubKey             [32]byte // Public key
@@ -31,9 +31,19 @@ func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 		return EncryptionKey{}, fmt.Errorf("key/encryption: invalid identifier: %s", identifier)
 	}
 
+	name, err := nanoid.New()
+	if err != nil {
+		return EncryptionKey{}, fmt.Errorf("key_generate: error generating nanoid: %w", err)
+	}
+
+	d, err := did.New(ma.DID_PREFIX + identifier + "#" + name)
+	if err != nil {
+		return EncryptionKey{}, fmt.Errorf("key_generate: error creating DID: %w", err)
+	}
+
 	// Generate a random private key
 	var privKey [curve25519.ScalarSize]byte
-	_, err := rand.Read(privKey[:])
+	_, err = rand.Read(privKey[:])
 	if err != nil {
 		return EncryptionKey{}, err
 	}
@@ -48,13 +58,8 @@ func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 		return EncryptionKey{}, fmt.Errorf("key_generate: error encoding public key multibase: %w", err)
 	}
 
-	name, err := nanoid.New()
-	if err != nil {
-		return EncryptionKey{}, fmt.Errorf("key_generate: error generating nanoid: %w", err)
-	}
-
 	return EncryptionKey{
-		DID:                ma.DID_PREFIX + identifier + "#" + name,
+		DID:                d,
 		Type:               KEY_AGREEMENT_KEY_TYPE,
 		PrivKey:            privKey,
 		PubKey:             pubKey,
@@ -64,42 +69,46 @@ func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 
 func (k EncryptionKey) Verify() error {
 
-	err := did.ValidateDID(k.DID)
+	err := k.DID.Verify()
 	if err != nil {
-		return err
+		return fmt.Errorf("key/encryption: %w", err)
 	}
 
 	if k.Type == "" {
-		return fmt.Errorf("key/encryption: key has no type")
+		return ErrNoType
+	}
+
+	if k.Type != KEY_AGREEMENT_KEY_TYPE {
+		return ErrInvalidKeyAgreementType
 	}
 
 	if k.PubKey == [curve25519.ScalarSize]byte{} {
-		return fmt.Errorf("key/encryption: key has no private key")
+		return ErrNoPublicKey
 	}
 
 	if k.PrivKey == [curve25519.PointSize]byte{} {
-		return fmt.Errorf("key/encryption: key has no private key")
+		return ErrNoPrivateKey
 	}
 
 	if k.PublicKeyMultibase == "" {
-		return fmt.Errorf("key/encryption: key has no public key")
+		return ErrNoPublicKeyMultibase
 	}
 
 	if !internal.IsValidMultibase(k.PublicKeyMultibase) {
-		return fmt.Errorf("key/encryption: invalid multibase")
+		return ErrInvalidPublicKeyMultibase
 	}
 
 	if k.PublicKeyMultibase == "" {
-		return fmt.Errorf("key/encryption: key has no public key")
+		return ErrNoPublicKeyMultibase
 	}
 
 	key, err := internal.MultibaseDecode(k.PublicKeyMultibase)
 	if err != nil {
-		return fmt.Errorf("key/encryption: error decoding multibase: %w", err)
+		return ErrInvalidPublicKeyMultibase
 	}
 
 	if key[0] != byte(mc.X25519Pub) {
-		return fmt.Errorf("key/encryption: invalid multicodec")
+		return ErrInvalidMulticodec
 	}
 
 	return nil

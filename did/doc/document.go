@@ -27,9 +27,10 @@ func New(identifier string, controller string) (*Document, error) {
 
 	log.Debugf("doc/new: identifier: %s", identifier)
 	log.Debugf("doc/new: controller: %s", controller)
-	_, err := did.New(identifier)
+
+	err := did.ValidateDID(identifier)
 	if err != nil {
-		return nil, fmt.Errorf("doc/new: failed to parse DID: %w", err)
+		return nil, fmt.Errorf("doc/new: invalid identifier: %w", err)
 	}
 
 	ctrller := []string{identifier}
@@ -79,7 +80,7 @@ func GetOrCreate(identifier string, controller string) (*Document, error) {
 
 	doc, err = New(identifier, controller)
 	if err != nil {
-		return nil, fmt.Errorf("doc/GetOrCreate: failed to create new document: %w", err)
+		return nil, fmt.Errorf("doc/GetOrCreate: %w", err)
 	}
 
 	return doc, nil

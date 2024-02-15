@@ -1,18 +1,15 @@
 package did
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/bahner/go-ma"
+	"github.com/ipfs/boxo/path"
 )
 
 type DID struct {
-	// The full DID
-	DID string
-	// The identifier is the IPNS name without the /ipns/ prefix
 	Identifier string
-	// The Fragment is the key shortname and internal name for the key
+	// The identifier is the IPNS name without the /ipns/ prefix
 	Fragment string
 }
 
@@ -27,20 +24,16 @@ func New(didStr string) (DID, error) {
 	// Firstly validate the DID
 	err := ValidateDID(didStr)
 	if err != nil {
-		return DID{}, fmt.Errorf("did/new: failed to validate DID: %w", err)
+		return DID{}, err
 	}
 
 	// Remove the prefix
-	name := strings.TrimPrefix(didStr, ma.DID_PREFIX)
-
-	// Extract the identifier and fragment
-	identifier := GetIdentifier(name)
-	fragment := GetFragment(name)
+	identifier := strings.TrimPrefix(didStr, ma.DID_PREFIX)
+	fragment := GetFragment(identifier)
 
 	return DID{
 		Identifier: identifier,
 		Fragment:   fragment,
-		DID:        didStr,
 	}, nil
 }
 
@@ -51,15 +44,27 @@ func (d *DID) IsValid() bool {
 
 func (d *DID) IsIdenticalTo(did DID) bool {
 
-	return AreIdentical(d, &did)
+	return AreIdentical(*d, did)
 }
 
 func (d *DID) Path(space string) string {
 
-	return "/" + space + "/" + d.Identifier
+	return "/" + path.IPNSNamespace + "/" + d.Identifier
 
 }
 
 func (d *DID) Verify() error {
-	return ValidateDID(d.DID)
+	return ValidateDID(d.DID())
+}
+
+func (d *DID) Name() string {
+	return d.Identifier + "#" + d.Fragment
+}
+
+func (d *DID) DID() string {
+	return ma.DID_PREFIX + d.Name()
+}
+
+func (d *DID) String() string {
+	return d.DID()
 }

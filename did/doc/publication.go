@@ -53,7 +53,7 @@ func (d *Document) Publish(opts *PublishOptions) (ipns.Name, error) {
 		if opts.Force {
 			log.Warnf("doc/publish: document is already published, put force flag is set, so proceeding forcefully")
 		} else {
-			return ipns.Name{}, fmt.Errorf("doc/publish: document is already published")
+			return ipns.Name{}, ErrDoumentAlreadyPublished
 		}
 	}
 

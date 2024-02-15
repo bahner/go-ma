@@ -19,7 +19,7 @@ const (
 )
 
 type SigningKey struct {
-	DID                string
+	DID                did.DID
 	Type               string
 	PrivKey            ed25519.PrivateKey
 	PubKey             ed25519.PublicKey
@@ -37,8 +37,19 @@ func (k *SigningKey) Sign(data []byte) ([]byte, error) {
 // Generates a signing key for the given identifier, ie. IPNS name
 func NewSigningKey(identifier string) (SigningKey, error) {
 
-	if !internal.IsValidIPNSName(identifier) {
-		return SigningKey{}, fmt.Errorf("key/ed25519: invalid identifier: %s", identifier)
+	err := did.ValidateDID(identifier)
+	if err != nil {
+		return SigningKey{}, fmt.Errorf("key/signing: %s: %w", identifier, did.ErrInvalidIdentifier)
+	}
+
+	name, err := nanoid.New()
+	if err != nil {
+		return SigningKey{}, fmt.Errorf("key/signing: error generating nanoid: %w", err)
+	}
+
+	d, err := did.New(ma.DID_PREFIX + identifier + "#" + name)
+	if err != nil {
+		return SigningKey{}, fmt.Errorf("key/ed25519: error creating DID: %w", err)
 	}
 
 	publicKey, privKey, err := ed25519.GenerateKey(rand.Reader)
@@ -51,13 +62,8 @@ func NewSigningKey(identifier string) (SigningKey, error) {
 		return SigningKey{}, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
 	}
 
-	name, err := nanoid.New()
-	if err != nil {
-		return SigningKey{}, fmt.Errorf("key/ed25519: error generating nanoid: %w", err)
-	}
-
 	return SigningKey{
-		DID:                ma.DID_PREFIX + identifier + "#" + name,
+		DID:                d,
 		Type:               ASSERTION_METHOD_KEY_TYPE,
 		PrivKey:            privKey,
 		PubKey:             publicKey,
@@ -67,29 +73,29 @@ func NewSigningKey(identifier string) (SigningKey, error) {
 
 func (s SigningKey) Verify() error {
 
-	err := did.ValidateDID(s.DID)
+	err := s.DID.Verify()
 	if err != nil {
 		return err
 	}
 
 	if s.Type == "" {
-		return fmt.Errorf("key/encryption: key has no type")
+		return ErrNoType
 	}
 
 	if s.Type != ASSERTION_METHOD_KEY_TYPE {
-		return fmt.Errorf("key/encryption: key type is not %s", ASSERTION_METHOD_KEY_TYPE)
+		return ErrInvalidAssertionMethodType
 	}
 
 	if len(s.PubKey) == 0 {
-		return fmt.Errorf("key/encryption: key has no public key")
+		return ErrNoPublicKey
 	}
 
 	if len(s.PrivKey) == 0 {
-		return fmt.Errorf("key/encryption: key has no private key")
+		return ErrNoPrivateKey
 	}
 
 	if s.PublicKeyMultibase == "" {
-		return fmt.Errorf("key/encryption: key has no public key")
+		return ErrNoPublicKeyMultibase
 	}
 
 	key, err := internal.MultibaseDecode(s.PublicKeyMultibase)
@@ -98,7 +104,7 @@ func (s SigningKey) Verify() error {
 	}
 
 	if key[0] != byte(mc.Ed25519Pub) {
-		return fmt.Errorf("key/encryption: invalid multicodec")
+		return ErrInvalidMulticodec
 	}
 
 	return nil

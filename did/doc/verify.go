@@ -7,6 +7,10 @@ import (
 	"github.com/multiformats/go-multibase"
 )
 
+var (
+	ErrInvalidPayload = fmt.Errorf("invalid document payload")
+)
+
 func (d *Document) Verify() error {
 
 	hashed, err := d.PayloadHash()
@@ -27,7 +31,7 @@ func (d *Document) Verify() error {
 
 	// Verify the signature
 	if !ed25519.Verify(pubKey, hashed[:], signature) {
-		return fmt.Errorf("verification failed")
+		return ErrDocumentSignatureInvalid
 	}
 
 	return nil

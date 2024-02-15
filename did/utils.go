@@ -1,7 +1,6 @@
 package did
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -21,10 +20,17 @@ func IsValidDID(didStr string) bool {
 
 func ValidateDID(didStr string) error {
 
-	if !strings.HasPrefix(didStr, ma.DID_PREFIX) {
-		return fmt.Errorf("invalid DID format, must start with %s", ma.DID_PREFIX)
+	if didStr == "" {
+		return ErrEmptyDID
 	}
 
+	// Check that the string has the correct prefix
+
+	if !strings.HasPrefix(didStr, ma.DID_PREFIX) {
+		return ErrInvalidPrefix
+	}
+
+	// Identifier here is a bit of a misnomer. It's the whole name.
 	identifier := strings.TrimPrefix(didStr, ma.DID_PREFIX)
 
 	name := strings.Split(identifier, "#")
@@ -32,15 +38,15 @@ func ValidateDID(didStr string) error {
 	fragment := name[1]
 
 	if len(name) != 2 {
-		return errors.New("invalid DID format, must contain both an identifier and a fragment and nothing else")
+		return ErrInvalidFormat
 	}
 
 	if !internal.IsValidIPNSName(id) {
-		return fmt.Errorf("invalid DID format, identifier is not a valid IPNS name: %s", id)
+		return fmt.Errorf("invalid identifier: %s, %w", id, ErrInvalidIdentifier)
 	}
 
 	if !internal.IsValidNanoID(name[1]) {
-		return fmt.Errorf("invalid DID format, fragment is not a valid fragment: %s", fragment)
+		return fmt.Errorf("invalid fragment: %s, %w", fragment, ErrInvalidFragment)
 	}
 
 	return nil
@@ -50,7 +56,7 @@ func ValidateDID(didStr string) error {
 // This is a stretched interpretation of the word Identical, but
 // I couldn't help myself. It means they are derived from the same key,
 // which makes them Identical in my book.
-func AreIdentical(did1 *DID, did2 *DID) bool {
+func AreIdentical(did1 DID, did2 DID) bool {
 	return did1.Identifier == did2.Identifier
 }
 
@@ -84,21 +90,35 @@ func IsValidFragment(str string) bool {
 	return fragment.MatchString(str)
 }
 
+func VerifyFragment(fragment string) error {
+	if !IsValidFragment(fragment) {
+		return ErrInvalidFragment
+	}
+	return nil
+}
+
 func IsValidIdentifier(identifier string) bool {
+	return VerifyIdentifier(identifier) == nil
+}
+
+func VerifyIdentifier(identifier string) error {
 
 	parts := strings.Split(identifier, "#")
 	if len(parts) != 2 {
-		return false
+		return ErrInvalidFormat
 	}
 
 	// Check that the identifier has a valid fragment
-	if !IsValidFragment(parts[1]) {
-		return false
+	fragment := parts[1]
+	if !IsValidFragment(fragment) {
+		return fmt.Errorf("invalid fragment: %s, %w", fragment, ErrInvalidFragment)
 	}
 
 	// Check that the id is a valid IPNS name
 	_, err := ipns.NameFromString(identifier)
+	if err != nil {
+		return fmt.Errorf("invalid identifier: %s, %w", identifier, ErrInvalidIdentifier)
+	}
 
-	// Last check so check that it has not errors
-	return err == nil
+	return nil
 }

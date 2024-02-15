@@ -3,7 +3,6 @@ package doc
 import (
 	"fmt"
 
-	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/key/set"
 )
 
@@ -13,13 +12,13 @@ import (
 // It's OK to set it as the DID of the keyset.IPNSKey.DID, but it's not required.
 func NewFromKeyset(k set.Keyset) (*Document, error) {
 
-	return NewFromKeysetWithController(k, k.DID.DID)
+	return NewFromKeysetWithController(k, k.DID.DID())
 
 }
 
 func NewFromKeysetWithController(k set.Keyset, controller string) (*Document, error) {
 
-	id := k.DID.DID
+	id := k.DID.DID()
 
 	d, err := New(id, controller)
 	if err != nil {
@@ -30,7 +29,7 @@ func NewFromKeysetWithController(k set.Keyset, controller string) (*Document, er
 		id,
 		id,
 		"MultiKey",
-		did.GetFragment(k.EncryptionKey.DID),
+		k.EncryptionKey.DID.Fragment,
 		k.EncryptionKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("new_actor: Failed to create encryption verification method: %w", err)
@@ -42,7 +41,7 @@ func NewFromKeysetWithController(k set.Keyset, controller string) (*Document, er
 		id,
 		id,
 		"MultiKey",
-		did.GetFragment(k.SigningKey.DID),
+		k.SigningKey.DID.Fragment,
 		k.SigningKey.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("new_actor: Failed to create assertion verification method: %w", err)

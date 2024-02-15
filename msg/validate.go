@@ -1,9 +1,7 @@
 package msg
 
 import (
-	"errors"
 	"fmt"
-	"time"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
@@ -17,16 +15,16 @@ func (h *Headers) validate() error {
 	var err error
 
 	if h == nil {
-		return errors.New("nil Message provided")
+		return ErrNilMessage
 	}
 
 	if h.MimeType != ma.MESSAGE_MIME_TYPE && h.MimeType != ma.BROADCAST_MIME_TYPE {
-		return errors.New("invalid Message type")
+		return ErrMessageInvalidType
 	}
 
 	// Check that message body headers are valid
 	if h.ContentType == "" {
-		return errors.New("ContentType must be non-empty")
+		return ErrMessageMissingContentType
 	}
 
 	// Verify ID
@@ -37,12 +35,6 @@ func (h *Headers) validate() error {
 
 	// Verify actors
 	err = h.verifyActors()
-	if err != nil {
-		return err
-	}
-
-	// Message version check
-	err = h.verifyTimestamps()
 	if err != nil {
 		return err
 	}
@@ -66,7 +58,7 @@ func (h *Headers) verifyMessageVersion() error {
 
 	supportedSemver, err := semver.Make(ma.VERSION)
 	if err != nil {
-		return fmt.Errorf("error parsing version constant: %s", err)
+		return fmt.Errorf("error parsing version constant: %w", err)
 	}
 
 	// Compare versions
@@ -78,33 +70,14 @@ func (h *Headers) verifyMessageVersion() error {
 	// If they are not the same, we need to check if the message version is greater or less than the supported verion.
 	// For know this is just for informational purposes.
 	if messageSemver.GT(supportedSemver) {
-		return fmt.Errorf("message version %s is greater than supported version %s", messageSemver, supportedSemver)
+		return fmt.Errorf("message version %s too high. %w", messageSemver, ErrVersionTooHigh)
 	}
 
 	if messageSemver.LT(supportedSemver) {
-		return fmt.Errorf("message version %s is less than supported version %s", messageSemver, supportedSemver)
+		return fmt.Errorf("message version %s too low. %w", messageSemver, ErrVersionTooLow)
 	}
 
-	return fmt.Errorf("message version %s is not supported", messageSemver)
-}
-
-func (h *Headers) verifyTimestamps() error {
-	// Time-based checks
-	now := time.Now()
-
-	created_time := h.CreatedTime()
-
-	if created_time.After(now) {
-		return errors.New("CreatedTime must be in the past")
-	}
-
-	expires_time := h.ExpiresTime()
-
-	if expires_time.Before(created_time) {
-		return errors.New("ExpiresTime must be after CreatedTime")
-	}
-
-	return nil
+	return fmt.Errorf("message version %s is not supported. %w", messageSemver, ErrVersionInvalid)
 }
 
 func (h *Headers) verifyActors() error {
@@ -122,7 +95,7 @@ func (h *Headers) verifyActors() error {
 
 	// Must they?
 	if h.From == h.To {
-		return errors.New("actors From and To must be different")
+		return ErrSameActor
 	}
 
 	return nil
@@ -131,11 +104,11 @@ func (h *Headers) verifyActors() error {
 // Check that ID is valid
 func (h *Headers) verifyID() error {
 	if h.ID == "" {
-		return errors.New("ID must be non-empty")
+		return ErrEmptyID
 	}
 
 	if !internal.IsValidNanoID(h.ID) {
-		return errors.New("ID must be a valid NanoID")
+		return ErrInvalidID
 	}
 
 	return nil

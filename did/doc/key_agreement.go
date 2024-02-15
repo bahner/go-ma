@@ -8,24 +8,9 @@ import (
 	"golang.org/x/crypto/curve25519"
 )
 
-// func (d *Document) KeyAgreementPublicKey() (crypto.PublicKey, error) {
-
-// 	pubKeyBytes, err := d.KeyAgreementPublicKeyBytes()
-// 	if err != nil {
-// 		return nil, fmt.Errorf("doc/key_agreement_public_key: Error getting public key bytes: %s", err)
-// 	}
-
-// 	// Convert the extracted bytes to a public key
-// 	var pubKey crypto.PublicKey
-// 	copy(pubKey.(*[curve25519.PointSize]byte)[:], pubKeyBytes)
-
-// 	return pubKey, nil
-
-// }
-
 func (d *Document) KeyAgreementPublicKeyBytes() ([]byte, error) {
 
-	vm, err := d.GetVerificationMethodbyID(d.KeyAgreement)
+	vm, err := d.GetVerificationMethodByID(d.KeyAgreement)
 	if err != nil {
 		return nil, fmt.Errorf("doc/key_agreement_public_key: Error getting verification method by ID: %w", err)
 	}
@@ -36,7 +21,7 @@ func (d *Document) KeyAgreementPublicKeyBytes() ([]byte, error) {
 	}
 
 	if codec != key.KEY_AGREEMENT_MULTICODEC_STRING {
-		return nil, fmt.Errorf("doc/key_agreement_public_key: codec != %s", key.KEY_AGREEMENT_MULTICODEC_STRING)
+		return nil, ErrMultiCodecInvalid
 	}
 
 	// Check if the number of bytes is correct for a curve25519 public key

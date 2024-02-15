@@ -36,15 +36,15 @@ func (m *Message) Sign(privKey ed25519.PrivateKey) error {
 func (m *Message) Verify() error {
 
 	if m == nil {
-		return fmt.Errorf("message/verify: nil message")
+		return ErrNilMessage
 	}
 
 	if m.From == "" {
-		return fmt.Errorf("message/verify: missing From")
+		return ErrMissingFrom
 	}
 
 	if m.Signature == nil {
-		return fmt.Errorf("message/verify: missing signature")
+		return ErrMissinSignature
 	}
 
 	// Sender document
@@ -53,9 +53,9 @@ func (m *Message) Verify() error {
 		return fmt.Errorf("message/verify: failed to create did from From: %w", err)
 	}
 
-	senderDoc, err := doc.Fetch(did.DID, true) // Accept cached document
+	senderDoc, err := doc.Fetch(did.DID(), true) // Accept cached document
 	if err != nil {
-		return fmt.Errorf("message/verify: failed to fetch sender document")
+		return ErrFetchDoc
 	}
 
 	// Signing key
