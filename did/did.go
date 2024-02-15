@@ -8,6 +8,8 @@ import (
 )
 
 type DID struct {
+	// The full DID
+	DID string
 	// The identifier is the IPNS name without the /ipns/ prefix
 	Identifier string
 	// The Fragment is the key shortname and internal name for the key
@@ -38,18 +40,13 @@ func New(didStr string) (DID, error) {
 	return DID{
 		Identifier: identifier,
 		Fragment:   fragment,
+		DID:        didStr,
 	}, nil
-}
-
-func (d *DID) String() string {
-
-	return ma.DID_PREFIX + d.Identifier + "#" + d.Fragment
-
 }
 
 // ValidateDID checks if the DID is valid.
 func (d *DID) IsValid() bool {
-	err := ValidateDID(d.String())
+	err := ValidateDID(d.DID)
 	return err == nil
 }
 

@@ -53,7 +53,7 @@ func FetchFromDID(d did.DID, cached bool) (*Document, error) {
 		return nil, fmt.Errorf("document is invalid")
 	}
 
-	log.Debugf("Fetched and cached document for : %s", d.String())
+	log.Debugf("Fetched and cached document for : %s", d.DID)
 	return document, nil
 
 }

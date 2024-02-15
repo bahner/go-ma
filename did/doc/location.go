@@ -14,7 +14,7 @@ func (d *Document) SetLastKnowLocation(location string) error {
 		return fmt.Errorf("doc/SetLastKnowLocation: %w", err)
 	}
 
-	d.LastKnownLocation = _did.String()
+	d.LastKnownLocation = _did.DID
 
 	d.UpdateVersion()
 
