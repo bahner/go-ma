@@ -5,8 +5,10 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma"
+	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
 	nanoid "github.com/matoous/go-nanoid/v2"
+	mc "github.com/multiformats/go-multicodec"
 	"golang.org/x/crypto/curve25519"
 )
 
@@ -58,4 +60,52 @@ func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 		PubKey:             pubKey,
 		PublicKeyMultibase: publicKeyMultibase,
 	}, nil
+}
+
+func (k EncryptionKey) Verify() error {
+
+	err := did.ValidateDID(k.DID)
+	if err != nil {
+		return err
+	}
+
+	if k.Type == "" {
+		return fmt.Errorf("key/encryption: key has no type")
+	}
+
+	if k.PubKey == [curve25519.ScalarSize]byte{} {
+		return fmt.Errorf("key/encryption: key has no private key")
+	}
+
+	if k.PrivKey == [curve25519.PointSize]byte{} {
+		return fmt.Errorf("key/encryption: key has no private key")
+	}
+
+	if k.PublicKeyMultibase == "" {
+		return fmt.Errorf("key/encryption: key has no public key")
+	}
+
+	if !internal.IsValidMultibase(k.PublicKeyMultibase) {
+		return fmt.Errorf("key/encryption: invalid multibase")
+	}
+
+	if k.PublicKeyMultibase == "" {
+		return fmt.Errorf("key/encryption: key has no public key")
+	}
+
+	key, err := internal.MultibaseDecode(k.PublicKeyMultibase)
+	if err != nil {
+		return fmt.Errorf("key/encryption: error decoding multibase: %w", err)
+	}
+
+	if key[0] != byte(mc.X25519Pub) {
+		return fmt.Errorf("key/encryption: invalid multicodec")
+	}
+
+	return nil
+
+}
+
+func (k EncryptionKey) IsValid() bool {
+	return k.Verify() == nil
 }

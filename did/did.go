@@ -46,8 +46,7 @@ func New(didStr string) (DID, error) {
 
 // ValidateDID checks if the DID is valid.
 func (d *DID) IsValid() bool {
-	err := ValidateDID(d.DID)
-	return err == nil
+	return d.Verify() == nil
 }
 
 func (d *DID) IsIdenticalTo(did DID) bool {
@@ -59,4 +58,8 @@ func (d *DID) Path(space string) string {
 
 	return "/" + space + "/" + d.Identifier
 
+}
+
+func (d *DID) Verify() error {
+	return ValidateDID(d.DID)
 }

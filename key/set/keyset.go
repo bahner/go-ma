@@ -37,3 +37,30 @@ func GetOrCreate(name string) (Keyset, error) {
 	}
 	return ks, nil
 }
+
+func (ks Keyset) Verify() error {
+	if ks.DID.Identifier != ks.IPFSKey.Id {
+		return fmt.Errorf("keyset: DID and IPFS key DID do not match")
+	}
+
+	err := ks.EncryptionKey.Verify()
+	if err != nil {
+		return fmt.Errorf("keyset: encryption key is invalid: %w", err)
+	}
+
+	err = ks.SigningKey.Verify()
+	if err != nil {
+		return fmt.Errorf("keyset: signing key is invalid: %w", err)
+	}
+
+	err = ks.IPFSKey.Verify()
+	if err != nil {
+		return fmt.Errorf("keyset: IPFS key is invalid: %w", err)
+	}
+
+	return nil
+}
+
+func (ks Keyset) IsValid() bool {
+	return ks.Verify() == nil
+}
