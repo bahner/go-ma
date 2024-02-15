@@ -9,11 +9,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (m *Message) Sign(privKey *ed25519.PrivateKey) error {
+func (m *Message) Sign(privKey ed25519.PrivateKey) error {
 
 	// Sign requires key to be of correct size
-	if len(*privKey) != ed25519.PrivateKeySize {
-		return fmt.Errorf("message/sign: invalid key size %d. Expected %d", len(*privKey), ed25519.PrivateKeySize)
+	if len(privKey) != ed25519.PrivateKeySize {
+		return fmt.Errorf("message/sign: invalid key size %d. Expected %d", len(privKey), ed25519.PrivateKeySize)
 	}
 
 	bytes_to_sign, err := m.marshalUnsignedHeadersToCBOR()
@@ -21,7 +21,7 @@ func (m *Message) Sign(privKey *ed25519.PrivateKey) error {
 		return err
 	}
 
-	sig := ed25519.Sign(*privKey, bytes_to_sign)
+	sig := ed25519.Sign(privKey, bytes_to_sign)
 
 	log.Debugf("Signed payload with signature: %s", sig)
 

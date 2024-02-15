@@ -43,7 +43,7 @@ func New(
 	to string,
 	content []byte,
 	contentType string,
-	priv_key *ed25519.PrivateKey) (*Message, error) {
+	priv_key ed25519.PrivateKey) (*Message, error) {
 
 	id, err := nanoid.New()
 	if err != nil {
