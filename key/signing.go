@@ -37,9 +37,9 @@ func (k *SigningKey) Sign(data []byte) ([]byte, error) {
 // Generates a signing key for the given identifier, ie. IPNS name
 func NewSigningKey(identifier string) (SigningKey, error) {
 
-	err := did.ValidateDID(identifier)
-	if err != nil {
-		return SigningKey{}, fmt.Errorf("key/signing: %s: %w", identifier, did.ErrInvalidIdentifier)
+	if !did.IsValidIdentifier(identifier) {
+		return SigningKey{}, fmt.Errorf("key/signing: identifier %s: %w", identifier, did.ErrInvalidIdentifier)
+
 	}
 
 	name, err := nanoid.New()
