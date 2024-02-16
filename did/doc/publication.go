@@ -73,8 +73,13 @@ func (d *Document) Publish(opts *PublishOptions) (ipns.Name, error) {
 	// Creates an immutable path from the CID
 	p := path.FromCid(c)
 
+	_did, err := did.New(d.ID)
+	if err != nil {
+		return ipns.Name{}, fmt.Errorf("doc/publish: failed to create DID from document ID: %w", err)
+	}
+
 	log.Debugf("doc/publish: Announcing publication of document %s to IPNS. Please wait ...", c.String())
-	n, err := ipfsAPI.Name().Publish(opts.Ctx, p, caopts.Name.Key(did.GetFragment(d.ID)))
+	n, err := ipfsAPI.Name().Publish(opts.Ctx, p, caopts.Name.Key(_did.Fragment))
 	if err != nil {
 		return ipns.Name{}, fmt.Errorf("doc/publish: failed to publish document to IPNS: %w", err)
 	}

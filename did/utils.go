@@ -7,45 +7,49 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/internal"
-	"github.com/ipfs/boxo/ipns"
-	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
 var fragment = regexp.MustCompile("^#[a-zA-Z0-9_-]*$")
 
-func IsValidDID(didStr string) bool {
+func IsValid(didStr string) bool {
 
-	return ValidateDID(didStr) == nil
+	return Validate(didStr) == nil
 }
 
-func ValidateDID(didStr string) error {
+func Validate(didStr string) error {
 
 	if didStr == "" {
 		return ErrEmptyDID
 	}
 
 	// Check that the string has the correct prefix
-
 	if !strings.HasPrefix(didStr, ma.DID_PREFIX) {
 		return ErrInvalidPrefix
 	}
 
-	// Identifier here is a bit of a misnomer. It's the whole name.
-	identifier := strings.TrimPrefix(didStr, ma.DID_PREFIX)
+	name := strings.TrimPrefix(didStr, ma.DID_PREFIX)
+	parts := strings.Split(name, "#")
 
-	name := strings.Split(identifier, "#")
-	id := name[0]
-	fragment := name[1]
+	if len(parts) == 0 {
+		return ErrMissingIdentifier
+	}
+	if len(parts) == 1 {
+		return ErrMissingFragment
+	}
 
-	if len(name) != 2 {
+	if len(parts) > 2 {
 		return ErrInvalidFormat
 	}
 
-	if !internal.IsValidIPNSName(id) {
-		return fmt.Errorf("invalid identifier: %s, %w", id, ErrInvalidIdentifier)
+	identifier := parts[0]
+	fragment := parts[1]
+
+	err := verifyIdentifier(identifier)
+	if err != nil {
+		return err
 	}
 
-	if !internal.IsValidNanoID(name[1]) {
+	if !isValidFragment("#" + fragment) {
 		return fmt.Errorf("invalid fragment: %s, %w", fragment, ErrInvalidFragment)
 	}
 
@@ -60,13 +64,9 @@ func AreIdentical(did1 DID, did2 DID) bool {
 	return did1.Identifier == did2.Identifier
 }
 
-func GenerateFragment() string {
-	fragment, _ := nanoid.New()
-
-	return "#" + fragment
-}
-
-func GetFragment(did string) string {
+// Get the fragment from the DID string
+// The prefix is not required, ut'll just be stripped off.
+func getFragment(did string) string {
 
 	didName := strings.TrimPrefix(did, ma.DID_PREFIX)
 
@@ -75,7 +75,9 @@ func GetFragment(did string) string {
 	return elements[len(elements)-1]
 }
 
-func GetIdentifier(did string) string {
+// Get the identifier from the DID string
+// The prefix is not required, ut'll just be stripped off.
+func getIdentifier(did string) string {
 
 	didName := strings.TrimPrefix(did, ma.DID_PREFIX)
 
@@ -84,40 +86,26 @@ func GetIdentifier(did string) string {
 	return elements[0]
 }
 
-// This simply checks that the string is a valid nanoID,
-// prefixed with a "#".
-func IsValidFragment(str string) bool {
-	return fragment.MatchString(str)
+func isValidFragment(fragment string) bool {
+	return verifyFragment(fragment) == nil
 }
 
-func VerifyFragment(fragment string) error {
-	if !IsValidFragment(fragment) {
-		return ErrInvalidFragment
+// This simply checks that the string is a valid nanoID,
+// prefixed with a "#".
+func verifyFragment(str string) error {
+
+	ok := fragment.MatchString(str)
+	if !ok {
+		return fmt.Errorf("invalid fragment: %s, %w", str, ErrInvalidFragment)
 	}
+
 	return nil
 }
 
-func IsValidIdentifier(identifier string) bool {
-	return VerifyIdentifier(identifier) == nil
-}
+func verifyIdentifier(id string) error {
 
-func VerifyIdentifier(identifier string) error {
-
-	parts := strings.Split(identifier, "#")
-	if len(parts) != 2 {
-		return ErrInvalidFormat
-	}
-
-	// Check that the identifier has a valid fragment
-	fragment := parts[1]
-	if !IsValidFragment(fragment) {
-		return fmt.Errorf("invalid fragment: %s, %w", fragment, ErrInvalidFragment)
-	}
-
-	// Check that the id is a valid IPNS name
-	_, err := ipns.NameFromString(identifier)
-	if err != nil {
-		return fmt.Errorf("invalid identifier: %s, %w", identifier, ErrInvalidIdentifier)
+	if !internal.IsValidIPNSName(id) {
+		return fmt.Errorf("invalid identifier: %s, %w", id, ErrInvalidIdentifier)
 	}
 
 	return nil

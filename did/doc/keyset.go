@@ -12,13 +12,13 @@ import (
 // It's OK to set it as the DID of the keyset.IPNSKey.DID, but it's not required.
 func NewFromKeyset(k set.Keyset) (*Document, error) {
 
-	return NewFromKeysetWithController(k, k.DID.DID())
+	return NewFromKeysetWithController(k, k.DID.Id)
 
 }
 
 func NewFromKeysetWithController(k set.Keyset, controller string) (*Document, error) {
 
-	id := k.DID.DID()
+	id := k.DID.Id
 
 	d, err := New(id, controller)
 	if err != nil {

@@ -43,25 +43,17 @@ func NewVerificationMethod(
 	publicKeyMultibase string,
 ) (VerificationMethod, error) {
 
-	if !did.IsValidDID(id) {
+	if !did.IsValid(id) {
 		return VerificationMethod{}, did.ErrInvalidDID
 	}
 
-	identifier := did.GetIdentifier(id)
-
-	// Create a random fragment if none is provided
-	if fragment == "" {
-		fragment = did.GenerateFragment()
-	} else {
-		fragment = "#" + fragment
-	}
-
-	if !did.IsValidFragment(fragment) {
-		return VerificationMethod{}, did.ErrInvalidFragment
+	d, err := did.New(id)
+	if err != nil {
+		return VerificationMethod{}, fmt.Errorf("doc/vm: %w", err)
 	}
 
 	return VerificationMethod{
-		ID:                 ma.DID_PREFIX + identifier + fragment,
+		ID:                 ma.DID_PREFIX + d.Identifier + "#" + fragment,
 		Controller:         []string{controller},
 		Type:               vmType,
 		PublicKeyMultibase: publicKeyMultibase,
@@ -150,7 +142,12 @@ func (d *Document) isUniqueVerificationMethod(newMethod VerificationMethod) bool
 }
 
 func (vm VerificationMethod) Fragment() string {
-	return did.GetFragment(vm.ID)
+	d, err := did.New(vm.ID)
+	if err != nil {
+		log.Errorf("vm/Fragment: %s", err)
+		return ""
+	}
+	return d.Fragment
 }
 
 func (vm VerificationMethod) Equal(other VerificationMethod) bool {
@@ -180,7 +177,7 @@ func (vm VerificationMethod) Equal(other VerificationMethod) bool {
 // Simply verify that the verification method seems valid
 func (vm VerificationMethod) Verify() error {
 
-	err := did.ValidateDID(vm.ID)
+	err := did.Validate(vm.ID)
 	if err != nil {
 		return fmt.Errorf("vm/Verify: %w", err)
 	}

@@ -1,15 +1,15 @@
 package did
 
 import (
-	"strings"
-
-	"github.com/bahner/go-ma"
 	"github.com/ipfs/boxo/path"
 )
 
 type DID struct {
+	// The Id is the full DID
+	Id string
+	// The Identifier is the IPNS name without the /ipns/ prefix
 	Identifier string
-	// The identifier is the IPNS name without the /ipns/ prefix
+	// The fragment is a NanoID that is used to identify the entity locally
 	Fragment string
 }
 
@@ -22,18 +22,15 @@ type DID struct {
 func New(didStr string) (DID, error) {
 
 	// Firstly validate the DID
-	err := ValidateDID(didStr)
+	err := Validate(didStr)
 	if err != nil {
 		return DID{}, err
 	}
 
-	// Remove the prefix
-	identifier := strings.TrimPrefix(didStr, ma.DID_PREFIX)
-	fragment := GetFragment(identifier)
-
 	return DID{
-		Identifier: identifier,
-		Fragment:   fragment,
+		Id:         didStr,
+		Identifier: getIdentifier(didStr),
+		Fragment:   getFragment(didStr),
 	}, nil
 }
 
@@ -43,28 +40,17 @@ func (d *DID) IsValid() bool {
 }
 
 func (d *DID) IsIdenticalTo(did DID) bool {
-
 	return AreIdentical(*d, did)
 }
 
 func (d *DID) Path(space string) string {
-
 	return "/" + path.IPNSNamespace + "/" + d.Identifier
-
 }
 
 func (d *DID) Verify() error {
-	return ValidateDID(d.DID())
+	return Validate(d.Id)
 }
 
 func (d *DID) Name() string {
 	return d.Identifier + "#" + d.Fragment
-}
-
-func (d *DID) DID() string {
-	return ma.DID_PREFIX + d.Name()
-}
-
-func (d *DID) String() string {
-	return d.DID()
 }

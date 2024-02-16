@@ -48,7 +48,7 @@ func (vm VerificationMethod) ValidateControllers() error {
 }
 
 func verifyController(controller string) error {
-	if !did.IsValidDID(controller) {
+	if !did.IsValid(controller) {
 		return fmt.Errorf("controller is not a valid DID: %s. %w", controller, did.ErrInvalidDID)
 	}
 	return nil

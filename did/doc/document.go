@@ -28,7 +28,7 @@ func New(identifier string, controller string) (*Document, error) {
 	log.Debugf("doc/new: identifier: %s", identifier)
 	log.Debugf("doc/new: controller: %s", controller)
 
-	err := did.ValidateDID(identifier)
+	err := did.Validate(identifier)
 	if err != nil {
 		return nil, fmt.Errorf("doc/new: invalid identifier: %w", err)
 	}
