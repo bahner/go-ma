@@ -49,15 +49,21 @@ func (d *Document) Publish(opts *PublishOptions) (ipns.Name, error) {
 		log.Debugf("doc/publish: allow big block flag is set")
 	}
 
+	ipfsAPI := api.GetIPFSAPI()
+
+	_did, err := did.New(d.ID)
+	if err != nil {
+		return ipns.Name{}, fmt.Errorf("doc/publish: failed to create DID from document ID: %w", err)
+	}
+
 	if d.isPublished() {
 		if opts.Force {
-			log.Warnf("doc/publish: document is already published, put force flag is set, so proceeding forcefully")
+			log.Warnf("doc/publish: forced publication. deleting existing IPNS key from IPFS")
+			ipfsAPI.Key().Remove(opts.Ctx, _did.Fragment)
 		} else {
 			return ipns.Name{}, ErrDoumentAlreadyPublished
 		}
 	}
-
-	ipfsAPI := api.GetIPFSAPI()
 
 	data, err := d.MarshalToCBOR()
 	if err != nil {
@@ -72,11 +78,6 @@ func (d *Document) Publish(opts *PublishOptions) (ipns.Name, error) {
 
 	// Creates an immutable path from the CID
 	p := path.FromCid(c)
-
-	_did, err := did.New(d.ID)
-	if err != nil {
-		return ipns.Name{}, fmt.Errorf("doc/publish: failed to create DID from document ID: %w", err)
-	}
 
 	log.Debugf("doc/publish: Announcing publication of document %s to IPNS. Please wait ...", c.String())
 	n, err := ipfsAPI.Name().Publish(opts.Ctx, p, caopts.Name.Key(_did.Fragment))
