@@ -14,24 +14,21 @@ func getOrCreateIPFSKey(name string) (iface.Key, error) {
 
 	var err error
 
-	ik, _ := lookupIPFSKey(name)
+	ik, err := lookupIPFSKey(name)
+	if err != nil {
+		log.Debugf("getOrCreateIPFSKey: Ignoring: %v", err)
+	}
 
 	if ik == nil {
 		ik, err = api.GetIPFSAPI().Key().Generate(context.Background(), name)
 		if err != nil {
-			return nil, fmt.Errorf("ipfs: failed to create key %s: %w", name, err)
+			return nil, fmt.Errorf("getOrCreateIPFSKey %s: %w", name, err)
 		}
 	}
 
-	log.Debugf("ipfs: Created key %v", ik)
+	log.Debugf("getOrCreateIPFSKey: Created %v", ik)
 
 	return ik, nil
-}
-
-// List all keys in the IPFS node.
-func listIPFSKeys() ([]iface.Key, error) {
-
-	return api.GetIPFSAPI().Key().List(context.Background())
 }
 
 // Looks up a key by name in the IPFS node.
@@ -39,9 +36,9 @@ func lookupIPFSKey(keyName string) (iface.Key, error) {
 
 	var lookedupKey iface.Key
 
-	keys, err := listIPFSKeys()
+	keys, err := api.GetIPFSAPI().Key().List(context.Background())
 	if err != nil {
-		return lookedupKey, fmt.Errorf("ipfs: failed to list : %w", err)
+		return lookedupKey, fmt.Errorf("lookupIPFSKey : %w", err)
 	}
 
 	// A little deeper than I usually like to nest, but hey, it's a one off.
@@ -51,5 +48,5 @@ func lookupIPFSKey(keyName string) (iface.Key, error) {
 		}
 	}
 
-	return lookedupKey, fmt.Errorf("ipfs: key %s not found", keyName)
+	return lookedupKey, fmt.Errorf("lookupIPFSKey %s: %w", keyName, ErrKeyNotFoundInIPFS)
 }

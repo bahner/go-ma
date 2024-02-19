@@ -25,7 +25,7 @@ func GetOrCreate(name string) (Keyset, error) {
 
 	var err error
 
-	ipfsKey, err := ipfs.Fetch(name)
+	ipfsKey, err := ipfs.GetOrCreate(name)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
 	}

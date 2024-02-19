@@ -16,11 +16,11 @@ type Key struct {
 }
 
 // Fetches the key from IPFS and updates the cache.
-func Fetch(name string) (Key, error) {
+func GetOrCreate(name string) (Key, error) {
 	// Get or create the key in IPFS
 	ik, err := getOrCreateIPFSKey(name)
 	if err != nil {
-		return Key{}, fmt.Errorf("ipfs: failed to create key %s: %w", name, err)
+		return Key{}, fmt.Errorf("GetOrCreate: %w", err)
 	}
 
 	ipnsName := ik.Path().Segments()[1]
@@ -36,15 +36,15 @@ func Fetch(name string) (Key, error) {
 
 func (k Key) Verify() error {
 	if k.IPNSName == "" {
-		return fmt.Errorf("ipfs: key has no IPNS name")
+		return ErrKeyMissingName
 	}
 
 	if k.Id == "" {
-		return fmt.Errorf("ipfs: key has no ID")
+		return ErrKeyMissingID
 	}
 
 	if k.Fragment == "" {
-		return fmt.Errorf("ipfs: key has no fragment")
+		return ErrKeyMissingFragment
 	}
 	return nil
 }
