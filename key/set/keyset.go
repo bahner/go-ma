@@ -39,7 +39,7 @@ func GetOrCreate(name string) (Keyset, error) {
 }
 
 func (ks Keyset) Verify() error {
-	if ks.DID.Identifier != ks.IPFSKey.Id {
+	if ks.DID.Identifier != ks.IPFSKey.Identifier {
 		return ErrSetKeysMisMatch
 	}
 
