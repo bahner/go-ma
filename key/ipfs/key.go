@@ -7,10 +7,10 @@ import (
 )
 
 type Key struct {
-	// The IPNS name of the key, not the local name
-	IPNSName string
 	// The ID used by kubo to identify the key
 	Id string
+	// The IPNS name of the key, not the local name
+	Identifier string
 	// Fragment is the local name of the key, which we use as the DID fragment
 	Fragment string
 }
@@ -26,16 +26,16 @@ func GetOrCreate(name string) (Key, error) {
 	ipnsName := ik.Path().Segments()[1]
 	// Create a new Key struct
 	k := Key{
-		Id:       ma.DID_PREFIX + ipnsName + "#" + name,
-		Fragment: name,
-		IPNSName: ipnsName,
+		Id:         ma.DID_PREFIX + ipnsName + "#" + name,
+		Fragment:   name,
+		Identifier: ipnsName,
 	}
 
 	return k, nil
 }
 
 func (k Key) Verify() error {
-	if k.IPNSName == "" {
+	if k.Identifier == "" {
 		return ErrKeyMissingName
 	}
 

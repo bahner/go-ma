@@ -11,12 +11,12 @@ import (
 // This creates a new keyset from an existing IPFS key.
 func newFromIPFSKey(k ipfs.Key) (Keyset, error) {
 
-	encryptionKey, err := key.NewEncryptionKey(k.IPNSName)
+	encryptionKey, err := key.NewEncryptionKey(k.Identifier)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("newFromIPFSKey: %w", err)
 	}
 
-	signatureKey, err := key.NewSigningKey(k.IPNSName)
+	signatureKey, err := key.NewSigningKey(k.Identifier)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("newFromIPFSKey: %w", err)
 	}
