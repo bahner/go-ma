@@ -35,22 +35,23 @@ func FetchFromDID(d did.DID, cached bool) (*Document, error) {
 
 	_cid, err := api.RootCID(d.Path(path.IPNSNamespace), cached)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get CID from IPNS name: %w", err)
+		return nil, fmt.Errorf("fetchFromDID: %w", err)
 	}
 	log.Debugf("Fetching CID: %s", _cid)
 
 	node, err := ipfsAPI.Dag().Get(context.Background(), _cid)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get document from IPFS: %w", err)
+		return nil, fmt.Errorf("fetchFromDID: %w", err)
 	}
 
 	err = cbor.Unmarshal(node.RawData(), document)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal document: %w", err)
+		return nil, fmt.Errorf("fetchFromDID: %w", err)
 	}
 
-	if !document.isValid() {
-		return nil, ErrDocumentInvalid
+	err = document.Verify()
+	if err != nil {
+		return nil, fmt.Errorf("fetchFromDID: %w", err)
 	}
 
 	log.Debugf("Fetched and cached document for : %s", d.Id)
