@@ -7,6 +7,7 @@ import (
 
 	"github.com/bahner/go-ma/api"
 	"github.com/bahner/go-ma/did"
+	ipfsKey "github.com/bahner/go-ma/key/ipfs"
 	"github.com/ipfs/boxo/ipns"
 	"github.com/ipfs/boxo/path"
 	caopts "github.com/ipfs/kubo/core/coreiface/options"
@@ -38,53 +39,59 @@ func (d *Document) Publish(opts *PublishOptions) (ipns.Name, error) {
 	}
 
 	if opts.Force {
-		log.Debugf("doc/publish: force flag is set")
+		log.Debugf("DocPublish: force flag is set")
 	}
 
 	if opts.Pin {
-		log.Debugf("doc/publish: pin flag is set")
+		log.Debugf("DocPublish: pin flag is set")
 	}
 
 	if opts.AllowBigBlock {
-		log.Debugf("doc/publish: allow big block flag is set")
-	}
-
-	ipfsAPI := api.GetIPFSAPI()
-
-	_did, err := did.New(d.ID)
-	if err != nil {
-		return ipns.Name{}, fmt.Errorf("doc/publish: failed to create DID from document ID: %w", err)
+		log.Debugf("DocPublish: allow big block flag is set")
 	}
 
 	if d.isPublished() {
 		if opts.Force {
-			log.Warnf("doc/publish: forced publication. deleting existing IPNS key from IPFS")
-			ipfsAPI.Key().Remove(opts.Ctx, _did.Fragment)
+			log.Infof("DocPublish: Document %s is already published. Forcing publication.", d.ID)
 		} else {
+			log.Warnf("DocPublish: Document %s is already published and not forced. Aborting ....", d.ID)
 			return ipns.Name{}, ErrDoumentAlreadyPublished
 		}
 	}
 
+	_did, err := did.New(d.ID)
+	if err != nil {
+		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
+	}
+
+	// Make sure a key is available for the document
+	ik, err := ipfsKey.GetOrCreate(_did.Fragment)
+	if err != nil {
+		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
+	}
+
 	data, err := d.MarshalToCBOR()
 	if err != nil {
-		return ipns.Name{}, fmt.Errorf("doc/publish: failed to marshal document to CBOR: %w", err)
+		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
 	}
 
 	// Actually add the document to IPFS and possibly pin it and allow bib blocks.
+
 	c, err := api.IPFSDagPutCBOR(data, opts.Pin, opts.AllowBigBlock)
 	if err != nil {
-		return ipns.Name{}, fmt.Errorf("doc/publish: failed to add document to IPFS: %w", err)
+		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
 	}
 
 	// Creates an immutable path from the CID
 	p := path.FromCid(c)
 
-	log.Debugf("doc/publish: Announcing publication of document %s to IPNS. Please wait ...", c.String())
-	n, err := ipfsAPI.Name().Publish(opts.Ctx, p, caopts.Name.Key(_did.Fragment))
+	log.Debugf("DocPublish: Announcing publication of document %s to IPNS. Please wait ...", c.String())
+	ipfsAPI := api.GetIPFSAPI()
+	n, err := ipfsAPI.Name().Publish(opts.Ctx, p, caopts.Name.Key(ik.Fragment))
 	if err != nil {
-		return ipns.Name{}, fmt.Errorf("doc/publish: failed to publish document to IPNS: %w", err)
+		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
 	}
-	log.Debugf("doc/publish: Successfully announced publication of document %s to %s", c.String(), n.AsPath().String())
+	log.Debugf("DocPublish: Successfully announced publication of document %s to %s", c.String(), n.AsPath().String())
 	return n, nil
 
 }
@@ -106,17 +113,17 @@ func (d *Document) isPublished() bool {
 
 	maybeDoc, err := Fetch(d.ID, false) // Don't accept cached document
 	if err != nil {
-		log.Debugf("Failed to fetch document: %s", err)
+		log.Debugf("DocumentPublishGoroutine: %v", err)
 		return false
 	}
 
 	if maybeDoc == nil {
-		log.Debugf("Fetched document is nil")
+		log.Debugf("DocumentPublishGoroutine: Document is Nill")
 		return false
 	}
 
 	if !d.Equal(maybeDoc) {
-		log.Debugf("document is already published: %s", d.ID)
+		log.Debugf("DocumentPublishGoroutine: %s:", d.ID)
 		return true
 	}
 	return false

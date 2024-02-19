@@ -27,35 +27,35 @@ func GetOrCreate(name string) (Keyset, error) {
 
 	ipfsKey, err := ipfs.GetOrCreate(name)
 	if err != nil {
-		return Keyset{}, fmt.Errorf("keyset/new: failed to get or create key in IPFS: %w", err)
+		return Keyset{}, fmt.Errorf("KeysetGetOrCreate: %w", err)
 	}
 	log.Infof("Created new key in IPFS: %v", ipfsKey)
 
 	ks, err := newFromIPFSKey(ipfsKey)
 	if err != nil {
-		return Keyset{}, fmt.Errorf("keyset/new: failed to create new keyset: %w", err)
+		return Keyset{}, fmt.Errorf("KeysetGetOrCreate: %w", err)
 	}
 	return ks, nil
 }
 
 func (ks Keyset) Verify() error {
 	if ks.DID.Identifier != ks.IPFSKey.Id {
-		return fmt.Errorf("keyset: DID and IPFS key DID do not match")
+		return ErrSetKeysMisMatch
 	}
 
 	err := ks.EncryptionKey.Verify()
 	if err != nil {
-		return fmt.Errorf("keyset: encryption key is invalid: %w", err)
+		return fmt.Errorf("KeysetVerify: %w", err)
 	}
 
 	err = ks.SigningKey.Verify()
 	if err != nil {
-		return fmt.Errorf("keyset: signing key is invalid: %w", err)
+		return fmt.Errorf("KeysetVerify: %w", err)
 	}
 
 	err = ks.IPFSKey.Verify()
 	if err != nil {
-		return fmt.Errorf("keyset: IPFS key is invalid: %w", err)
+		return fmt.Errorf("KeysetVerify: %w", err)
 	}
 
 	return nil

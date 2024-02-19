@@ -14,7 +14,7 @@ func UnmarshalFromCBOR(data []byte) (Keyset, error) {
 	var k Keyset
 	err := cbor.Unmarshal(data, &k)
 	if err != nil {
-		return Keyset{}, fmt.Errorf("keyset/unmarshal: failed to unmarshal keyset: %w", err)
+		return Keyset{}, fmt.Errorf("KeysetUnmarshalFromCBOR: %w", err)
 	}
 
 	return k, nil
@@ -24,7 +24,7 @@ func (k Keyset) Pack() (string, error) {
 
 	data, err := k.MarshalToCBOR()
 	if err != nil {
-		return "", fmt.Errorf("keyset/pack: failed to marshal keyset: %w", err)
+		return "", fmt.Errorf("KeysetPack: %w", err)
 	}
 
 	return internal.MultibaseEncode(data)
@@ -34,7 +34,7 @@ func Unpack(data string) (Keyset, error) {
 
 	decoded, err := internal.MultibaseDecode(data)
 	if err != nil {
-		return Keyset{}, fmt.Errorf("keyset/unpack: failed to decode keyset: %w", err)
+		return Keyset{}, fmt.Errorf("KeysetUnpack: %w", err)
 	}
 
 	return UnmarshalFromCBOR(decoded)

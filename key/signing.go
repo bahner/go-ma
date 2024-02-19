@@ -39,22 +39,22 @@ func NewSigningKey(identifier string) (SigningKey, error) {
 
 	name, err := nanoid.New()
 	if err != nil {
-		return SigningKey{}, fmt.Errorf("key/signing: error generating nanoid: %w", err)
+		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
 
 	d, err := did.New(ma.DID_PREFIX + identifier + "#" + name)
 	if err != nil {
-		return SigningKey{}, fmt.Errorf("key/ed25519: error creating DID: %w", err)
+		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
 
 	publicKey, privKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
-		return SigningKey{}, fmt.Errorf("key/signing: error generating key pair: %w", err)
+		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
 
 	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, ASSERTION_METHOD_KEY_MULTICODEC_STRING)
 	if err != nil {
-		return SigningKey{}, fmt.Errorf("key/ed25519: error encoding public key multibase: %w", err)
+		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
 
 	return SigningKey{
@@ -95,7 +95,7 @@ func (s SigningKey) Verify() error {
 
 	key, err := internal.MultibaseDecode(s.PublicKeyMultibase)
 	if err != nil {
-		return fmt.Errorf("key/encryption: error decoding multibase: %w", err)
+		return fmt.Errorf("SigningKeyVerify: %w", err)
 	}
 
 	if key[0] != byte(mc.Ed25519Pub) {

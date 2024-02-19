@@ -13,17 +13,17 @@ func newFromIPFSKey(k ipfs.Key) (Keyset, error) {
 
 	encryptionKey, err := key.NewEncryptionKey(k.IPNSName)
 	if err != nil {
-		return Keyset{}, fmt.Errorf("keyset/new: failed to generate encryption key: %w", err)
+		return Keyset{}, fmt.Errorf("newFromIPFSKey: %w", err)
 	}
 
 	signatureKey, err := key.NewSigningKey(k.IPNSName)
 	if err != nil {
-		return Keyset{}, fmt.Errorf("keyset/new: failed to generate signature key: %w", err)
+		return Keyset{}, fmt.Errorf("newFromIPFSKey: %w", err)
 	}
 
 	d, err := did.New(k.Id)
 	if err != nil {
-		return Keyset{}, fmt.Errorf("keyset/new: failed to get or create DID: %w", err)
+		return Keyset{}, fmt.Errorf("newFromIPFSKey: %w", err)
 	}
 
 	return Keyset{

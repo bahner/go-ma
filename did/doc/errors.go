@@ -29,7 +29,7 @@ var (
 
 	ErrControllersIsEmpty = errors.New("controller missing")
 
-	ErrDocumentIsNil          = errors.New("document is nil")
+	ErrDocumentIsNil            = errors.New("document is nil")
 	ErrDocumentInvalid          = errors.New("invalid document")
 	ErrDocumentSignatureInvalid = errors.New("invalid document signature")
 )

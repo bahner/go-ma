@@ -28,17 +28,17 @@ type EncryptionKey struct {
 func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 
 	if !internal.IsValidIPNSName(identifier) {
-		return EncryptionKey{}, fmt.Errorf("key/encryption: invalid identifier: %s", identifier)
+		return EncryptionKey{}, fmt.Errorf("NewEncryptionKey: %s", identifier)
 	}
 
 	name, err := nanoid.New()
 	if err != nil {
-		return EncryptionKey{}, fmt.Errorf("key_generate: error generating nanoid: %w", err)
+		return EncryptionKey{}, fmt.Errorf("NewEncryptionKey: %w", err)
 	}
 
 	d, err := did.New(ma.DID_PREFIX + identifier + "#" + name)
 	if err != nil {
-		return EncryptionKey{}, fmt.Errorf("key_generate: error creating DID: %w", err)
+		return EncryptionKey{}, fmt.Errorf("NewEncryptionKey: %w", err)
 	}
 
 	// Generate a random private key
@@ -55,7 +55,7 @@ func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 	// Encode the public key to multibase
 	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(pubKey[:], KEY_AGREEMENT_MULTICODEC_STRING)
 	if err != nil {
-		return EncryptionKey{}, fmt.Errorf("key_generate: error encoding public key multibase: %w", err)
+		return EncryptionKey{}, fmt.Errorf("NewEncryptionKey: %w", err)
 	}
 
 	return EncryptionKey{
@@ -71,7 +71,7 @@ func (k EncryptionKey) Verify() error {
 
 	err := k.DID.Verify()
 	if err != nil {
-		return fmt.Errorf("key/encryption: %w", err)
+		return fmt.Errorf("encryptionKey: %w", err)
 	}
 
 	if k.Type == "" {
