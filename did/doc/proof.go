@@ -2,7 +2,6 @@ package doc
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/bahner/go-ma/key"
 	"github.com/multiformats/go-multibase"
@@ -14,7 +13,6 @@ const (
 )
 
 type Proof struct {
-	Created            string `cbor:"created" json:"created"`
 	Type               string `cbor:"type" json:"type"`
 	VerificationMethod string `cbor:"verificationMethod" json:"verificationMethod"`
 	ProofPurpose       string `cbor:"proofPurpose" json:"proofPurpose"`
@@ -52,7 +50,6 @@ func (d *Document) Sign(signKey key.SigningKey, vm VerificationMethod) error {
 func NewProof(proofValue string, vm string) Proof {
 
 	return Proof{
-		Created:            time.Now().Format(time.RFC3339),
 		Type:               proofType,
 		ProofPurpose:       proofPurpose,
 		ProofValue:         proofValue,

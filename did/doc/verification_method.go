@@ -18,7 +18,8 @@ type VerificationMethod struct {
 	// The controller of the verification method. This is the DID of the entity that controls the key.
 	// Should probably always be the DID itself, but maybe the DID controller.
 	Controller []string `cbor:"controller,toarray" json:"controller"`
-	// Created is the time the verification method was created
+	// PubLicKeyMultibase is the public key of the verification method, encoded in multibase
+	// according to https://www.w3.org/TR/did-core/#dfn-publickeymultibase
 	PublicKeyMultibase string `cbor:"publicKeyMultibase" json:"publicKeyMultibase"`
 }
 
@@ -39,7 +40,8 @@ func NewVerificationMethod(
 	// Name (fragment) of the verification method. If "", a random fragment will be generated
 	// Fragment should not be prefixed with "#"
 	fragment string,
-	// The public key of the verification method, encoded in multibase
+	// The public key of the verification method.
+	// Ref. https://www.w3.org/TR/did-core/#dfn-publickeymultibase
 	publicKeyMultibase string,
 ) (VerificationMethod, error) {
 
