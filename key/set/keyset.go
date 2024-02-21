@@ -5,7 +5,6 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/key"
-	"github.com/bahner/go-ma/key/ipfs"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -14,7 +13,6 @@ import (
 // The key itself resides in IPFS.
 type Keyset struct {
 	DID           did.DID
-	IPFSKey       ipfs.Key
 	EncryptionKey key.EncryptionKey
 	SigningKey    key.SigningKey
 }
@@ -25,13 +23,13 @@ func GetOrCreate(name string) (Keyset, error) {
 
 	var err error
 
-	ipfsKey, err := ipfs.GetOrCreate(name)
+	d, err := did.GetOrCreate(name)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("KeysetGetOrCreate: %w", err)
 	}
-	log.Infof("Created new key in IPFS: %v", ipfsKey)
+	log.Infof("Created new key in IPFS: %v", d)
 
-	ks, err := newFromIPFSKey(ipfsKey)
+	ks, err := newFromDID(d)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("KeysetGetOrCreate: %w", err)
 	}
@@ -39,9 +37,6 @@ func GetOrCreate(name string) (Keyset, error) {
 }
 
 func (ks Keyset) Verify() error {
-	if ks.DID.Identifier != ks.IPFSKey.Identifier {
-		return ErrSetKeysMisMatch
-	}
 
 	err := ks.EncryptionKey.Verify()
 	if err != nil {
@@ -53,7 +48,7 @@ func (ks Keyset) Verify() error {
 		return fmt.Errorf("KeysetVerify: %w", err)
 	}
 
-	err = ks.IPFSKey.Verify()
+	err = ks.DID.Verify()
 	if err != nil {
 		return fmt.Errorf("KeysetVerify: %w", err)
 	}
@@ -63,4 +58,24 @@ func (ks Keyset) Verify() error {
 
 func (ks Keyset) IsValid() bool {
 	return ks.Verify() == nil
+}
+
+// This creates a new keyset from an existing DID
+func newFromDID(d did.DID) (Keyset, error) {
+
+	encryptionKey, err := key.NewEncryptionKey(d.Identifier)
+	if err != nil {
+		return Keyset{}, fmt.Errorf("newFromIPFSKey: %w", err)
+	}
+
+	signatureKey, err := key.NewSigningKey(d.Identifier)
+	if err != nil {
+		return Keyset{}, fmt.Errorf("newFromIPFSKey: %w", err)
+	}
+
+	return Keyset{
+		DID:           d,
+		EncryptionKey: encryptionKey,
+		SigningKey:    signatureKey,
+	}, nil
 }

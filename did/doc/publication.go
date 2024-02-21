@@ -7,7 +7,6 @@ import (
 
 	"github.com/bahner/go-ma/api"
 	"github.com/bahner/go-ma/did"
-	ipfsKey "github.com/bahner/go-ma/key/ipfs"
 	"github.com/ipfs/boxo/ipns"
 	"github.com/ipfs/boxo/path"
 	caopts "github.com/ipfs/kubo/core/coreiface/options"
@@ -65,7 +64,7 @@ func (d *Document) Publish(opts *PublishOptions) (ipns.Name, error) {
 	}
 
 	// Make sure a key is available for the document
-	ik, err := ipfsKey.GetOrCreate(_did.Fragment)
+	ik, err := did.GetOrCreate(_did.Fragment)
 	if err != nil {
 		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
 	}

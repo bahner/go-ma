@@ -17,4 +17,5 @@ var (
 	ErrInvalidFormat     = errors.New("invalid DID format, must contain both an identifier and a fragment and nothing else")
 	ErrInvalidIdentifier = errors.New("identifier must be a valid IPNS name")
 	ErrMissingIdentifier = errors.New("missing identifier")
+	ErrIPFSKeyNotFound   = errors.New("ipfsKey not found")
 )

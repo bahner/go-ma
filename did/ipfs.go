@@ -1,13 +1,31 @@
-package ipfs
+package did
+
+// This file contains the functions to create and fetch DIDs from IPFS.
+// So this is a "live" part of the DID system, as opposed to the "static" part
 
 import (
 	"context"
 	"fmt"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/api"
 	iface "github.com/ipfs/kubo/core/coreiface"
 	log "github.com/sirupsen/logrus"
 )
+
+// Creates a new DID my actually creating or fetching a new key in IPFS
+// And get the names - notably the IPNS name from there.
+func GetOrCreate(name string) (DID, error) {
+	// Get or create the key in IPFS
+	ik, err := getOrCreateIPFSKey(name)
+	if err != nil {
+		return DID{}, fmt.Errorf("GetOrCreate: %w", err)
+	}
+
+	ipnsName := ik.Path().Segments()[1]
+
+	return New(ma.DID_PREFIX + ipnsName + "#" + name)
+}
 
 // Get or create a key with the given name in the IPFS node.
 func getOrCreateIPFSKey(name string) (iface.Key, error) {
@@ -48,5 +66,5 @@ func lookupIPFSKey(keyName string) (iface.Key, error) {
 		}
 	}
 
-	return lookedupKey, fmt.Errorf("lookupIPFSKey %s: %w", keyName, ErrKeyNotFoundInIPFS)
+	return lookedupKey, fmt.Errorf("lookupIPFSKey %s: %w", keyName, ErrIPFSKeyNotFound)
 }
