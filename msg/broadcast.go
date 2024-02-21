@@ -11,6 +11,8 @@ import (
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
+// A Broadcast  message is just a message with no recipient.
+// This packages tries to enforce this, so as to avoid mistakes.
 func NewBroadcast(
 	from string,
 	content []byte,

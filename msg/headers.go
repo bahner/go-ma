@@ -25,7 +25,7 @@ type Headers struct {
 	Signature []byte `cbor:"signature"`
 }
 
-func (m *Message) baseHeaders() Headers {
+func (m *Message) unsignedHeaders() Headers {
 
 	return Headers{
 		// Message Headers
@@ -38,11 +38,6 @@ func (m *Message) baseHeaders() Headers {
 	}
 }
 
-func (m *Message) unsignedHeaders() Headers {
-
-	return m.baseHeaders()
-}
-
 func (m *Message) marshalUnsignedHeadersToCBOR() ([]byte, error) {
 	return cbor.Marshal(m.unsignedHeaders())
 }
@@ -50,7 +45,7 @@ func (m *Message) marshalUnsignedHeadersToCBOR() ([]byte, error) {
 // Returns the all the imprimatur headers
 func (m *Message) Headers() Headers {
 
-	hdrs := m.baseHeaders()
+	hdrs := m.unsignedHeaders()
 	hdrs.Signature = m.Signature
 
 	return hdrs
@@ -59,22 +54,6 @@ func (m *Message) Headers() Headers {
 func (m *Message) marshalHeadersToCBOR() ([]byte, error) {
 	return cbor.Marshal(m.Headers())
 }
-
-// func (h *Headers) CreatedTime() time.Time {
-// 	return time.Unix(h.Created, 0)
-// }
-
-// func (h *Headers) ExpiresTime() time.Time {
-// 	return time.Unix(h.Expires, 0)
-// }
-
-// func (h *Headers) Sender() (did.DID, error) {
-// 	return did.New(h.From)
-// }
-
-// func (h *Headers) Recipient() (did.DID, error) {
-// 	return did.New(h.To)
-// }
 
 func (h *Headers) semVersion() (semver.Version, error) {
 	return semver.Make(h.Version)

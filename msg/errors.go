@@ -21,6 +21,7 @@ var (
 	ErrMissingFrom           = errors.New("mmissing From sender")
 	ErrMissinSignature       = errors.New("mmissing signature")
 	ErrNilMessage            = errors.New("nil Message provided")
+	ErrNilEnvelope           = errors.New("nil Envelope provided")
 	ErrSameActor             = errors.New("header From and To be different")
 	ErrVersionInvalid        = fmt.Errorf("version not %s", ma.VERSION)
 	ErrVersionTooHigh        = fmt.Errorf("version is higher %s", ma.VERSION)
