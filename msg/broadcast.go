@@ -13,7 +13,6 @@ import (
 
 func NewBroadcast(
 	from string,
-	to string,
 	content []byte,
 	contentType string,
 	priv_key ed25519.PrivateKey) (*Message, error) {
@@ -30,7 +29,6 @@ func NewBroadcast(
 		Version:  ma.VERSION,
 		// Recipients
 		From: from,
-		To:   to,
 		// Body
 		ContentType: contentType,
 		// The content is not signed as such, but the hash is.
@@ -50,8 +48,14 @@ func NewBroadcast(
 func (m *Message) Broadcast(ctx context.Context, t *pubsub.Topic) error {
 
 	// Verify that the message is valid before sending it
-	if m.Verify() != nil {
-		return fmt.Errorf("send: message verification failed")
+	err := m.Verify()
+	if err != nil {
+		return err
+	}
+
+	err = m.verifyBroadcast(t)
+	if err != nil {
+		return err
 	}
 
 	msgBytes, err := cbor.Marshal(m)
@@ -61,6 +65,22 @@ func (m *Message) Broadcast(ctx context.Context, t *pubsub.Topic) error {
 
 	// Post the *unencrypted* message to the topic
 	t.Publish(ctx, msgBytes)
+
+	return nil
+}
+
+func (m *Message) verifyBroadcast(t *pubsub.Topic) error {
+	if m.MimeType != ma.BROADCAST_MIME_TYPE {
+		return ErrMessageInvalidType
+	}
+
+	if m.To != "" {
+		return ErrBroadcastHasTo
+	}
+
+	if t.String() != ma.BROADCAST_TOPIC {
+		return ErrInvalidBroadcastTopic
+	}
 
 	return nil
 }

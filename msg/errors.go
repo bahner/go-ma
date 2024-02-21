@@ -22,4 +22,6 @@ var (
 	ErrMissingTo                 = errors.New("mmissing To reciient")
 	ErrMissinSignature           = errors.New("mmissing signature")
 	ErrFetchDoc                  = errors.New("failed to fetch entity document")
+	ErrInvalidBroadcastTopic     = errors.New("invalid broadcast topic")
+	ErrBroadcastHasTo            = errors.New("broadcast message must not have a recipient")
 )

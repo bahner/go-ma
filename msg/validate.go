@@ -27,6 +27,11 @@ func (h *Headers) validate() error {
 		return ErrMessageMissingContentType
 	}
 
+	err = h.verifyBroadcast()
+	if err != nil {
+		return err
+	}
+
 	// Verify ID
 	err = h.verifyID()
 	if err != nil {
@@ -88,12 +93,16 @@ func (h *Headers) verifyActors() error {
 	if err != nil {
 		return err
 	}
-	_, err = did.New(h.To)
-	if err != nil {
-		return err
+
+	// Unless it's a broadcast we need a valid recipient
+	if h.MimeType != ma.BROADCAST_MIME_TYPE {
+		_, err = did.New(h.To)
+		if err != nil {
+			return err
+		}
 	}
 
-	// Must they?
+	// Should this be an error?
 	if h.From == h.To {
 		return ErrSameActor
 	}
@@ -112,4 +121,13 @@ func (h *Headers) verifyID() error {
 	}
 
 	return nil
+}
+
+func (h *Headers) verifyBroadcast() error {
+	if h.MimeType != ma.BROADCAST_MIME_TYPE {
+		return ErrInvalidBroadcastTopic
+	}
+
+	return nil
+
 }
