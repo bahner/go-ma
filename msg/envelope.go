@@ -1,10 +1,12 @@
 package msg
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/bahner/go-ma/did/doc"
 	cbor "github.com/fxamacker/cbor/v2"
+	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"golang.org/x/crypto/curve25519"
 )
 
@@ -93,7 +95,7 @@ func (e *Envelope) getHeaders(privkey []byte) (*Headers, error) {
 }
 
 // Use a pointer here, this might be arbitrarily big.
-func (m *Message) enclose() (*Envelope, error) {
+func (m *Message) Enclose() (*Envelope, error) {
 
 	// AT this point we *need* to fetch the recipient's document, otherwise we can't encrypt the message.
 	// But this fetch should probably have a timeout, so we don't get stuck here - or a caching function.
@@ -133,4 +135,17 @@ func (m *Message) enclose() (*Envelope, error) {
 		EncryptedHeaders: encryptedMsgHeaders,
 		EncryptedContent: encryptedContent,
 	}, nil
+}
+
+func (e *Envelope) Send(ctx context.Context, t *pubsub.Topic) error {
+
+	eBytes, err := cbor.Marshal(e)
+	if err != nil {
+		return fmt.Errorf("send: envelope serialization error: %w", err)
+	}
+
+	// t.Publish(ctx, eBytes, nil)
+	t.Publish(ctx, eBytes)
+
+	return nil
 }
