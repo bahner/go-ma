@@ -1,9 +1,6 @@
 package msg
 
 import (
-	"time"
-
-	"github.com/bahner/go-ma/did"
 	semver "github.com/blang/semver/v4"
 	cbor "github.com/fxamacker/cbor/v2"
 )
@@ -18,10 +15,6 @@ type Headers struct {
 	ID string `cbor:"id"`
 	// MIME type of the message
 	MimeType string `cbor:"mimeType"`
-	// Creation time of the message in seconds since Unix epoch
-	Created int64 `cbor:"keyasint64"`
-	// Expiration time of the message in seconds since Unix epoch
-	Expires int64 `cbor:"keyasint64"`
 	// Sender of the message
 	From string `cbor:"from"`
 	// Recipient of the message
@@ -67,22 +60,22 @@ func (m *Message) marshalHeadersToCBOR() ([]byte, error) {
 	return cbor.Marshal(m.Headers())
 }
 
-func (h *Headers) CreatedTime() time.Time {
-	return time.Unix(h.Created, 0)
-}
+// func (h *Headers) CreatedTime() time.Time {
+// 	return time.Unix(h.Created, 0)
+// }
 
-func (h *Headers) ExpiresTime() time.Time {
-	return time.Unix(h.Expires, 0)
-}
+// func (h *Headers) ExpiresTime() time.Time {
+// 	return time.Unix(h.Expires, 0)
+// }
 
-func (h *Headers) Sender() (did.DID, error) {
-	return did.New(h.From)
-}
+// func (h *Headers) Sender() (did.DID, error) {
+// 	return did.New(h.From)
+// }
 
-func (h *Headers) Recipient() (did.DID, error) {
-	return did.New(h.To)
-}
+// func (h *Headers) Recipient() (did.DID, error) {
+// 	return did.New(h.To)
+// }
 
-func (h *Headers) SemVersion() (semver.Version, error) {
+func (h *Headers) semVersion() (semver.Version, error) {
 	return semver.Make(h.Version)
 }

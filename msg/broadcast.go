@@ -75,11 +75,11 @@ func (m *Message) verifyBroadcast(t *pubsub.Topic) error {
 	}
 
 	if m.To != "" {
-		return ErrBroadcastHasTo
+		return ErrBroadcastHasRecipient
 	}
 
 	if t.String() != ma.BROADCAST_TOPIC {
-		return ErrInvalidBroadcastTopic
+		return ErrBroadcastInvalidTopic
 	}
 
 	return nil
