@@ -2,6 +2,7 @@ package msg
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
@@ -18,17 +19,24 @@ func (h *Headers) validate() error {
 		return ErrNilMessage
 	}
 
-	if h.MimeType != ma.MESSAGE_MIME_TYPE && h.MimeType != ma.BROADCAST_MIME_TYPE {
-		return ErrMessageInvalidType
-	}
-
-	// Check that message body headers are valid
-	if h.ContentType == "" {
-		return ErrMissingContentType
-	}
-
 	// Verify ID
-	err = h.verifyID()
+	err = verifyID(h.Id)
+	if err != nil {
+		return err
+	}
+
+	err = verifyType(h.Type)
+	if err != nil {
+		return err
+	}
+
+	// Message version check. Check the type first
+	err = verifyMessageVersion(h.Type)
+	if err != nil {
+		return err
+	}
+
+	err = verifyContentType(h.ContentType)
 	if err != nil {
 		return err
 	}
@@ -39,19 +47,18 @@ func (h *Headers) validate() error {
 		return err
 	}
 
-	// Message version check
-	err = h.verifyMessageVersion()
-	if err != nil {
-		return err
-	}
-
 	return nil
 }
 
 // Compare messageVersion.  Return nil if ok else an error
-func (h *Headers) verifyMessageVersion() error {
+// Takes the type string as input
+func verifyMessageVersion(t string) error {
 
-	messageSemver, err := h.semVersion()
+	// Split the string on "/"
+	parts := strings.Split(t, "/")
+
+	// Make a semver version from the last element
+	messageSemver, err := semver.Make(parts[len(parts)-1])
 	if err != nil {
 		return err
 	}
@@ -89,7 +96,7 @@ func (h *Headers) verifyActors() error {
 		return err
 	}
 
-	if h.ContentType == ma.BROADCAST_MIME_TYPE {
+	if h.ContentType == ma.BROADCAST_MESSAGE_TYPE {
 		if h.To != "" {
 			return ErrBroadcastHasRecipient
 		}
@@ -110,13 +117,45 @@ func (h *Headers) verifyActors() error {
 }
 
 // Check that ID is valid
-func (h *Headers) verifyID() error {
-	if h.ID == "" {
+func verifyID(id string) error {
+	if id == "" {
 		return ErrEmptyID
 	}
 
-	if !internal.IsValidNanoID(h.ID) {
+	if !internal.IsValidNanoID(id) {
 		return ErrInvalidID
+	}
+
+	return nil
+}
+
+func verifyType(t string) error {
+
+	if t == ma.MESSAGE_TYPE || t == ma.BROADCAST_MESSAGE_TYPE {
+		return nil
+	}
+
+	return ErrMessageInvalidType
+
+}
+
+// We don't want to parse this. That's up to the receiver
+// But we do want to check that it is there.
+func verifyContentType(ct string) error {
+
+	if ct == "" {
+		return ErrMissingContentType
+	}
+
+	return nil
+}
+
+// We don't want to parse this. That's up to the receiver
+// But we do want to check that it is there.
+func verifyContent(c []byte) error {
+
+	if c == nil {
+		return ErrMissingContent
 	}
 
 	return nil

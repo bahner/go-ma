@@ -11,21 +11,13 @@ import (
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
-const (
-
-	// Messages which are older than a day should be ignored
-	MESSAGE_TTL = ma.MESSAGE_DEFAULT_TTL
-)
-
 // This struct mimicks the Message format, but it's *not* Message.
 // It should enable using Message later, if that's a good idea.
 type Message struct {
-	// Version of the message format
-	Version string `cbor:"version"`
 	// Unique identifier of the message
-	ID string `cbor:"id"`
+	Id string `cbor:"id"`
 	// MIME type of the message
-	MimeType string `cbor:"mimeType"`
+	Type string `cbor:"mimeType"`
 	// Sender of the message
 	From string `cbor:"from"`
 	// Recipient of the message
@@ -54,16 +46,19 @@ func New(
 
 	m := &Message{
 		// Message meta data
-		ID:       id,
-		MimeType: ma.MESSAGE_MIME_TYPE,
-		Version:  ma.VERSION,
+		Id:   id,
+		Type: ma.MESSAGE_TYPE,
 		// Recipient
 		From: from,
 		To:   to,
 		// Body
 		ContentType: contentType,
-		// The content is not signed as such, but the hash is.
-		Content: content,
+		Content:     content,
+	}
+
+	err = verifyContent(content)
+	if err != nil {
+		return nil, err
 	}
 
 	err = m.Sign(priv_key)
@@ -81,14 +76,13 @@ func newFromHeaders(h *Headers) (*Message, error) {
 
 	err := h.validate()
 	if err != nil {
-		return nil, fmt.Errorf("msg_new_from_headers: failed to validate headers: %w", err)
+		return nil, fmt.Errorf("newFromHeaders: %w", err)
 	}
 
 	m := &Message{
 		// Message meta data
-		ID:       h.ID,
-		MimeType: h.MimeType,
-		Version:  h.Version,
+		Id:   h.Id,
+		Type: h.Type,
 		// Recipient
 		From: h.From,
 		To:   h.To,
@@ -97,6 +91,7 @@ func newFromHeaders(h *Headers) (*Message, error) {
 		// Signature
 		Signature: h.Signature,
 	}
+
 	return m, nil
 }
 

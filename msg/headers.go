@@ -1,7 +1,6 @@
 package msg
 
 import (
-	semver "github.com/blang/semver/v4"
 	cbor "github.com/fxamacker/cbor/v2"
 )
 
@@ -10,11 +9,9 @@ import (
 // NB! Content is *not* a part of the headers
 type Headers struct {
 	// Version of the message format
-	Version string
-	// Unique identifier of the message
-	ID string `cbor:"id"`
+	Id string `cbor:"id"`
 	// MIME type of the message
-	MimeType string `cbor:"mimeType"`
+	Type string `cbor:"type"`
 	// Sender of the message
 	From string `cbor:"from"`
 	// Recipient of the message
@@ -29,9 +26,8 @@ func (m *Message) unsignedHeaders() Headers {
 
 	return Headers{
 		// Message Headers
-		ID:          m.ID,
-		MimeType:    m.MimeType,
-		Version:     m.Version,
+		Id:          m.Id,
+		Type:        m.Type,
 		From:        m.From,
 		To:          m.To,
 		ContentType: m.ContentType,
@@ -53,8 +49,4 @@ func (m *Message) Headers() Headers {
 
 func (m *Message) marshalHeadersToCBOR() ([]byte, error) {
 	return cbor.Marshal(m.Headers())
-}
-
-func (h *Headers) semVersion() (semver.Version, error) {
-	return semver.Make(h.Version)
 }

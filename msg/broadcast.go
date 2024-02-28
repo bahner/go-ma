@@ -26,15 +26,13 @@ func NewBroadcast(
 
 	m := &Message{
 		// Message meta data
-		ID:       id,
-		MimeType: ma.BROADCAST_MIME_TYPE,
-		Version:  ma.VERSION,
+		Id:   id,
+		Type: ma.BROADCAST_MESSAGE_TYPE,
 		// Recipients
 		From: from,
 		// Body
 		ContentType: contentType,
-		// The content is not signed as such, but the hash is.
-		Content: content,
+		Content:     content,
 	}
 
 	err = m.Sign(priv_key)
@@ -72,7 +70,7 @@ func (m *Message) Broadcast(ctx context.Context, t *pubsub.Topic) error {
 }
 
 func (m *Message) verifyBroadcast(t *pubsub.Topic) error {
-	if m.MimeType != ma.BROADCAST_MIME_TYPE {
+	if m.Type != ma.BROADCAST_MESSAGE_TYPE {
 		return ErrMessageInvalidType
 	}
 
