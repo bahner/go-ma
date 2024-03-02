@@ -1,10 +1,10 @@
-package internal
+package multi
 
 import "fmt"
 
-func EncodePublicKeyMultibase(publicKey []byte, codecName string) (string, error) {
+func PublicKeyMultibaseEncode(publicKey []byte, codecName string) (string, error) {
 
-	multicodecedKey, err := MulticodecEncode(codecName, publicKey)
+	multicodecedKey, err := MulticodecEncode(publicKey)
 	if err != nil {
 		return "", fmt.Errorf("key/codec: error multicodec encoding public key: %s", err)
 	}
@@ -18,7 +18,7 @@ func EncodePublicKeyMultibase(publicKey []byte, codecName string) (string, error
 
 }
 
-func DecodePublicKeyMultibase(publicKey string) (string, []byte, error) {
+func PublicKeyMultibaseDecode(publicKey string) (string, []byte, error) {
 
 	decodedPublicKeyMultibase, err := MultibaseDecode(publicKey)
 	if err != nil {

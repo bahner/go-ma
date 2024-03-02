@@ -7,6 +7,7 @@ import (
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/multi"
 	nanoid "github.com/matoous/go-nanoid/v2"
 	mc "github.com/multiformats/go-multicodec"
 	"golang.org/x/crypto/curve25519"
@@ -53,7 +54,7 @@ func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 	curve25519.ScalarBaseMult(&pubKey, &privKey)
 
 	// Encode the public key to multibase
-	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(pubKey[:], KEY_AGREEMENT_MULTICODEC_STRING)
+	publicKeyMultibase, err := multi.PublicKeyMultibaseEncode(pubKey[:], KEY_AGREEMENT_MULTICODEC_STRING)
 	if err != nil {
 		return EncryptionKey{}, fmt.Errorf("NewEncryptionKey: %w", err)
 	}
@@ -94,7 +95,7 @@ func (k EncryptionKey) Verify() error {
 		return ErrNoPublicKeyMultibase
 	}
 
-	if !internal.IsValidMultibase(k.PublicKeyMultibase) {
+	if !multi.IsValidMultibase(k.PublicKeyMultibase) {
 		return ErrInvalidPublicKeyMultibase
 	}
 
@@ -102,7 +103,7 @@ func (k EncryptionKey) Verify() error {
 		return ErrNoPublicKeyMultibase
 	}
 
-	key, err := internal.MultibaseDecode(k.PublicKeyMultibase)
+	key, err := multi.MultibaseDecode(k.PublicKeyMultibase)
 	if err != nil {
 		return ErrInvalidPublicKeyMultibase
 	}

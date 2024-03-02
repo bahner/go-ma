@@ -1,4 +1,4 @@
-package internal
+package multi
 
 import (
 	"github.com/multiformats/go-multibase"

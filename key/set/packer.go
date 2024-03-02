@@ -3,7 +3,7 @@ package set
 import (
 	"fmt"
 
-	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/multi"
 	cbor "github.com/fxamacker/cbor/v2"
 )
 
@@ -27,12 +27,12 @@ func (k Keyset) Pack() (string, error) {
 		return "", fmt.Errorf("KeysetPack: %w", err)
 	}
 
-	return internal.MultibaseEncode(data)
+	return multi.MultibaseEncode(data)
 }
 
 func Unpack(data string) (Keyset, error) {
 
-	decoded, err := internal.MultibaseDecode(data)
+	decoded, err := multi.MultibaseDecode(data)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("KeysetUnpack: %w", err)
 	}

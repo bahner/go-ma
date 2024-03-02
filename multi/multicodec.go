@@ -1,4 +1,4 @@
-package internal
+package multi
 
 import (
 	"fmt"
@@ -7,13 +7,9 @@ import (
 	"github.com/multiformats/go-varint"
 )
 
-func MulticodecEncode(codecName string, payload []byte) ([]byte, error) {
+func MulticodecEncode(payload []byte) ([]byte, error) {
 
-	var officialCodec multicodec.Code
-	if err := officialCodec.Set(codecName); err != nil {
-		return nil, fmt.Errorf("invalid codec name: %w", err)
-	}
-	codec := uint64(officialCodec)
+	codec := uint64(multicodec.Blake3)
 
 	codecBytes := varint.ToUvarint(codec)
 	encoded := append(codecBytes, payload...)
@@ -35,7 +31,6 @@ func MulticodecDecode(encoded []byte) (string, []byte, error) {
 	if n < 1 || n >= len(encoded) {
 		return "", nil, fmt.Errorf("error decoding: invalid varint size")
 	}
-	// log.Debugf("mutlticodecdecode: code %d", code)
 
 	codecName := multicodec.Code(code).String()
 	if codecName == "" {

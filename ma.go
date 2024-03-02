@@ -16,9 +16,8 @@ const (
 	RENDEZVOUS = "/" + NAME + "/" + VERSION
 
 	// BLAKE3 label for symmetric key generation.
-	HASH_ALGORITHM_MULTICODEC_STRING = "blake3"
-	BLAKE3_LABEL                     = NAME
-	BLAKE3_SUM_SIZE                  = 32 // 256 bits
+	BLAKE3_LABEL    = NAME
+	BLAKE3_SUM_SIZE = 32 // 256 bits
 
 	// Message constants
 	MESSAGE_TYPE           = "/ma/message/" + VERSION

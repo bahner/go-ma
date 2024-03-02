@@ -3,8 +3,8 @@ package doc
 import (
 	"fmt"
 
-	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
+	"github.com/bahner/go-ma/multi"
 	"golang.org/x/crypto/curve25519"
 )
 
@@ -15,7 +15,7 @@ func (d *Document) KeyAgreementPublicKeyBytes() ([]byte, error) {
 		return nil, fmt.Errorf("doc/key_agreement_public_key: Error getting verification method by ID: %w", err)
 	}
 	// Decode the multibase-encoded public key
-	codec, pubKeyBytes, err := internal.DecodePublicKeyMultibase(vm.PublicKeyMultibase)
+	codec, pubKeyBytes, err := multi.PublicKeyMultibaseDecode(vm.PublicKeyMultibase)
 	if err != nil {
 		return nil, fmt.Errorf("doc/key_agreement_public_key: Error decoding publicKeyMultibase: %w", err)
 	}

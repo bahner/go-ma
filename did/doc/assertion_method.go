@@ -5,8 +5,8 @@ import (
 
 	"crypto/ed25519"
 
-	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/key"
+	"github.com/bahner/go-ma/multi"
 )
 
 func (d *Document) AssertionMethodPublicKey() (ed25519.PublicKey, error) {
@@ -15,7 +15,7 @@ func (d *Document) AssertionMethodPublicKey() (ed25519.PublicKey, error) {
 	if err != nil {
 		return nil, ErrVerificationMethoddUnkownID
 	}
-	codec, pubKeyBytes, err := internal.DecodePublicKeyMultibase(vm.PublicKeyMultibase)
+	codec, pubKeyBytes, err := multi.PublicKeyMultibaseDecode(vm.PublicKeyMultibase)
 	if err != nil {
 		return nil, ErrPublicKeyMultibaseInvalid
 	}

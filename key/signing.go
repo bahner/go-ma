@@ -9,6 +9,7 @@ import (
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/multi"
 	nanoid "github.com/matoous/go-nanoid/v2"
 	mc "github.com/multiformats/go-multicodec"
 )
@@ -52,7 +53,7 @@ func NewSigningKey(identifier string) (SigningKey, error) {
 		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
 
-	publicKeyMultibase, err := internal.EncodePublicKeyMultibase(publicKey, ASSERTION_METHOD_KEY_MULTICODEC_STRING)
+	publicKeyMultibase, err := multi.PublicKeyMultibaseEncode(publicKey, ASSERTION_METHOD_KEY_MULTICODEC_STRING)
 	if err != nil {
 		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
@@ -93,7 +94,7 @@ func (s SigningKey) Verify() error {
 		return ErrNoPublicKeyMultibase
 	}
 
-	key, err := internal.MultibaseDecode(s.PublicKeyMultibase)
+	key, err := multi.MultibaseDecode(s.PublicKeyMultibase)
 	if err != nil {
 		return fmt.Errorf("SigningKeyVerify: %w", err)
 	}
