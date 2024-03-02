@@ -3,7 +3,8 @@ package ma
 const (
 
 	// Just our name
-	NAME = "ma"
+	NAME        = "ma"
+	PROPER_NAME = "間"
 
 	// Ma version
 	VERSION = "0.0.1"
