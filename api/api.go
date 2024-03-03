@@ -5,9 +5,11 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/bahner/go-ma"
 	"github.com/ipfs/kubo/client/rpc"
 	maddr "github.com/multiformats/go-multiaddr"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
@@ -17,6 +19,9 @@ var (
 )
 
 func initializeApi() {
+
+	viper.SetDefault("api.maddr", ma.DEFAULT_IPFS_API_MULTIADDR)
+	viper.BindPFlag("api.maddr", pflag.Lookup("api-maddr"))
 
 	ipfsAPIMultiAddr, err := maddr.NewMultiaddr(viper.GetString("api.maddr"))
 	if err != nil {
