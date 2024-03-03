@@ -21,7 +21,7 @@ var (
 	ErrPublicKeyMultibaseInvalid  = errors.New("failed to decode public key multibase")
 	ErrPublicKeyMultibaseEmpty    = errors.New("public key multibase is empty")
 	ErrPublicKeyMultibaseMismatch = errors.New("public key multibase mismatch")
-	ErrMultiCodecInvalid          = fmt.Errorf("codec must be %s", key.ASSERTION_METHOD_KEY_MULTICODEC_STRING)
+	ErrMultiCodecInvalid          = fmt.Errorf("codec must be %s", key.KEY_AGREEMENT_MULTICODEC.String())
 
 	ErrPublicKeyLengthInvalid = fmt.Errorf("public keysize must be %d", ed25519.PublicKeySize)
 

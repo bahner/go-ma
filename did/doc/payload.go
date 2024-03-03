@@ -3,6 +3,7 @@ package doc
 import (
 	"github.com/bahner/go-ma/multi"
 	cbor "github.com/fxamacker/cbor/v2"
+	"github.com/multiformats/go-multicodec"
 	"lukechampine.com/blake3"
 )
 
@@ -35,8 +36,7 @@ func (d *Document) PayloadHash() ([]byte, error) {
 
 	// Hash the payload
 	hashed := blake3.Sum256(p)
-	multicodecHashed, err := multi.MulticodecEncode(hashed[:])
-	// multicodecHashed, err := multi.MulticodecEncode(ma.HASH_ALGORITHM_MULTICODEC_STRING, hashed[:])
+	multicodecHashed, err := multi.MulticodecEncode(multicodec.Blake3, hashed[:])
 	if err != nil {
 		return nil, ErrPayloadMultiencode
 	}

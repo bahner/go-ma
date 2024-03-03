@@ -5,6 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/multi"
 	cbor "github.com/fxamacker/cbor/v2"
+	log "github.com/sirupsen/logrus"
 )
 
 func (k Keyset) MarshalToCBOR() ([]byte, error) {
@@ -16,6 +17,8 @@ func UnmarshalFromCBOR(data []byte) (Keyset, error) {
 	if err != nil {
 		return Keyset{}, fmt.Errorf("KeysetUnmarshalFromCBOR: %w", err)
 	}
+
+	log.Debugf("Unmarshaled keyset: %v", k)
 
 	return k, nil
 }
@@ -37,5 +40,8 @@ func Unpack(data string) (Keyset, error) {
 		return Keyset{}, fmt.Errorf("KeysetUnpack: %w", err)
 	}
 
-	return UnmarshalFromCBOR(decoded)
+	keyset, err := UnmarshalFromCBOR(decoded)
+	log.Debugf("Unpacked keyset: %v", keyset)
+
+	return keyset, err
 }

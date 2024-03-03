@@ -14,8 +14,9 @@ import (
 )
 
 const (
-	KEY_AGREEMENT_MULTICODEC_STRING = "x25519-pub"
-	KEY_AGREEMENT_KEY_TYPE          = "MultiKey"
+	// KEY_AGREEMENT_MULTICODEC_STRING = "x25519-pub"
+	KEY_AGREEMENT_MULTICODEC = mc.X25519Pub
+	KEY_AGREEMENT_KEY_TYPE   = "MultiKey"
 )
 
 type EncryptionKey struct {
@@ -54,7 +55,7 @@ func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 	curve25519.ScalarBaseMult(&pubKey, &privKey)
 
 	// Encode the public key to multibase
-	publicKeyMultibase, err := multi.PublicKeyMultibaseEncode(pubKey[:], KEY_AGREEMENT_MULTICODEC_STRING)
+	publicKeyMultibase, err := multi.PublicKeyMultibaseEncode(KEY_AGREEMENT_MULTICODEC, pubKey[:])
 	if err != nil {
 		return EncryptionKey{}, fmt.Errorf("NewEncryptionKey: %w", err)
 	}

@@ -20,7 +20,7 @@ func (d *Document) KeyAgreementPublicKeyBytes() ([]byte, error) {
 		return nil, fmt.Errorf("doc/key_agreement_public_key: Error decoding publicKeyMultibase: %w", err)
 	}
 
-	if codec != key.KEY_AGREEMENT_MULTICODEC_STRING {
+	if codec != key.KEY_AGREEMENT_MULTICODEC {
 		return nil, ErrMultiCodecInvalid
 	}
 

@@ -1,10 +1,14 @@
 package multi
 
-import "fmt"
+import (
+	"fmt"
 
-func PublicKeyMultibaseEncode(publicKey []byte, codecName string) (string, error) {
+	"github.com/multiformats/go-multicodec"
+)
 
-	multicodecedKey, err := MulticodecEncode(publicKey)
+func PublicKeyMultibaseEncode(codec multicodec.Code, publicKey []byte) (string, error) {
+
+	multicodecedKey, err := MulticodecEncode(codec, publicKey)
 	if err != nil {
 		return "", fmt.Errorf("key/codec: error multicodec encoding public key: %s", err)
 	}
@@ -18,18 +22,20 @@ func PublicKeyMultibaseEncode(publicKey []byte, codecName string) (string, error
 
 }
 
-func PublicKeyMultibaseDecode(publicKey string) (string, []byte, error) {
+func PublicKeyMultibaseDecode(publicKey string) (multicodec.Code, []byte, error) {
+
+	var codec multicodec.Code
 
 	decodedPublicKeyMultibase, err := MultibaseDecode(publicKey)
 	if err != nil {
-		return "", nil, fmt.Errorf("key/codec: error multibase decoding public key: %s", err)
+		return codec, nil, err
 	}
 
-	codecName, decodedPublicKey, err := MulticodecDecode(decodedPublicKeyMultibase)
+	codec, decodedPublicKey, err := MulticodecDecode(decodedPublicKeyMultibase)
 	if err != nil {
-		return "", nil, fmt.Errorf("key/codec: error multicodec decoding public key: %s", err)
+		return codec, nil, err
 	}
 
-	return codecName, decodedPublicKey, nil
+	return codec, decodedPublicKey, nil
 
 }
