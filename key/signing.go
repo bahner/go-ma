@@ -15,8 +15,8 @@ import (
 )
 
 const (
-	ASSERTION_METHOD_KEY_MULTICODEC_STRING = "ed25519-pub"
-	ASSERTION_METHOD_KEY_TYPE              = "MultiKey"
+	ASSERTION_METHOD_KEY_TYPE   = "MultiKey"
+	ASSERTION_METHOD_MULTICODEC = mc.Ed25519Pub
 )
 
 type SigningKey struct {
@@ -53,7 +53,7 @@ func NewSigningKey(identifier string) (SigningKey, error) {
 		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
 
-	publicKeyMultibase, err := multi.PublicKeyMultibaseEncode(publicKey, ASSERTION_METHOD_KEY_MULTICODEC_STRING)
+	publicKeyMultibase, err := multi.PublicKeyMultibaseEncode(ASSERTION_METHOD_MULTICODEC, publicKey)
 	if err != nil {
 		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
@@ -99,7 +99,7 @@ func (s SigningKey) Verify() error {
 		return fmt.Errorf("SigningKeyVerify: %w", err)
 	}
 
-	if key[0] != byte(mc.Ed25519Pub) {
+	if key[0] != byte(ASSERTION_METHOD_MULTICODEC) {
 		return ErrInvalidMulticodec
 	}
 

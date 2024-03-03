@@ -7,36 +7,38 @@ import (
 	"github.com/multiformats/go-varint"
 )
 
-func MulticodecEncode(payload []byte) ([]byte, error) {
+func MulticodecEncode(codec multicodec.Code, payload []byte) ([]byte, error) {
 
-	codec := uint64(multicodec.Blake3)
+	c := uint64(codec)
 
-	codecBytes := varint.ToUvarint(codec)
+	codecBytes := varint.ToUvarint(c)
 	encoded := append(codecBytes, payload...)
 	return encoded, nil
 }
 
-// Returns the codec name, payload and error of a multicodec encoded byte array
-func MulticodecDecode(encoded []byte) (string, []byte, error) {
+// Returns the codec, payload and error of a multicodec encoded byte array
+func MulticodecDecode(encoded []byte) (multicodec.Code, []byte, error) {
+
+	var codec multicodec.Code
+
 	if len(encoded) < 1 {
-		return "", nil, fmt.Errorf("error decoding: insufficient data")
+		return codec, nil, ErrNoInput
 	}
 
 	// log.Debugf("mutlticodecdecode: encoded: %x", encoded)
 
 	code, n, err := varint.FromUvarint(encoded)
 	if err != nil {
-		return "", nil, fmt.Errorf("error decoding varint: %w", err)
+		return codec, nil, fmt.Errorf("error decoding varint: %w", err)
 	}
 	if n < 1 || n >= len(encoded) {
-		return "", nil, fmt.Errorf("error decoding: invalid varint size")
+		return codec, nil, ErrInvalidSize
 	}
 
-	codecName := multicodec.Code(code).String()
-	if codecName == "" {
-		return "", nil, fmt.Errorf("error obtaining codec name: unknown codec")
+	codec = multicodec.Code(code)
+	if codec == 0 {
+		return codec, nil, ErrUnknownCodec
 	}
 
-	// log.Debugf("mutlticodecdecode: codecName: %s", codecName)
-	return codecName, encoded[n:], nil
+	return codec, encoded[n:], nil
 }

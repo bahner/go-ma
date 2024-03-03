@@ -5,8 +5,8 @@ import (
 
 	"crypto/ed25519"
 
-	"github.com/bahner/go-ma/key"
 	"github.com/bahner/go-ma/multi"
+	"github.com/multiformats/go-multicodec"
 )
 
 func (d *Document) AssertionMethodPublicKey() (ed25519.PublicKey, error) {
@@ -20,7 +20,7 @@ func (d *Document) AssertionMethodPublicKey() (ed25519.PublicKey, error) {
 		return nil, ErrPublicKeyMultibaseInvalid
 	}
 
-	if codec != key.ASSERTION_METHOD_KEY_MULTICODEC_STRING {
+	if codec != multicodec.Ed25519Pub {
 		return nil, ErrMultiCodecInvalid
 	}
 
