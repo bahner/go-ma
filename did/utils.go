@@ -76,7 +76,7 @@ func getFragment(did string) string {
 }
 
 // Get the identifier from the DID string
-// The prefix is not required, ut'll just be stripped off.
+// The prefix is not required, it'll just be stripped off.
 func getIdentifier(did string) string {
 
 	didName := strings.TrimPrefix(did, ma.DID_PREFIX)
