@@ -49,7 +49,8 @@ func decrypt(data []byte, ephemeralKey []byte, privKey []byte) ([]byte, error) {
 }
 
 // Encrypts a message fields from an message
-func encrypt(data []byte, symmetricKey []byte, recipientPublicKeyBytes []byte) ([]byte, error) {
+// func encrypt(data []byte, symmetricKey []byte, recipientPublicKeyBytes []byte) ([]byte, error) {
+func encrypt(data []byte, symmetricKey []byte) ([]byte, error) {
 
 	// Encrypt the actual message with ChaCha20-Poly1305
 	aead, err := chacha20poly1305.NewX(symmetricKey)

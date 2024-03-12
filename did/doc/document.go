@@ -8,6 +8,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	cbor "github.com/fxamacker/cbor/v2"
+	"github.com/ipfs/go-cid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -69,21 +70,21 @@ func (d *Document) String() string {
 
 // GetOrCreate document from cache or create a new one
 // identifier is a did string, eg. "did:ma:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#foo"
-func GetOrCreate(identifier string, controller string) (*Document, error) {
+func GetOrCreate(identifier string, controller string) (*Document, cid.Cid, error) {
 
-	doc, err := Fetch(identifier, true) // Accept cached document
+	doc, c, err := Fetch(identifier, true) // Accept cached document
 	if err == nil {
 		doc.AddController(controller)
 		log.Debugf("doc/GetOrCreate: found previously published document for: %s", identifier)
-		return doc, nil
+		return doc, c, nil
 	}
 
 	doc, err = New(identifier, controller)
 	if err != nil {
-		return nil, fmt.Errorf("doc/GetOrCreate: %w", err)
+		return nil, cid.Cid{}, fmt.Errorf("doc/GetOrCreate: %w", err)
 	}
 
-	return doc, nil
+	return doc, cid.Cid{}, nil
 }
 
 func (d *Document) Equal(other *Document) bool {
