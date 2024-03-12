@@ -32,12 +32,15 @@ func FetchFromDID(d did.DID, cached bool) (*Document, cid.Cid, error) {
 	var document = &Document{}
 
 	ipfsAPI := api.GetIPFSAPI()
-	ip, err := d.ImmutablePath()
+	ip, err := d.Path()
 	if err != nil {
 		return nil, cid.Cid{}, fmt.Errorf("fetchFromDID: %w", err)
 	}
 
-	c := ip.RootCid()
+	c, err := api.ResolveRootCID(ip.String(), cached)
+	if err != nil {
+		return nil, cid.Cid{}, fmt.Errorf("fetchFromDID: %w", err)
+	}
 
 	log.Debugf("Fetching CID: %s", c)
 

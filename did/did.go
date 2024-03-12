@@ -45,18 +45,7 @@ func (d *DID) IsIdenticalTo(did DID) bool {
 
 func (d *DID) Path() (path.Path, error) {
 
-	return path.NewPath("/" + path.IPNSNamespace + "/" + d.Id)
-}
-
-func (d *DID) ImmutablePath() (path.ImmutablePath, error) {
-
-	p, err := d.Path()
-	if err != nil {
-		return path.ImmutablePath{}, err
-	}
-
-	return path.NewImmutablePath(p)
-
+	return path.NewPath("/" + path.IPNSNamespace + "/" + d.Identifier)
 }
 
 func (d *DID) Verify() error {

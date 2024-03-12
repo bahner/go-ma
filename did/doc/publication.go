@@ -25,7 +25,7 @@ func DefaultPublishOptions() *PublishOptions {
 	return &PublishOptions{
 		Ctx:           context.Background(),
 		Pin:           true,
-		Force:         false,
+		Force:         true,
 		AllowBigBlock: false,
 	}
 }
@@ -34,24 +34,25 @@ func DefaultPublishOptions() *PublishOptions {
 // If the opts is nil, the default options are used.
 // NB! Publication is more than simply adding the document to IPFS.
 // It's about publishing the document to IPNS and possibly pinning it.
-func (d *Document) Publish(opts *PublishOptions) (ipns.Name, error) {
+func (d *Document) Publish(o ...*PublishOptions) (ipns.Name, error) {
 
-	if opts == nil {
-		opts = DefaultPublishOptions()
+	opts := DefaultPublishOptions()
+
+	// Iterate through all options provided
+	for _, opt := range o {
+		if opt == nil {
+			continue // Skip any nil options
+		}
+		if opt.Force {
+			opts.Force = opt.Force
+		}
+		if opt.Pin {
+			opts.Pin = opt.Pin
+		}
+		if opt.AllowBigBlock {
+			opts.AllowBigBlock = opt.AllowBigBlock
+		}
 	}
-
-	if opts.Force {
-		log.Debugf("DocPublish: force flag is set")
-	}
-
-	if opts.Pin {
-		log.Debugf("DocPublish: pin flag is set")
-	}
-
-	if opts.AllowBigBlock {
-		log.Debugf("DocPublish: allow big block flag is set")
-	}
-
 	_did, err := did.New(d.ID)
 	if err != nil {
 		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
