@@ -11,7 +11,7 @@ import (
 
 // Takes an IPFS path name and returns the root CID.
 // The cached field tells the function whether to use the cached value or not.
-func RootCID(name string, cached bool) (cid.Cid, error) {
+func ResolveRootCID(name string, cached bool) (cid.Cid, error) {
 
 	api := GetIPFSAPI()
 
