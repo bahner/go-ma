@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"slices"
-	"time"
 
 	"github.com/bahner/go-ma/did"
 	cbor "github.com/fxamacker/cbor/v2"
@@ -14,13 +13,11 @@ import (
 
 type Document struct {
 	Context            []string             `cbor:"@context,toarray" json:"@context"`
-	Version            int64                `cbor:"version,keyasint64" json:"version"`
 	ID                 string               `cbor:"id" json:"id"`
 	Controller         []string             `cbor:"controller,toarray" json:"controller"`
 	VerificationMethod []VerificationMethod `cbor:"verificationMethod,toarray" json:"verificationMethod"`
 	AssertionMethod    string               `cbor:"assertionMethod" json:"assertionMethod"`
 	KeyAgreement       string               `cbor:"keyAgreement" json:"keyAgreement"`
-	LastKnownLocation  string               `cbor:"lastKnownLocation,omitempty" json:"lastKnownLocation,omitempty"`
 	Proof              Proof                `cbor:"proof" json:"proof"`
 }
 
@@ -38,7 +35,6 @@ func New(identifier string, controller string) (*Document, error) {
 
 	doc := Document{
 		Context:    DID_CONTEXT,
-		Version:    time.Now().Unix(),
 		ID:         identifier,
 		Controller: ctrller,
 	}
@@ -89,10 +85,6 @@ func GetOrCreate(identifier string, controller string) (*Document, cid.Cid, erro
 
 func (d *Document) Equal(other *Document) bool {
 	if d.ID != other.ID {
-		return false
-	}
-
-	if d.Version != other.Version {
 		return false
 	}
 
