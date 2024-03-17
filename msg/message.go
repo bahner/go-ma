@@ -24,7 +24,7 @@ type Message struct {
 	To string `cbor:"to"`
 	// MIME type of the message body
 	ContentType string `cbor:"contentType"`
-	// Hexadecimal string representation of the SHA-256 hash of the message body
+	// Byte slice of the content
 	Content []byte `cbor:"content"`
 	// Signature of the message headers. NB! This includes the ContentHash field,
 	// which can be used to verify the integrity of the message body.

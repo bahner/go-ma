@@ -2,6 +2,7 @@ package doc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -13,6 +14,8 @@ import (
 	caopts "github.com/ipfs/kubo/core/coreiface/options"
 	log "github.com/sirupsen/logrus"
 )
+
+var ErrAlreadyPublished = errors.New("Document is already published")
 
 type PublishOptions struct {
 	Ctx           context.Context
@@ -36,6 +39,7 @@ func DefaultPublishOptions() *PublishOptions {
 // It's about publishing the document to IPNS and possibly pinning it.
 func (d *Document) Publish(o ...*PublishOptions) (ipns.Name, error) {
 
+	alreadyPublishedString := "'to' cid was already recursively pinned"
 	opts := DefaultPublishOptions()
 
 	// Iterate through all options provided
@@ -84,7 +88,9 @@ func (d *Document) Publish(o ...*PublishOptions) (ipns.Name, error) {
 	if err == nil && c != e && opts.Pin && opts.Force {
 		err := a.Pin().Update(opts.Ctx, path.FromCid(e), p)
 		if err != nil {
-			// Not sure if this is "fatal" or not. We should probably return the error and let the caller decide.
+			if err.Error() == alreadyPublishedString {
+				return ipns.Name{}, fmt.Errorf("DocPublish: %w", ErrAlreadyPublished)
+			}
 			return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
 		}
 	} else {
@@ -94,6 +100,7 @@ func (d *Document) Publish(o ...*PublishOptions) (ipns.Name, error) {
 	log.Debugf("DocPublish: Announcing publication of document %s to IPNS. Please wait ...", c.String())
 	n, err := a.Name().Publish(opts.Ctx, p, caopts.Name.Key(ik.Fragment))
 	if err != nil {
+
 		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
 	}
 	log.Debugf("DocPublish: Successfully announced publication of document %s to %s", c.String(), n.AsPath().String())
