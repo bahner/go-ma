@@ -14,36 +14,31 @@ import (
 // Takes a DID and fetches the document from IPFS.
 // Eg. Fetch("did:ma:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#bahner")
 // The cached flag determines whether the document should be fetched from IPNS cache or not.
-func Fetch(didStr string, cached bool) (*Document, cid.Cid, error) {
+func Fetch(didStr string) (*Document, cid.Cid, error) {
 
-	d, err := did.New(didStr)
+	d, err := did.NewFromString(didStr)
 	if err != nil {
 		return nil, cid.Cid{}, err
 	}
 
-	return FetchFromDID(d, cached)
+	return FetchFromDID(d)
 
 }
 
 // Fetched the document from IPFS using the DID object.
 // The cached flag determines whether the document should be fetched from IPNS cache or not.
-func FetchFromDID(d did.DID, cached bool) (*Document, cid.Cid, error) {
+func FetchFromDID(d did.DID) (*Document, cid.Cid, error) {
 
 	var document = &Document{}
 
-	ipfsAPI := api.GetIPFSAPI()
-	ip, err := d.Path()
-	if err != nil {
-		return nil, cid.Cid{}, fmt.Errorf("fetchFromDID: %w", err)
-	}
-
-	c, err := api.ResolveRootCID(ip.String(), cached)
+	// Resolve the root CID, ie. the actual IPLD CID of the document
+	c, err := api.ResolveRootCID(d.Name.String())
 	if err != nil {
 		return nil, cid.Cid{}, fmt.Errorf("fetchFromDID: %w", err)
 	}
 
 	log.Debugf("Fetching CID: %s", c)
-
+	ipfsAPI := api.GetIPFSAPI()
 	node, err := ipfsAPI.Dag().Get(context.Background(), c)
 	if err != nil {
 		return nil, cid.Cid{}, fmt.Errorf("fetchFromDID: %w", err)

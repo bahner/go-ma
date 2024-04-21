@@ -11,6 +11,16 @@ import (
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
+const (
+	// Message constants
+	PREFIX               = "/ma/message/"
+	BROADCAST            = PREFIX + "broadcast/" + ma.VERSION
+	CHAT                 = PREFIX + "chat/" + ma.VERSION
+	DOT                  = PREFIX + "dot/" + ma.VERSION
+	ENVELOPE             = PREFIX + "envelope/" + ma.VERSION
+	DEFAULT_CONTENT_TYPE = "text/plain"
+)
+
 // This struct mimicks the Message format, but it's *not* Message.
 // It should enable using Message later, if that's a good idea.
 type Message struct {
@@ -35,6 +45,7 @@ type Message struct {
 func New(
 	from string,
 	to string,
+	msg_type string,
 	content []byte,
 	contentType string,
 	priv_key ed25519.PrivateKey) (*Message, error) {
@@ -47,7 +58,7 @@ func New(
 	m := &Message{
 		// Message meta data
 		Id:   id,
-		Type: ma.MESSAGE_TYPE,
+		Type: msg_type,
 		// Recipient
 		From: from,
 		To:   to,

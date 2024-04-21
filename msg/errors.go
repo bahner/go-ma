@@ -10,7 +10,7 @@ import (
 var (
 	ErrBroadcastHasRecipient = errors.New("broadcast message must not have a recipient")
 	ErrBroadcastInvalidTopic = fmt.Errorf("broadcast topic must be %s", ma.BROADCAST_TOPIC)
-	ErrBroadcastInvalidType  = fmt.Errorf("broadcast message must not %s", ma.BROADCAST_MESSAGE_TYPE)
+	ErrBroadcastInvalidType  = fmt.Errorf("broadcast message must not %s", BROADCAST)
 	ErrEmptyID               = errors.New("id must be non-empty")
 	ErrInvalidID             = errors.New("invalid message id")
 	ErrFetchDoc              = errors.New("failed to fetch entity document")

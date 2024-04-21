@@ -4,9 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/multi"
 	nanoid "github.com/matoous/go-nanoid/v2"
 	mc "github.com/multiformats/go-multicodec"
@@ -27,21 +25,15 @@ type EncryptionKey struct {
 	PublicKeyMultibase string
 }
 
-func NewEncryptionKey(identifier string) (EncryptionKey, error) {
-
-	if !internal.IsValidIPNSName(identifier) {
-		return EncryptionKey{}, fmt.Errorf("NewEncryptionKey: %s", identifier)
-	}
+func NewEncryptionKey(d did.DID) (EncryptionKey, error) {
 
 	name, err := nanoid.New()
 	if err != nil {
 		return EncryptionKey{}, fmt.Errorf("NewEncryptionKey: %w", err)
 	}
 
-	d, err := did.New(ma.DID_PREFIX + identifier + "#" + name)
-	if err != nil {
-		return EncryptionKey{}, fmt.Errorf("NewEncryptionKey: %w", err)
-	}
+	// We just mangle the base DID as this is not a pointer to a DID.
+	d.Fragment = name
 
 	// Generate a random private key
 	var privKey [curve25519.ScalarSize]byte
@@ -71,7 +63,7 @@ func NewEncryptionKey(identifier string) (EncryptionKey, error) {
 
 func (k EncryptionKey) Verify() error {
 
-	err := k.DID.Verify()
+	err := k.DID.Validate()
 	if err != nil {
 		return fmt.Errorf("encryptionKey: %w", err)
 	}

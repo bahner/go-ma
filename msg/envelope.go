@@ -6,6 +6,7 @@ import (
 
 	"github.com/bahner/go-ma/did/doc"
 	cbor "github.com/fxamacker/cbor/v2"
+	"github.com/ipfs/boxo/namesys"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"golang.org/x/crypto/curve25519"
 )
@@ -38,7 +39,7 @@ func (e *Envelope) Verify() error {
 }
 
 // Use a pointer here, this might be arbitrarily big.
-func (m *Message) Enclose() (*Envelope, error) {
+func (m *Message) Enclose(resolver *namesys.Resolver) (*Envelope, error) {
 
 	err := m.Verify()
 	if err != nil {
@@ -47,7 +48,7 @@ func (m *Message) Enclose() (*Envelope, error) {
 
 	// AT this point we *need* to fetch the recipient's document, otherwise we can't encrypt the message.
 	// But this fetch should probably have a timeout, so we don't get stuck here - or a caching function.
-	to, _, err := doc.Fetch(m.To, true) // Accept cached document
+	to, _, err := doc.Fetch(m.To)
 	if err != nil {
 		return nil, fmt.Errorf("msg_enclose: %w", err)
 	}

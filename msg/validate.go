@@ -91,17 +91,17 @@ func (h *Headers) verifyActors() error {
 
 	var err error
 
-	_, err = did.New(h.From)
+	_, err = did.NewFromString(h.From)
 	if err != nil {
 		return err
 	}
 
-	if h.ContentType == ma.BROADCAST_MESSAGE_TYPE {
+	if h.ContentType == BROADCAST {
 		if h.To != "" {
 			return ErrBroadcastHasRecipient
 		}
 	} else {
-		_, err = did.New(h.To)
+		_, err = did.NewFromString(h.To)
 		if err != nil {
 			return ErrInvalidRecipient
 		}
@@ -131,7 +131,10 @@ func verifyID(id string) error {
 
 func verifyType(t string) error {
 
-	if t == ma.MESSAGE_TYPE || t == ma.BROADCAST_MESSAGE_TYPE {
+	if t == CHAT ||
+		t == BROADCAST ||
+		t == ENVELOPE ||
+		t == DOT {
 		return nil
 	}
 

@@ -8,7 +8,7 @@ import (
 
 func (d *Document) AddController(controller string) error {
 
-	err := verifyController(controller)
+	err := did.Validate(controller)
 	if err != nil {
 		return fmt.Errorf("doc/AddController: %w", err)
 	}
@@ -40,20 +40,10 @@ func (vm VerificationMethod) ValidateControllers() error {
 	}
 
 	for _, c := range vm.Controller {
-		if !isValidController(c) {
-			return did.ErrInvalidDID
+		err := did.Validate(c)
+		if err != nil {
+			return fmt.Errorf("doc/ValidateControllers: %w", err)
 		}
 	}
 	return nil
-}
-
-func verifyController(controller string) error {
-	if !did.IsValid(controller) {
-		return fmt.Errorf("controller is not a valid DID: %s. %w", controller, did.ErrInvalidDID)
-	}
-	return nil
-}
-
-func isValidController(controller string) bool {
-	return verifyController(controller) == nil
 }

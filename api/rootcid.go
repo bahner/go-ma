@@ -11,12 +11,13 @@ import (
 
 // Takes an IPFS path name and returns the root CID.
 // The cached field tells the function whether to use the cached value or not.
-func ResolveRootCID(name string, cached bool) (cid.Cid, error) {
+func ResolveRootCID(name string) (cid.Cid, error) {
 
 	api := GetIPFSAPI()
 
+	// Set cached to false, we need to find the latest version of the document
 	opts := func(settings *options.NameResolveSettings) error {
-		settings.Cache = cached
+		settings.Cache = false
 		return nil
 	}
 

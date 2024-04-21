@@ -48,12 +48,12 @@ func (m *Message) Verify() error {
 	}
 
 	// Sender document
-	did, err := did.New(m.From)
+	did, err := did.NewFromString(m.From)
 	if err != nil {
 		return fmt.Errorf("message/verify: failed to create did from From: %w", err)
 	}
 
-	senderDoc, _, err := doc.Fetch(did.Id, true) // Accept cached document
+	senderDoc, _, err := doc.Fetch(did.Id) // Accept cached document
 	if err != nil {
 		return ErrFetchDoc
 	}

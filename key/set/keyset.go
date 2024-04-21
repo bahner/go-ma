@@ -5,13 +5,15 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/key"
-	log "github.com/sirupsen/logrus"
+	"github.com/libp2p/go-libp2p/core/crypto"
 )
 
 // KeySet struct the encryption and signing keys are actual keys,
 // but the IPFSKey is a reference to the IPFS key and holds names and paths.
 // The key itself resides in IPFS.
+// The PrivKey is a libp2p key.
 type Keyset struct {
+	Identity      crypto.PrivKey
 	DID           did.DID
 	EncryptionKey key.EncryptionKey
 	SigningKey    key.SigningKey
@@ -19,21 +21,26 @@ type Keyset struct {
 
 // Creates new keyset from a name (typically fragment of a DID)
 // This requires that the key is already in IPFS and that IPFS is running.
-func GetOrCreate(name string) (Keyset, error) {
+func New(d did.DID, identity crypto.PrivKey) (Keyset, error) {
 
 	var err error
 
-	d, err := did.GetOrCreate(name)
+	encryptionKey, err := key.NewEncryptionKey(d)
 	if err != nil {
-		return Keyset{}, fmt.Errorf("KeysetGetOrCreate: %w", err)
+		return Keyset{}, fmt.Errorf("newFromIPFSKey: %w", err)
 	}
-	log.Infof("Created new key in IPFS: %v", d)
 
-	ks, err := newFromDID(d)
+	signatureKey, err := key.NewSigningKey(d)
 	if err != nil {
-		return Keyset{}, fmt.Errorf("KeysetGetOrCreate: %w", err)
+		return Keyset{}, fmt.Errorf("newFromIPFSKey: %w", err)
 	}
-	return ks, nil
+
+	return Keyset{
+		Identity:      identity,
+		DID:           d,
+		EncryptionKey: encryptionKey,
+		SigningKey:    signatureKey,
+	}, nil
 }
 
 func (ks Keyset) Verify() error {
@@ -48,7 +55,7 @@ func (ks Keyset) Verify() error {
 		return fmt.Errorf("KeysetVerify: %w", err)
 	}
 
-	err = ks.DID.Verify()
+	err = ks.DID.Validate()
 	if err != nil {
 		return fmt.Errorf("KeysetVerify: %w", err)
 	}
@@ -58,24 +65,4 @@ func (ks Keyset) Verify() error {
 
 func (ks Keyset) IsValid() bool {
 	return ks.Verify() == nil
-}
-
-// This creates a new keyset from an existing DID
-func newFromDID(d did.DID) (Keyset, error) {
-
-	encryptionKey, err := key.NewEncryptionKey(d.Identifier)
-	if err != nil {
-		return Keyset{}, fmt.Errorf("newFromIPFSKey: %w", err)
-	}
-
-	signatureKey, err := key.NewSigningKey(d.Identifier)
-	if err != nil {
-		return Keyset{}, fmt.Errorf("newFromIPFSKey: %w", err)
-	}
-
-	return Keyset{
-		DID:           d,
-		EncryptionKey: encryptionKey,
-		SigningKey:    signatureKey,
-	}, nil
 }

@@ -7,7 +7,6 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	cbor "github.com/fxamacker/cbor/v2"
-	"github.com/ipfs/go-cid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -21,25 +20,26 @@ type Document struct {
 	Proof              Proof                `cbor:"proof" json:"proof"`
 }
 
-func New(identifier string, controller string) (*Document, error) {
+// Takes an identity DID and a controller DID. They can be the same.
+func New(identity string, controller string) (*Document, error) {
 
-	log.Debugf("doc/new: identifier: %s", identifier)
+	log.Debugf("doc/new: identifier: %s", identity)
 	log.Debugf("doc/new: controller: %s", controller)
 
-	err := did.Validate(identifier)
+	err := did.Validate(identity)
 	if err != nil {
 		return nil, fmt.Errorf("doc/new: invalid identifier: %w", err)
 	}
 
-	ctrller := []string{identifier}
+	ctrller := []string{identity}
 
 	doc := Document{
 		Context:    DID_CONTEXT,
-		ID:         identifier,
+		ID:         identity,
 		Controller: ctrller,
 	}
 	doc.AddController(controller)
-	log.Infof("doc/new: created new document for %s", identifier)
+	log.Infof("doc/new: created new document for %s", identity)
 	return &doc, nil
 }
 
@@ -62,25 +62,6 @@ func (d *Document) String() string {
 	}
 
 	return string(bytes)
-}
-
-// GetOrCreate document from cache or create a new one
-// identifier is a did string, eg. "did:ma:k51qzi5uqu5dj9807pbuod1pplf0vxh8m4lfy3ewl9qbm2s8dsf9ugdf9gedhr#foo"
-func GetOrCreate(identifier string, controller string) (*Document, cid.Cid, error) {
-
-	doc, c, err := Fetch(identifier, true) // Accept cached document
-	if err == nil {
-		doc.AddController(controller)
-		log.Debugf("doc/GetOrCreate: found previously published document for: %s", identifier)
-		return doc, c, nil
-	}
-
-	doc, err = New(identifier, controller)
-	if err != nil {
-		return nil, cid.Cid{}, fmt.Errorf("doc/GetOrCreate: %w", err)
-	}
-
-	return doc, cid.Cid{}, nil
 }
 
 func (d *Document) Equal(other *Document) bool {

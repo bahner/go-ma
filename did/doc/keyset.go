@@ -18,7 +18,7 @@ func NewFromKeyset(k set.Keyset) (*Document, error) {
 
 func NewFromKeysetWithController(k set.Keyset, controller string) (*Document, error) {
 
-	id := k.DID.Id
+	id := k.DID.Name.String()
 
 	d, err := New(id, controller)
 	if err != nil {

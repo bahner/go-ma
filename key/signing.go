@@ -6,7 +6,6 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/internal"
 	"github.com/bahner/go-ma/multi"
@@ -36,17 +35,14 @@ func (k *SigningKey) Sign(data []byte) ([]byte, error) {
 }
 
 // Generates a signing key for the given identifier, ie. IPNS name
-func NewSigningKey(identifier string) (SigningKey, error) {
+func NewSigningKey(d did.DID) (SigningKey, error) {
 
 	name, err := nanoid.New()
 	if err != nil {
 		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
-
-	d, err := did.New(ma.DID_PREFIX + identifier + "#" + name)
-	if err != nil {
-		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
-	}
+	// We just mangle the base DID as this is not a pointer to a DID.
+	d.Fragment = name
 
 	publicKey, privKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {
@@ -69,7 +65,7 @@ func NewSigningKey(identifier string) (SigningKey, error) {
 
 func (s SigningKey) Verify() error {
 
-	err := s.DID.Verify()
+	err := s.DID.Validate()
 	if err != nil {
 		return err
 	}

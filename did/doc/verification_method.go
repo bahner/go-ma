@@ -3,7 +3,6 @@ package doc
 import (
 	"fmt"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
 	log "github.com/sirupsen/logrus"
 )
@@ -45,17 +44,8 @@ func NewVerificationMethod(
 	publicKeyMultibase string,
 ) (VerificationMethod, error) {
 
-	if !did.IsValid(id) {
-		return VerificationMethod{}, did.ErrInvalidDID
-	}
-
-	d, err := did.New(id)
-	if err != nil {
-		return VerificationMethod{}, fmt.Errorf("doc/vm: %w", err)
-	}
-
 	return VerificationMethod{
-		ID:                 ma.DID_PREFIX + d.Identifier + "#" + fragment,
+		ID:                 id,
 		Controller:         []string{controller},
 		Type:               vmType,
 		PublicKeyMultibase: publicKeyMultibase,
@@ -144,7 +134,7 @@ func (d *Document) isUniqueVerificationMethod(newMethod VerificationMethod) bool
 }
 
 func (vm VerificationMethod) Fragment() string {
-	d, err := did.New(vm.ID)
+	d, err := did.NewFromString(vm.ID)
 	if err != nil {
 		log.Errorf("vm/Fragment: %s", err)
 		return ""

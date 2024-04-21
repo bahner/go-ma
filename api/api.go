@@ -5,7 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/bahner/go-ma"
 	"github.com/ipfs/kubo/client/rpc"
 	maddr "github.com/multiformats/go-multiaddr"
 	log "github.com/sirupsen/logrus"
@@ -13,30 +12,34 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Default IPFS API multiaddr. Default to Brave's IPFS companion extension,
+// which feature a nice GUI for IPFS.
+const defaultIPFSAPIMaddr = "/ip4/127.0.0.1/tcp/45005"
+
 var (
 	once    sync.Once
 	ipfsAPI *rpc.HttpApi
 )
 
-func initializeApi() {
-
-	viper.SetDefault("api.maddr", ma.DEFAULT_IPFS_API_MULTIADDR)
-	viper.BindPFlag("api.maddr", pflag.Lookup("api-maddr"))
-
-	ipfsAPIMultiAddr, err := maddr.NewMultiaddr(viper.GetString("api.maddr"))
-	if err != nil {
-		log.Fatalf("ipfs: failed to parse IPFS API socket: %v", err)
-	}
-
-	ipfsAPI, err = rpc.NewApi(ipfsAPIMultiAddr)
-	if err != nil {
-		log.Fatalf("ipfs: failed to initialize IPFS API: %v", err)
-	}
-
-}
-
 func GetIPFSAPI() *rpc.HttpApi {
-	once.Do(initializeApi)
+
+	// Only initialize the API once, then just return it later.
+	once.Do(func() {
+		viper.SetDefault("api.maddr", defaultIPFSAPIMaddr)
+		viper.BindPFlag("api.maddr", pflag.Lookup("api-maddr"))
+
+		ipfsAPIMultiAddr, err := maddr.NewMultiaddr(viper.GetString("api.maddr"))
+		if err != nil {
+			log.Fatalf("ipfs: failed to parse IPFS API socket: %v", err)
+		}
+
+		ipfsAPI, err = rpc.NewApi(ipfsAPIMultiAddr)
+		if err != nil {
+			log.Fatalf("ipfs: failed to initialize IPFS API: %v", err)
+		}
+
+	})
+
 	return ipfsAPI
 }
 
