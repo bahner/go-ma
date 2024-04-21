@@ -7,6 +7,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	cbor "github.com/fxamacker/cbor/v2"
+	"github.com/ipfs/boxo/path"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,33 +19,42 @@ type Document struct {
 	AssertionMethod    string               `cbor:"assertionMethod" json:"assertionMethod"`
 	KeyAgreement       string               `cbor:"keyAgreement" json:"keyAgreement"`
 	Proof              Proof                `cbor:"proof" json:"proof"`
+	immutablePath      path.ImmutablePath   // This isn't published
+	did                did.DID              // This isn't published
 }
 
 // Takes an identity DID and a controller DID. They can be the same.
-func New(identity string, controller string) (*Document, error) {
+func New(identity did.DID, controller did.DID) (*Document, error) {
 
-	log.Debugf("doc/new: identifier: %s", identity)
-	log.Debugf("doc/new: controller: %s", controller)
+	log.Debugf("doc/new: identifier: %s", identity.Id)
+	log.Debugf("doc/new: controller: %s", controller.Id)
 
-	err := did.Validate(identity)
-	if err != nil {
-		return nil, fmt.Errorf("doc/new: invalid identifier: %w", err)
-	}
-
-	ctrller := []string{identity}
+	ctrller := []string{controller.Id}
 
 	doc := Document{
 		Context:    DID_CONTEXT,
-		ID:         identity,
+		ID:         identity.Id,
 		Controller: ctrller,
+		did:        identity,
 	}
-	doc.AddController(controller)
+	doc.AddController(controller.Id)
 	log.Infof("doc/new: created new document for %s", identity)
 	return &doc, nil
 }
 
 func (d *Document) MarshalToCBOR() ([]byte, error) {
-	bytes, err := cbor.Marshal(d)
+
+	marshalD := Document{
+		Context:            d.Context,
+		ID:                 d.ID,
+		Controller:         d.Controller,
+		VerificationMethod: d.VerificationMethod,
+		AssertionMethod:    d.AssertionMethod,
+		KeyAgreement:       d.KeyAgreement,
+		Proof:              d.Proof,
+	}
+
+	bytes, err := cbor.Marshal(marshalD)
 	if err != nil {
 		return nil, fmt.Errorf("doc/string: failed to marshal document to CBOR: %w", err)
 	}
@@ -100,3 +110,11 @@ func compareSlices(a []string, b []string) bool {
 
 	return slices.Compare(a, b) == 0
 }
+
+// func (d *Document) Path() path.Path {
+// 	return d.immutablePath
+// }
+
+// func (d *Document) DID() did.DID {
+// 	return d.did
+// }

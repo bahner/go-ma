@@ -3,6 +3,7 @@ package doc
 import (
 	"fmt"
 
+	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/key/set"
 )
 
@@ -12,15 +13,15 @@ import (
 // It's OK to set it as the DID of the keyset.IPNSKey.DID, but it's not required.
 func NewFromKeyset(k set.Keyset) (*Document, error) {
 
-	return NewFromKeysetWithController(k, k.DID.Id)
+	return NewFromKeysetWithController(k, k.DID)
 
 }
 
-func NewFromKeysetWithController(k set.Keyset, controller string) (*Document, error) {
+func NewFromKeysetWithController(k set.Keyset, controller did.DID) (*Document, error) {
 
 	id := k.DID.Name.String()
 
-	d, err := New(id, controller)
+	d, err := New(k.DID, controller)
 	if err != nil {
 		return nil, err
 	}
