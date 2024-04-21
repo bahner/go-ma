@@ -2,6 +2,8 @@ package did
 
 import (
 	"github.com/ipfs/boxo/ipns"
+	"github.com/libp2p/go-libp2p/core/crypto"
+	"github.com/libp2p/go-libp2p/core/peer"
 )
 
 const PREFIX = "did:ma:"
@@ -41,6 +43,16 @@ func NewFromString(didStr string) (DID, error) {
 	}
 
 	return New(name, fragment), nil
+}
+
+func NewFromPrivateKey(key crypto.PrivKey, fragment string) (DID, error) {
+
+	p, err := peer.IDFromPrivateKey(key)
+	if err != nil {
+		return DID{}, err
+	}
+
+	return New(ipns.NameFromPeer(p), fragment), nil
 }
 
 func (d *DID) Validate() error {

@@ -19,11 +19,15 @@ type Keyset struct {
 	SigningKey    key.SigningKey
 }
 
-// Creates new keyset from a name (typically fragment of a DID)
-// This requires that the key is already in IPFS and that IPFS is running.
-func New(d did.DID, identity crypto.PrivKey) (Keyset, error) {
+// Creates new keyset from private key and a name. The name the fragment of the DID.
+func New(identity crypto.PrivKey, name string) (Keyset, error) {
 
 	var err error
+
+	d, err := did.NewFromPrivateKey(identity, name)
+	if err != nil {
+		return Keyset{}, fmt.Errorf("new: %w", err)
+	}
 
 	encryptionKey, err := key.NewEncryptionKey(d)
 	if err != nil {
