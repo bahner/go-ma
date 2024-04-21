@@ -5,15 +5,14 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/multi"
+	mf "github.com/bahner/go-ma/utils"
 	nanoid "github.com/matoous/go-nanoid/v2"
-	mc "github.com/multiformats/go-multicodec"
+	"github.com/multiformats/go-multicodec"
 	"golang.org/x/crypto/curve25519"
 )
 
 const (
-	// KEY_AGREEMENT_MULTICODEC_STRING = "x25519-pub"
-	KEY_AGREEMENT_MULTICODEC = mc.X25519Pub
+	KEY_AGREEMENT_MULTICODEC = multicodec.X25519Pub
 	KEY_AGREEMENT_KEY_TYPE   = "MultiKey"
 )
 
@@ -47,7 +46,7 @@ func NewEncryptionKey(d did.DID) (EncryptionKey, error) {
 	curve25519.ScalarBaseMult(&pubKey, &privKey)
 
 	// Encode the public key to multibase
-	publicKeyMultibase, err := multi.PublicKeyMultibaseEncode(KEY_AGREEMENT_MULTICODEC, pubKey[:])
+	publicKeyMultibase, err := mf.PublicKeyMultibaseEncode(KEY_AGREEMENT_MULTICODEC, pubKey[:])
 	if err != nil {
 		return EncryptionKey{}, fmt.Errorf("NewEncryptionKey: %w", err)
 	}
@@ -88,21 +87,17 @@ func (k EncryptionKey) Verify() error {
 		return ErrNoPublicKeyMultibase
 	}
 
-	if !multi.IsValidMultibase(k.PublicKeyMultibase) {
-		return ErrInvalidPublicKeyMultibase
-	}
-
-	if k.PublicKeyMultibase == "" {
-		return ErrNoPublicKeyMultibase
-	}
-
-	key, err := multi.MultibaseDecode(k.PublicKeyMultibase)
+	encodedKey, err := mf.MultibaseDecode(k.PublicKeyMultibase)
 	if err != nil {
-		return ErrInvalidPublicKeyMultibase
+		return err
 	}
 
-	if key[0] != byte(mc.X25519Pub) {
-		return ErrInvalidMulticodec
+	codec, _, err := mf.MulticodecDecode(encodedKey)
+	if err != nil {
+		return fmt.Errorf("encryptionKey: %w", err)
+	}
+	if codec != multicodec.X25519Pub {
+		return fmt.Errorf("not X25519Pub multicodec %w", ErrInvalidEncryptionKeyMulticodec)
 	}
 
 	return nil

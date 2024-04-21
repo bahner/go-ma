@@ -7,15 +7,14 @@ import (
 	"crypto/rand"
 
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/internal"
-	"github.com/bahner/go-ma/multi"
+	mf "github.com/bahner/go-ma/utils"
 	nanoid "github.com/matoous/go-nanoid/v2"
-	mc "github.com/multiformats/go-multicodec"
+	"github.com/multiformats/go-multicodec"
 )
 
 const (
 	ASSERTION_METHOD_KEY_TYPE   = "MultiKey"
-	ASSERTION_METHOD_MULTICODEC = mc.Ed25519Pub
+	ASSERTION_METHOD_MULTICODEC = multicodec.Ed25519Pub
 )
 
 type SigningKey struct {
@@ -27,8 +26,9 @@ type SigningKey struct {
 }
 
 func (k *SigningKey) Sign(data []byte) ([]byte, error) {
-	if !internal.IsValidEd25519PrivateKey(k.PrivKey) {
-		return nil, fmt.Errorf("keyset/ed25519: invalid private key")
+	err := validateSigningPrivateKey(k.PrivKey)
+	if err != nil {
+		return nil, err
 	}
 
 	return ed25519.Sign(k.PrivKey, data), nil
@@ -49,7 +49,7 @@ func NewSigningKey(d did.DID) (SigningKey, error) {
 		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
 
-	publicKeyMultibase, err := multi.PublicKeyMultibaseEncode(ASSERTION_METHOD_MULTICODEC, publicKey)
+	publicKeyMultibase, err := mf.PublicKeyMultibaseEncode(ASSERTION_METHOD_MULTICODEC, publicKey)
 	if err != nil {
 		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
@@ -90,13 +90,18 @@ func (s SigningKey) Verify() error {
 		return ErrNoPublicKeyMultibase
 	}
 
-	key, err := multi.MultibaseDecode(s.PublicKeyMultibase)
+	encodedKey, err := mf.MultibaseDecode(s.PublicKeyMultibase)
 	if err != nil {
 		return fmt.Errorf("SigningKeyVerify: %w", err)
 	}
 
-	if key[0] != byte(ASSERTION_METHOD_MULTICODEC) {
-		return ErrInvalidMulticodec
+	codec, _, err := mf.MulticodecDecode(encodedKey)
+	if err != nil {
+		return fmt.Errorf("SigningKeyVerify: %w", err)
+	}
+
+	if codec != ASSERTION_METHOD_MULTICODEC {
+		return ErrInvalidSigningKeyMulticodec
 	}
 
 	return nil
@@ -105,4 +110,15 @@ func (s SigningKey) Verify() error {
 
 func (s SigningKey) IsValid() bool {
 	return s.Verify() == nil
+}
+
+func validateSigningPrivateKey(privKey ed25519.PrivateKey) error {
+	if privKey == nil {
+		return ErrPrivateKeyIsNil
+	}
+
+	if len(privKey) != ed25519.PrivateKeySize {
+		return fmt.Errorf("Invalid key length %d, should be %d: %w", len(privKey), ed25519.PrivateKeySize, ErrInvalidKeySize)
+	}
+	return nil
 }

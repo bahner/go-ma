@@ -13,7 +13,9 @@ import (
 )
 
 // Default IPFS API multiaddr. Default to Brave's IPFS companion extension,
-// which feature a nice GUI for IPFS.
+// which doesn't require any special configuration or installation.
+// Kubo is "/ip4/127.0.0.1/tcp/5001"
+
 const defaultIPFSAPIMaddr = "/ip4/127.0.0.1/tcp/45005"
 
 var (

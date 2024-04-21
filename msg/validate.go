@@ -6,7 +6,7 @@ import (
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did"
-	"github.com/bahner/go-ma/internal"
+	"github.com/bahner/go-ma/utils"
 	semver "github.com/blang/semver/v4"
 )
 
@@ -122,7 +122,7 @@ func verifyID(id string) error {
 		return ErrEmptyID
 	}
 
-	if !internal.IsValidNanoID(id) {
+	if !utils.ValidateNanoID(id) {
 		return ErrInvalidID
 	}
 

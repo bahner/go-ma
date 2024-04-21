@@ -1,4 +1,4 @@
-package multi
+package utils
 
 import (
 	"github.com/multiformats/go-multibase"
@@ -26,7 +26,7 @@ func MultibaseDecode(attr string) ([]byte, error) {
 	return decoded_attr, nil
 }
 
-func IsValidMultibase(input string) bool {
+func ValidateMultibase(input string) error {
 	_, _, err := multibase.Decode(input)
-	return err == nil
+	return err
 }

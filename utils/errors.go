@@ -1,4 +1,4 @@
-package multi
+package utils
 
 import "fmt"
 
