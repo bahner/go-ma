@@ -138,7 +138,7 @@ func verifyType(t string) error {
 		return nil
 	}
 
-	return ErrMessageInvalidType
+	return ErrInvalidMessageType
 
 }
 

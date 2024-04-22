@@ -71,7 +71,7 @@ func (m *Message) Broadcast(ctx context.Context, t *pubsub.Topic) error {
 
 func (m *Message) verifyBroadcast(t *pubsub.Topic) error {
 	if m.Type != BROADCAST {
-		return ErrMessageInvalidType
+		return ErrInvalidMessageType
 	}
 
 	if m.To != "" {
