@@ -18,5 +18,4 @@ const (
 	// BLAKE3 label for symmetric key generation.
 	BLAKE3_LABEL    = NAME
 	BLAKE3_SUM_SIZE = 32 // 256 bits
-
 )

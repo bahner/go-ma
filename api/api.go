@@ -16,19 +16,25 @@ import (
 // which doesn't require any special configuration or installation.
 // Kubo is "/ip4/127.0.0.1/tcp/5001"
 
-const defaultIPFSAPIMaddr = "/ip4/127.0.0.1/tcp/45005"
+const DEFAULT_IPFS_API_MADDR = "/ip4/127.0.0.1/tcp/45005"
 
 var (
 	once    sync.Once
 	ipfsAPI *rpc.HttpApi
 )
 
+func init() {
+
+	// This must always be first as it's used everywhere else.
+	pflag.String("api-maddr", DEFAULT_IPFS_API_MADDR, "Multiaddr of the IPFS API.")
+	viper.SetDefault("api.maddr", DEFAULT_IPFS_API_MADDR)
+	viper.BindPFlag("api.maddr", pflag.Lookup("api-maddr"))
+}
+
 func GetIPFSAPI() *rpc.HttpApi {
 
 	// Only initialize the API once, then just return it later.
 	once.Do(func() {
-		viper.SetDefault("api.maddr", defaultIPFSAPIMaddr)
-		viper.BindPFlag("api.maddr", pflag.Lookup("api-maddr"))
 
 		ipfsAPIMultiAddr, err := maddr.NewMultiaddr(viper.GetString("api.maddr"))
 		if err != nil {
