@@ -5,19 +5,13 @@ import (
 	"crypto/ed25519"
 	"fmt"
 
-	"github.com/bahner/go-ma"
 	cbor "github.com/fxamacker/cbor/v2"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
 const (
-	// Message constants
 	PREFIX               = "/ma/message/"
-	BROADCAST            = PREFIX + "broadcast/" + ma.VERSION
-	CHAT                 = PREFIX + "chat/" + ma.VERSION
-	DOT                  = PREFIX + "dot/" + ma.VERSION
-	ENVELOPE             = PREFIX + "envelope/" + ma.VERSION
 	DEFAULT_CONTENT_TYPE = "text/plain"
 )
 
@@ -80,32 +74,6 @@ func New(
 	return m, nil
 }
 
-// Create a new Message from the headers
-// Validate the headers (sinature) before adding the content. This is to be lazy
-// about decrypting the content, in case we don't need it.
-func newFromHeaders(h *Headers) (*Message, error) {
-
-	err := h.validate()
-	if err != nil {
-		return nil, fmt.Errorf("newFromHeaders: %w", err)
-	}
-
-	m := &Message{
-		// Message meta data
-		Id:   h.Id,
-		Type: h.Type,
-		// Recipient
-		From: h.From,
-		To:   h.To,
-		// Body
-		ContentType: h.ContentType,
-		// Signature
-		Signature: h.Signature,
-	}
-
-	return m, nil
-}
-
 // UnmarshalMessageFromCBOR unmarshals a Message from a CBOR byte slice
 // and verifies the signature
 func UnmarshalMessageFromCBOR(b []byte) (*Message, error) {
@@ -145,4 +113,30 @@ func (m *Message) Send(ctx context.Context, t *pubsub.Topic) error {
 	t.Publish(ctx, eBytes)
 
 	return nil
+}
+
+// Create a new Message from the headers
+// Validate the headers (sinature) before adding the content. This is to be lazy
+// about decrypting the content, in case we don't need it.
+func newFromHeaders(h *Headers) (*Message, error) {
+
+	err := h.validate()
+	if err != nil {
+		return nil, fmt.Errorf("newFromHeaders: %w", err)
+	}
+
+	m := &Message{
+		// Message meta data
+		Id:   h.Id,
+		Type: h.Type,
+		// Recipient
+		From: h.From,
+		To:   h.To,
+		// Body
+		ContentType: h.ContentType,
+		// Signature
+		Signature: h.Signature,
+	}
+
+	return m, nil
 }

@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
 	cbor "github.com/fxamacker/cbor/v2"
-	"github.com/ipfs/boxo/namesys"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"golang.org/x/crypto/curve25519"
 )
+
+const ENVELOPE = PREFIX + "envelope/" + ma.VERSION
 
 // Bask the encrypted message and the encrypted symmetric key in a CBOR envelope.
 type Envelope struct {
@@ -39,7 +41,7 @@ func (e *Envelope) Verify() error {
 }
 
 // Use a pointer here, this might be arbitrarily big.
-func (m *Message) Enclose(resolver *namesys.Resolver) (*Envelope, error) {
+func (m *Message) Enclose() (*Envelope, error) {
 
 	err := m.Verify()
 	if err != nil {
