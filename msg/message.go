@@ -20,8 +20,8 @@ const (
 type Message struct {
 	// Unique identifier of the message
 	Id string `cbor:"id"`
-	// MIME type of the message
-	Type string `cbor:"mimeType"`
+	// MA message type of the message
+	Type string `cbor:"type"`
 	// Sender of the message
 	From string `cbor:"from"`
 	// Recipient of the message

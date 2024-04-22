@@ -131,10 +131,10 @@ func verifyID(id string) error {
 
 func verifyType(t string) error {
 
-	if t == CHAT ||
-		t == BROADCAST ||
-		t == ENVELOPE ||
-		t == DOT {
+	if t == BROADCAST ||
+		t == CHAT ||
+		t == DOT ||
+		t == REPLY {
 		return nil
 	}
 

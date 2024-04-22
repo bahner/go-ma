@@ -4,14 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
 	cbor "github.com/fxamacker/cbor/v2"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"golang.org/x/crypto/curve25519"
 )
-
-const ENVELOPE = PREFIX + "envelope/" + ma.VERSION
 
 // Bask the encrypted message and the encrypted symmetric key in a CBOR envelope.
 type Envelope struct {
