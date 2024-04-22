@@ -3,24 +3,58 @@ package set
 import (
 	"fmt"
 
+	"github.com/bahner/go-ma/did"
+	"github.com/bahner/go-ma/key"
 	mf "github.com/bahner/go-ma/utils"
 	cbor "github.com/fxamacker/cbor/v2"
+	"github.com/libp2p/go-libp2p/core/crypto"
 	log "github.com/sirupsen/logrus"
 )
 
-func (k Keyset) MarshalToCBOR() ([]byte, error) {
-	return cbor.Marshal(k)
-}
-func UnmarshalFromCBOR(data []byte) (Keyset, error) {
-	var k Keyset
-	err := cbor.Unmarshal(data, &k)
+func (ks *Keyset) MarshalToCBOR() ([]byte, error) {
+	identityBytes, err := crypto.MarshalPrivateKey(ks.Identity)
 	if err != nil {
-		return Keyset{}, fmt.Errorf("KeysetUnmarshalFromCBOR: %w", err)
+		return nil, fmt.Errorf("marshal identity key: %w", err)
+	}
+	temp := struct {
+		Identity      []byte
+		DID           did.DID
+		EncryptionKey key.EncryptionKey
+		SigningKey    key.SigningKey
+	}{
+		Identity:      identityBytes,
+		DID:           ks.DID,
+		EncryptionKey: ks.EncryptionKey,
+		SigningKey:    ks.SigningKey,
 	}
 
-	log.Debugf("Unmarshaled keyset: %v", k)
+	return cbor.Marshal(temp)
+}
 
-	return k, nil
+func UnmarshalFromCBOR(data []byte) (Keyset, error) {
+	temp := struct {
+		Identity      []byte
+		DID           did.DID
+		EncryptionKey key.EncryptionKey
+		SigningKey    key.SigningKey
+	}{}
+
+	err := cbor.Unmarshal(data, &temp)
+	if err != nil {
+		return Keyset{}, fmt.Errorf("unmarshal keyset: %w", err)
+	}
+
+	identity, err := crypto.UnmarshalPrivateKey(temp.Identity)
+	if err != nil {
+		return Keyset{}, fmt.Errorf("unmarshal identity key: %w", err)
+	}
+
+	return Keyset{
+		Identity:      identity,
+		DID:           temp.DID,
+		EncryptionKey: temp.EncryptionKey,
+		SigningKey:    temp.SigningKey,
+	}, nil
 }
 
 func (k Keyset) Pack() (string, error) {
