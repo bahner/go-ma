@@ -34,7 +34,7 @@ func NewReply(m *Message, reply []byte) ([]byte, error) {
 		})
 }
 
-func (m *Message) Reply(replyBytes []byte, privKey ed25519.PrivateKey, topic *pubsub.Topic) error {
+func (m *Message) Reply(ctx context.Context, replyBytes []byte, privKey ed25519.PrivateKey, topic *pubsub.Topic) error {
 	id, err := nanoid.New()
 	if err != nil {
 		return err
@@ -67,5 +67,5 @@ func (m *Message) Reply(replyBytes []byte, privKey ed25519.PrivateKey, topic *pu
 		return err
 	}
 
-	return envelope.Send(context.Background(), topic)
+	return envelope.Send(ctx, topic)
 }
