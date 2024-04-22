@@ -133,7 +133,7 @@ func verifyType(t string) error {
 
 	if t == BROADCAST ||
 		t == CHAT ||
-		t == DOT ||
+		t == REQUEST ||
 		t == REPLY {
 		return nil
 	}
