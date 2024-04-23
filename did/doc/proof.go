@@ -4,12 +4,15 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma/key"
+	"github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/node/basicnode"
 	"github.com/multiformats/go-multibase"
 )
 
 const (
-	proofType    = "MultiformatSignature2023"
-	proofPurpose = "assertionMethod"
+	proofType      = "MultiformatSignature2023"
+	proofPurpose   = "assertionMethod"
+	proofNumFields = 4
 )
 
 type Proof struct {
@@ -55,4 +58,28 @@ func NewProof(proofValue string, vm string) Proof {
 		ProofValue:         proofValue,
 		VerificationMethod: vm,
 	}
+}
+
+func buildProofNode(proof Proof) (ipld.Node, error) {
+	nb := basicnode.Prototype.Map.NewBuilder()
+	ma, err := nb.BeginMap(proofNumFields)
+	if err != nil {
+		return nil, err
+	}
+
+	ma.AssembleKey().AssignString("type")
+	ma.AssembleValue().AssignString(proof.Type)
+
+	ma.AssembleKey().AssignString("verificationMethod")
+	ma.AssembleValue().AssignString(proof.VerificationMethod)
+
+	ma.AssembleKey().AssignString("proofPurpose")
+	ma.AssembleValue().AssignString(proof.ProofPurpose)
+
+	ma.AssembleKey().AssignString("proofValue")
+	ma.AssembleValue().AssignString(proof.ProofValue)
+
+	ma.Finish()
+
+	return nb.Build(), nil
 }

@@ -19,7 +19,7 @@ func NewFromKeyset(k set.Keyset) (*Document, error) {
 
 func NewFromKeysetWithController(k set.Keyset, controller did.DID) (*Document, error) {
 
-	id := k.DID.IPNS
+	id := k.DID.Id
 
 	d, err := New(k.DID, controller)
 	if err != nil {

@@ -11,6 +11,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// How many fields to add to the node
+const NUM_NODE_FIELDS = 7
+
 type Document struct {
 	Context            []string             `cbor:"@context,toarray" json:"@context"`
 	ID                 string               `cbor:"id" json:"id"`

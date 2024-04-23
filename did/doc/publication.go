@@ -16,59 +16,45 @@ import (
 
 var ErrAlreadyPublished = errors.New("Document is already published")
 
-type PublishOptions struct {
-	Ctx           context.Context
-	Pin           bool
-	Force         bool
-	AllowBigBlock bool
-}
-
-func DefaultPublishOptions() *PublishOptions {
-	return &PublishOptions{
-		Ctx:           context.Background(),
-		Pin:           true,
-		Force:         true,
-		AllowBigBlock: false,
-	}
-}
-
-// Publishes document to a key known by the IPFS node. This maybe a peer ID or a name.
-// Both provided as a simple string.
-// The only option we honour is the force option. If set to true we will update the existing pin regardless.
+// Publishes the document to IPFS and IPNS. This is a little noise, as it does a lot of things.
+// Notably it can take a long time, which is why there's also a gorutine version.
 func (d *Document) Publish() (ipns.Name, error) {
 
 	ctx := context.Background()
-	alreadyPublishedString := "'to' cid was already recursively pinned"
 
-	node, newCID, err := d.Node()
+	node, err := d.Node()
 	if err != nil {
 		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
 	}
-	newImmutablePath := path.FromCid(newCID)
+	newImmutablePath := path.FromCid(node.Cid)
 
 	// Get the IPFS API
 	a := api.GetIPFSAPI()
-	a.Dag().Add(ctx, node)
 
-	// If an existing document is already published and Pin is set we need to update the existing pin f asked to force.
-	err = a.Pin().Update(ctx, d.immutablePath, newImmutablePath)
+	// Add the Document Node to the IPFS DAG
+	err = a.Dag().Add(ctx, node.Node)
 	if err != nil {
-		if err.Error() == alreadyPublishedString {
-			return ipns.Name{}, fmt.Errorf("DocPublish: %w", ErrAlreadyPublished)
-		}
+		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
+	}
+	log.Infof("DocPublish: Successfully added document %s to IPLD", node.Cid.String())
+
+	// Pin the document
+	log.Infof("Pinning %s in IPFS. Please wait ...", newImmutablePath.String())
+	err = pinDocument(ctx, d.immutablePath, newImmutablePath)
+	if err != nil {
 		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
 	}
 
 	// Now that the document is pinned we can update the path to the new one.
 	d.immutablePath = newImmutablePath
 
-	log.Debugf("DocPublish: Announcing publication of document %s to IPNS. Please wait ...", newCID.String())
-	n, err := a.Name().Publish(ctx, newImmutablePath, options.Name.Key(d.did.IPNS))
+	log.Debugf("DocPublish: Announcing publication of document %s to IPNS. Please wait ...", node.Cid.String())
+	name, err := a.Name().Publish(ctx, newImmutablePath, options.Name.Key(d.did.IPNS))
 	if err != nil {
 		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
 	}
-	log.Debugf("DocPublish: Successfully announced publication of document %s to %s", newCID.String(), n.AsPath().String())
-	return n, nil
+	log.Debugf("DocPublish: Successfully announced publication of document %s to %s", node.Cid.String(), name.AsPath().String())
+	return name, nil
 
 }
 
@@ -82,6 +68,33 @@ func (d *Document) PublishGoroutine(wg *sync.WaitGroup, cancel context.CancelFun
 	defer wg.Done()
 
 	d.Publish()
+
+}
+
+func pinDocument(ctx context.Context, oldP path.ImmutablePath, newP path.ImmutablePath) error {
+
+	alreadyPublishedString := "'to' cid was already recursively pinned"
+
+	a := api.GetIPFSAPI()
+
+	var err error
+	if (oldP == path.ImmutablePath{}) {
+		err = a.Pin().Add(ctx, newP)
+		if err != nil {
+			return fmt.Errorf("DocPublish: %w", err)
+		}
+	} else {
+		// If an existing document is already published and Pin is set we need to update the existing pin f asked to force.
+		err = a.Pin().Update(ctx, oldP, newP)
+		if err != nil {
+			if err.Error() == alreadyPublishedString {
+				return fmt.Errorf("DocPublish: %w", ErrAlreadyPublished)
+			}
+			return fmt.Errorf("DocPublish: %w", err)
+		}
+	}
+
+	return nil
 
 }
 

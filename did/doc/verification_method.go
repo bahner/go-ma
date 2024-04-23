@@ -4,8 +4,12 @@ import (
 	"fmt"
 
 	"github.com/bahner/go-ma/did"
+	"github.com/ipld/go-ipld-prime"
+	"github.com/ipld/go-ipld-prime/node/basicnode"
 	log "github.com/sirupsen/logrus"
 )
+
+const verificationMethodNumFields = 4
 
 // VerificationMethod defines the structure of a Verification Method
 type VerificationMethod struct {
@@ -195,4 +199,51 @@ func (vm VerificationMethod) Verify() error {
 func (vm VerificationMethod) IsValid() bool {
 
 	return vm.Verify() == nil
+}
+
+func buildVerificationMethodNode(vm VerificationMethod) (ipld.Node, error) {
+	nb := basicnode.Prototype.Map.NewBuilder()
+	ma, err := nb.BeginMap(verificationMethodNumFields)
+	if err != nil {
+		return nil, err
+	}
+
+	ma.AssembleKey().AssignString("id")
+	ma.AssembleValue().AssignString(vm.ID)
+
+	ma.AssembleKey().AssignString("type")
+	ma.AssembleValue().AssignString(vm.Type)
+
+	controllerNode, err := buildStringListNode(vm.Controller)
+	if err != nil {
+		return nil, err
+	}
+	ma.AssembleKey().AssignString("controller")
+	ma.AssembleValue().AssignNode(controllerNode)
+
+	ma.AssembleKey().AssignString("publicKeyMultibase")
+	ma.AssembleValue().AssignString(vm.PublicKeyMultibase)
+
+	ma.Finish()
+
+	return nb.Build(), nil
+}
+
+func buildVerificationMethodList(vms []VerificationMethod) (ipld.Node, error) {
+	nb := basicnode.Prototype.List.NewBuilder()
+	la, err := nb.BeginList(-1)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, vm := range vms {
+		vmNode, err := buildVerificationMethodNode(vm)
+		if err != nil {
+			return nil, err
+		}
+		la.AssembleValue().AssignNode(vmNode)
+	}
+	la.Finish()
+
+	return nb.Build(), nil
 }

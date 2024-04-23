@@ -1,3 +1,5 @@
 # TODO
 
 Write better documentation and maybe some examples. It's about time
+
+Fix setting loglevel early with generation
