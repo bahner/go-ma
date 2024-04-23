@@ -63,7 +63,7 @@ func (d *Document) Publish() (ipns.Name, error) {
 	d.immutablePath = newImmutablePath
 
 	log.Debugf("DocPublish: Announcing publication of document %s to IPNS. Please wait ...", newCID.String())
-	n, err := a.Name().Publish(ctx, newImmutablePath, options.Name.Key(d.did.Name.String()))
+	n, err := a.Name().Publish(ctx, newImmutablePath, options.Name.Key(d.did.IPNS))
 	if err != nil {
 		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
 	}

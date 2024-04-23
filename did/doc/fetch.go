@@ -32,7 +32,7 @@ func FetchFromDID(d did.DID) (*Document, cid.Cid, error) {
 	var document = &Document{}
 
 	// Resolve the root CID, ie. the actual IPLD CID of the document
-	c, err := resolveRootCID(d.Name.String())
+	c, err := resolveRootCID(d.IPNS)
 	if err != nil {
 		return nil, cid.Cid{}, fmt.Errorf("fetchFromDID: %w", err)
 	}

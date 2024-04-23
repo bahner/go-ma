@@ -11,8 +11,8 @@ const PREFIX = "did:ma:"
 type DID struct {
 	// The Id is the full DID
 	Id string
-	// The Name is the IPNS name of the entity
-	Name ipns.Name
+	// The IPNS is the IPNS name of the entity
+	IPNS string
 	// The fragment is a NanoID that is used to identify the entity locally
 	Fragment string
 }
@@ -22,8 +22,9 @@ type DID struct {
 func New(name ipns.Name, fragment string) DID {
 
 	return DID{
-		Id:       PREFIX + name.String() + "#" + fragment,
-		Name:     name,
+		Id: PREFIX + name.String() + "#" + fragment,
+		// Name is the IPNS name. As String() for easy marshalling
+		IPNS:     name.String(),
 		Fragment: fragment,
 	}
 }
