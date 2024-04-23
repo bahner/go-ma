@@ -113,11 +113,3 @@ func compareSlices(a []string, b []string) bool {
 
 	return slices.Compare(a, b) == 0
 }
-
-// func (d *Document) Path() path.Path {
-// 	return d.immutablePath
-// }
-
-// func (d *Document) DID() did.DID {
-// 	return d.did
-// }

@@ -10,6 +10,7 @@ import (
 	mf "github.com/bahner/go-ma/utils"
 	nanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/multiformats/go-multicodec"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -41,8 +42,10 @@ func NewSigningKey(d did.DID) (SigningKey, error) {
 	if err != nil {
 		return SigningKey{}, fmt.Errorf("NewSigningKey: %w", err)
 	}
-	// We just mangle the base DID as this is not a pointer to a DID.
-	d.Fragment = name
+
+	// Create a unique identifier for the key
+	d = did.New(d.IPNSName(), name)
+	log.Info("Created new DID: ", d)
 
 	publicKey, privKey, err := ed25519.GenerateKey(rand.Reader)
 	if err != nil {

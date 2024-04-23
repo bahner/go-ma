@@ -31,8 +31,8 @@ func NewEncryptionKey(d did.DID) (EncryptionKey, error) {
 		return EncryptionKey{}, fmt.Errorf("NewEncryptionKey: %w", err)
 	}
 
-	// We just mangle the base DID as this is not a pointer to a DID.
-	d.Fragment = name
+	// Create a unique identifier for the key
+	d = did.New(d.IPNSName(), name)
 
 	// Generate a random private key
 	var privKey [curve25519.ScalarSize]byte
