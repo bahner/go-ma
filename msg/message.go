@@ -14,7 +14,7 @@ import (
 const (
 	PREFIX               = "/ma/"
 	MESSAGE              = PREFIX + ma.VERSION
-	DEFAULT_CONTENT_TYPE = "text/plain"
+	MESSAGE_CONTENT_TYPE = "application/x.ma"
 )
 
 // This struct mimicks the Message format, but it's *not* Message.
@@ -41,8 +41,8 @@ type Message struct {
 func New(
 	from string,
 	to string,
-	content []byte,
 	contentType string,
+	content []byte,
 	priv_key ed25519.PrivateKey) (*Message, error) {
 
 	id, err := nanoid.New()
