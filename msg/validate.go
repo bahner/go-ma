@@ -132,9 +132,7 @@ func verifyID(id string) error {
 func verifyType(t string) error {
 
 	if t == BROADCAST ||
-		t == CHAT ||
-		t == REQUEST ||
-		t == REPLY {
+		t == MESSAGE {
 		return nil
 	}
 

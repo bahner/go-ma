@@ -5,13 +5,15 @@ import (
 	"crypto/ed25519"
 	"fmt"
 
+	"github.com/bahner/go-ma"
 	cbor "github.com/fxamacker/cbor/v2"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
 const (
-	PREFIX               = "/ma/message/"
+	PREFIX               = "/ma/"
+	MESSAGE              = PREFIX + ma.VERSION
 	DEFAULT_CONTENT_TYPE = "text/plain"
 )
 
@@ -39,7 +41,6 @@ type Message struct {
 func New(
 	from string,
 	to string,
-	msg_type string,
 	content []byte,
 	contentType string,
 	priv_key ed25519.PrivateKey) (*Message, error) {
@@ -52,7 +53,7 @@ func New(
 	m := &Message{
 		// Message meta data
 		Id:   id,
-		Type: msg_type,
+		Type: MESSAGE,
 		// Recipient
 		From: from,
 		To:   to,

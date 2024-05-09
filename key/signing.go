@@ -35,7 +35,8 @@ func (k *SigningKey) Sign(data []byte) ([]byte, error) {
 	return ed25519.Sign(k.PrivKey, data), nil
 }
 
-// Generates a signing key for the given identifier, ie. IPNS name
+// Generates a signing key for the given identifier, ie. IPNS name.
+// The IPNS key itself could be used, but lets stick to a more common DID structure.
 func NewSigningKey(d did.DID) (SigningKey, error) {
 
 	name, err := nanoid.New()
@@ -121,7 +122,7 @@ func validateSigningPrivateKey(privKey ed25519.PrivateKey) error {
 	}
 
 	if len(privKey) != ed25519.PrivateKeySize {
-		return fmt.Errorf("Invalid key length %d, should be %d: %w", len(privKey), ed25519.PrivateKeySize, ErrInvalidKeySize)
+		return fmt.Errorf("invalid key length %d, should be %d: %w", len(privKey), ed25519.PrivateKeySize, ErrInvalidKeySize)
 	}
 	return nil
 }
