@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	PREFIX               = "/ma/"
-	MESSAGE              = PREFIX + ma.VERSION
-	MESSAGE_CONTENT_TYPE = "application/x.ma"
+	PREFIX       = "/ma/"
+	MESSAGE      = PREFIX + ma.VERSION
+	CONTENT_TYPE = "application/x.ma"
 )
 
 // This struct mimicks the Message format, but it's *not* Message.
