@@ -8,10 +8,7 @@ import (
 
 func PublicKeyMultibaseEncode(codec multicodec.Code, publicKey []byte) (string, error) {
 
-	multicodecedKey, err := MulticodecEncode(codec, publicKey)
-	if err != nil {
-		return "", fmt.Errorf("key/codec: error multicodec encoding public key: %s", err)
-	}
+	multicodecedKey := MulticodecEncode(codec, publicKey)
 
 	publicKeyMultibase, err := MultibaseEncode(multicodecedKey)
 	if err != nil {

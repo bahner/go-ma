@@ -7,13 +7,12 @@ import (
 	"github.com/multiformats/go-varint"
 )
 
-func MulticodecEncode(codec multicodec.Code, payload []byte) ([]byte, error) {
+func MulticodecEncode(codec multicodec.Code, payload []byte) []byte {
 
 	c := uint64(codec)
 
 	codecBytes := varint.ToUvarint(c)
-	encoded := append(codecBytes, payload...)
-	return encoded, nil
+	return append(codecBytes, payload...)
 }
 
 // Returns the codec, payload and error of a multicodec encoded byte array
