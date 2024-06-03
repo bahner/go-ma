@@ -8,14 +8,14 @@ import (
 )
 
 // Payload generates the unsigned DID,
-// This is everything non-metadata in the DID document.
-// We don't use a pointer here, so that we don't have to reiterate the
-// struct in the function. We just need to change the signature.
+// This is everything except the proof.
 func Payload(d Document) (Document, error) {
 
-	d.Proof = Proof{}
+	payloadDoc := d
 
-	return d, nil
+	payloadDoc.Proof = Proof{}
+
+	return payloadDoc, nil
 }
 
 // Marshals the payload to CBOR for publication
