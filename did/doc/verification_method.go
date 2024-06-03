@@ -49,7 +49,7 @@ func NewVerificationMethod(
 ) (VerificationMethod, error) {
 
 	return VerificationMethod{
-		ID:                 id,
+		ID:                 id + "#" + fragment,
 		Controller:         []string{controller},
 		Type:               vmType,
 		PublicKeyMultibase: publicKeyMultibase,
