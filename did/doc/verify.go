@@ -13,7 +13,7 @@ var (
 
 func (d *Document) Verify() error {
 
-	hashed, err := d.PayloadHash()
+	payloadHash, err := d.PayloadHash()
 	if err != nil {
 		return fmt.Errorf("doc/verify: Error hashing payload: %s", err)
 	}
@@ -30,7 +30,7 @@ func (d *Document) Verify() error {
 	}
 
 	// Verify the signature
-	if !ed25519.Verify(pubKey, hashed[:], signature) {
+	if !ed25519.Verify(pubKey, payloadHash, signature) {
 		return ErrDocumentSignatureInvalid
 	}
 

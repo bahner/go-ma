@@ -28,13 +28,13 @@ func (d *Document) Sign(signKey key.SigningKey, vm VerificationMethod) error {
 		return fmt.Errorf("doc sign: signKey.PublicKeyMultibase != vm.PublicKeyMultibase. %w", ErrPublicKeyMultibaseMismatch)
 	}
 
-	multicodecHashed, err := d.PayloadHash()
+	payloadHash, err := d.PayloadHash()
 	if err != nil {
 		return fmt.Errorf("doc sign: Error hashing payload: %s", err)
 	}
 
 	// Sign the hashed payload with an ed25519 key
-	signature, err := signKey.Sign(multicodecHashed)
+	signature, err := signKey.Sign(payloadHash)
 	if err != nil {
 		return fmt.Errorf("doc sign: %w", err)
 	}
