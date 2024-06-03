@@ -36,10 +36,7 @@ func (d *Document) PayloadHash() ([]byte, error) {
 
 	// Hash the payload
 	hashed := blake3.Sum256(p)
-	multicodecHashed, err := utils.MulticodecEncode(multicodec.Blake3, hashed[:])
-	if err != nil {
-		return nil, ErrPayloadMultiencode
-	}
+	multicodecHashed := utils.MulticodecEncode(multicodec.Blake3, hashed[:])
 
 	return multicodecHashed, nil
 }
