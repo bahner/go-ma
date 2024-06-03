@@ -2,6 +2,7 @@ package doc
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/bahner/go-ma/did"
 	"github.com/ipld/go-ipld-prime"
@@ -48,8 +49,12 @@ func NewVerificationMethod(
 	publicKeyMultibase string,
 ) (VerificationMethod, error) {
 
+	// Remove the fragment from the id.
+	// We want to use a new fragment for each verification method
+	identity := strings.Split(id, "#")[0]
+
 	return VerificationMethod{
-		ID:                 id + "#" + fragment,
+		ID:                 identity + "#" + fragment,
 		Controller:         []string{controller},
 		Type:               vmType,
 		PublicKeyMultibase: publicKeyMultibase,
