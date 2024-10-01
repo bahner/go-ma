@@ -12,7 +12,7 @@ import (
 )
 
 // Decrypts a message fields from an message
-func decrypt(data []byte, ephemeralKey []byte, privKey []byte) ([]byte, error) {
+func decrypt(data []byte, ephemeralKey []byte, privKey []byte, symmetricKeyLabel []byte) ([]byte, error) {
 
 	// Derive the shared secret using recipient's private key and ephemeral public key
 	shared, err := curve25519.X25519(privKey, ephemeralKey)
@@ -21,7 +21,7 @@ func decrypt(data []byte, ephemeralKey []byte, privKey []byte) ([]byte, error) {
 	}
 	log.Debugf("shared: %x", shared)
 
-	symmetricKey := key.GenerateSymmetricKey(shared, ma.BLAKE3_SUM_SIZE, []byte(ma.BLAKE3_LABEL))
+	symmetricKey := key.GenerateSymmetricKey(shared, ma.BLAKE3_SUM_SIZE, symmetricKeyLabel)
 	log.Debugf("symmetricKey: %x", symmetricKey)
 
 	// Split the nonce from the ciphertext
@@ -77,7 +77,7 @@ func encrypt(data []byte, symmetricKey []byte) ([]byte, error) {
 	return cipherTextWithNonce, nil
 }
 
-func generateEphemeralKeys(recipientPublicKeyBytes []byte) ([]byte, []byte, error) {
+func generateSharedKey(recipientPublicKeyBytes []byte) ([]byte, []byte, error) {
 
 	// The private key is not stored, only used twice, both for the headers and the content encryption.
 	// This should be OK, but we could use a different key for the content encryption in the future, if deemed necessary.
@@ -96,16 +96,12 @@ func generateEphemeralKeys(recipientPublicKeyBytes []byte) ([]byte, []byte, erro
 	log.Debugf("msg_enclose: ephemeralPublic: %x", ephemeralPublic)
 
 	// Derive shared secret
-	shared, err := curve25519.X25519(ephemeralPrivate[:], recipientPublicKeyBytes)
+	sharedSecret, err := curve25519.X25519(ephemeralPrivate[:], recipientPublicKeyBytes)
 	if err != nil {
 		return nil, nil, fmt.Errorf("msg_encrypt: error deriving shared secret: %w", err)
 	}
 	// log.Debugf("msg_encrypt: shared: %x", shared)
 
-	// Generate a symmetric key from the shared secret using blake3
-	symmetricKey := key.GenerateSymmetricKey(shared, ma.BLAKE3_SUM_SIZE, []byte(ma.BLAKE3_LABEL))
-	// log.Debugf("msg_encrypt: symmetricKey: %x", symmetricKey)
-
-	return ephemeralPublic, symmetricKey, nil
+	return ephemeralPublic, sharedSecret, nil
 
 }

@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
+	"github.com/bahner/go-ma/key"
 	cbor "github.com/fxamacker/cbor/v2"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"golang.org/x/crypto/curve25519"
@@ -58,7 +60,7 @@ func (m *Message) Enclose() (*Envelope, error) {
 	}
 
 	// Generate ephemeral keys to be used for his message
-	ephemeralPublic, symmetricKey, err := generateEphemeralKeys(recipientPublicKeyBytes)
+	ephemeralPublic, sharedSecret, err := generateSharedKey(recipientPublicKeyBytes)
 	if err != nil {
 		return nil, fmt.Errorf("msg_enclose: %w", err)
 	}
@@ -68,19 +70,21 @@ func (m *Message) Enclose() (*Envelope, error) {
 		return nil, fmt.Errorf("msg_enclose: %w", err)
 	}
 
-	encryptedMsgHeaders, err := encrypt(msgHeaders, symmetricKey)
+	symmetricHeadersKey := key.GenerateSymmetricKey(sharedSecret, ma.BLAKE3_SUM_SIZE, []byte(ma.NAME))
+	encryptedHeaders, err := encrypt(msgHeaders, symmetricHeadersKey)
 	if err != nil {
 		return nil, fmt.Errorf("msg_enclose: %w", err)
 	}
 
-	encryptedContent, err := encrypt(m.Content, symmetricKey)
+	symmetricContentKey := key.GenerateSymmetricKey(sharedSecret, ma.BLAKE3_SUM_SIZE, []byte(ma.RENDEZVOUS))
+	encryptedContent, err := encrypt(m.Content, symmetricContentKey)
 	if err != nil {
 		return nil, fmt.Errorf("msg_enclose: %w", err)
 	}
 
 	return &Envelope{
 		EphemeralKey:     ephemeralPublic,
-		EncryptedHeaders: encryptedMsgHeaders,
+		EncryptedHeaders: encryptedHeaders,
 		EncryptedContent: encryptedContent,
 	}, nil
 }
@@ -132,12 +136,12 @@ func UnmarshalAndVerifyEnvelopeFromCBOR(data []byte) (*Envelope, error) {
 }
 
 func (e *Envelope) getContent(privkey []byte) ([]byte, error) {
-	return decrypt(e.EncryptedContent, e.EphemeralKey, privkey)
+	return decrypt(e.EncryptedContent, e.EphemeralKey, privkey, []byte(ma.BLAKE3_CONTENT_LABEL))
 }
 
 func (e *Envelope) getHeaders(privkey []byte) (*Headers, error) {
 
-	bytes, err := decrypt(e.EncryptedHeaders, e.EphemeralKey, privkey)
+	bytes, err := decrypt(e.EncryptedHeaders, e.EphemeralKey, privkey, []byte(ma.BLAKE3_HEADERS_LABEL))
 	if err != nil {
 		return nil, err
 	}

@@ -16,6 +16,7 @@ const (
 	BROADCAST_TOPIC = "/" + NAME + "/broadcast/" + VERSION
 
 	// BLAKE3 label for symmetric key generation.
-	BLAKE3_LABEL    = NAME
-	BLAKE3_SUM_SIZE = 32 // 256 bits
+	BLAKE3_CONTENT_LABEL = RENDEZVOUS
+	BLAKE3_HEADERS_LABEL = NAME
+	BLAKE3_SUM_SIZE      = 32 // 256 bits
 )
