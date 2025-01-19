@@ -11,13 +11,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// How many fields to add to the node
-const NUM_NODE_FIELDS = 7
+// How many fields to add to the node. Used for sanity checking.
+const NUM_NODE_FIELDS = 9
 
 type Document struct {
-	Context            []string             `cbor:"@context,toarray" json:"@context"`
-	ID                 string               `cbor:"id" json:"id"`
-	Controller         []string             `cbor:"controller,toarray" json:"controller"`
+	Context    []string `cbor:"@context,toarray" json:"@context"`
+	ID         string   `cbor:"id" json:"id"`
+	Controller []string `cbor:"controller,toarray" json:"controller"`
+	// Identity is a cid for the secret keyset of the entity.
+	// It's contents should be encrypted and multibase encoded, but the structure is not defined here.
+	// Each language should have it's own way of parsing the contents of the keyset.
+	Identity string `cbor:"identity" json:"identity"`
+	// The node to dial for communication with the entity.
+	Node               Node                 `cbor:"node" json:"node"`
 	VerificationMethod []VerificationMethod `cbor:"verificationMethod,toarray" json:"verificationMethod"`
 	AssertionMethod    string               `cbor:"assertionMethod" json:"assertionMethod"`
 	KeyAgreement       string               `cbor:"keyAgreement" json:"keyAgreement"`
@@ -51,6 +57,8 @@ func (d *Document) MarshalToCBOR() ([]byte, error) {
 		Context:            d.Context,
 		ID:                 d.ID,
 		Controller:         d.Controller,
+		Node:               d.Node,
+		Identity:           d.Identity,
 		VerificationMethod: d.VerificationMethod,
 		AssertionMethod:    d.AssertionMethod,
 		KeyAgreement:       d.KeyAgreement,
@@ -112,4 +120,41 @@ func compareSlices(a []string, b []string) bool {
 	slices.Sort(b)
 
 	return slices.Compare(a, b) == 0
+}
+
+func (d *Document) Validate() error {
+
+	err := d.validateContexts()
+	if err != nil {
+		return fmt.Errorf("doc/Validate: %w", err)
+	}
+
+	err = d.validateControllers()
+	if err != nil {
+		return fmt.Errorf("doc/Validate: %w", err)
+	}
+
+	err = validateNode(d.Node)
+	if err != nil {
+		return fmt.Errorf("doc/Validate: %w", err)
+	}
+
+	for _, vm := range d.VerificationMethod {
+		err = vm.validateVerificationMethod()
+		if err != nil {
+			return fmt.Errorf("doc/Validate: %w", err)
+		}
+	}
+
+	err = validateIdentity(d.Identity)
+	if err != nil {
+		return fmt.Errorf("doc/Validate: %w", err)
+	}
+
+	err = d.Verify()
+	if err != nil {
+		return fmt.Errorf("doc/Validate: %w", err)
+	}
+
+	return nil
 }

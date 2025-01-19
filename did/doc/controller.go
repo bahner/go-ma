@@ -33,17 +33,26 @@ func (d *Document) DeleteController(controller string) {
 	}
 }
 
-func (vm VerificationMethod) ValidateControllers() error {
+func (d *Document) validateControllers() error {
 
-	if len(vm.Controller) == 0 {
-		return ErrControllersIsEmpty
+	if len(d.Controller) == 0 {
+		return ErrControllerIsEmpty
 	}
 
-	for _, c := range vm.Controller {
-		err := did.Validate(c)
+	for _, c := range d.Controller {
+		err := validateController(c)
 		if err != nil {
 			return fmt.Errorf("doc/ValidateControllers: %w", err)
 		}
+	}
+	return nil
+}
+
+func validateController(controller string) error {
+
+	err := did.Validate(controller)
+	if err != nil {
+		return err
 	}
 	return nil
 }

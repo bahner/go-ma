@@ -16,7 +16,7 @@ import (
 // which doesn't require any special configuration or installation.
 // Kubo is "/ip4/127.0.0.1/tcp/5001"
 
-const DEFAULT_IPFS_API_MADDR = "/ip4/127.0.0.1/tcp/45005"
+const DEFAULT_IPFS_API_MADDR = "/ip4/127.0.0.1/tcp/5001"
 
 var (
 	once    sync.Once

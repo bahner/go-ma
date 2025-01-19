@@ -65,7 +65,7 @@ func NewVerificationMethod(
 // checked for validity before adding it to the slice.
 func (v *VerificationMethod) AddController(controller string) error {
 
-	err := v.ValidateControllers()
+	err := v.validateController()
 	if err != nil {
 		return fmt.Errorf("doc/vm: %w", err)
 	}
@@ -93,7 +93,7 @@ func (v *VerificationMethod) DeleteController(controller string) {
 func (d *Document) AddVerificationMethod(method VerificationMethod) error {
 
 	// Make sure the verification method is valid
-	err := method.Verify()
+	err := method.validateVerificationMethod()
 	if err != nil {
 		return fmt.Errorf("doc/vm: %w", err)
 	}
@@ -176,7 +176,7 @@ func (vm VerificationMethod) Equal(other VerificationMethod) bool {
 }
 
 // Simply verify that the verification method seems valid
-func (vm VerificationMethod) Verify() error {
+func (vm VerificationMethod) validateVerificationMethod() error {
 
 	err := did.Validate(vm.ID)
 	if err != nil {
@@ -187,7 +187,7 @@ func (vm VerificationMethod) Verify() error {
 		return ErrVerificationMethodMissingType
 	}
 
-	err = vm.ValidateControllers()
+	err = vm.validateController()
 	if err != nil {
 		return fmt.Errorf("vm/Verify: %w", err)
 	}
@@ -203,7 +203,7 @@ func (vm VerificationMethod) Verify() error {
 
 func (vm VerificationMethod) IsValid() bool {
 
-	return vm.Verify() == nil
+	return vm.validateVerificationMethod() == nil
 }
 
 func buildVerificationMethodNode(vm VerificationMethod) (ipld.Node, error) {
@@ -251,4 +251,19 @@ func buildVerificationMethodList(vms []VerificationMethod) (ipld.Node, error) {
 	la.Finish()
 
 	return nb.Build(), nil
+}
+
+func (vm *VerificationMethod) validateController() error {
+
+	if len(vm.Controller) == 0 {
+		return ErrControllerIsEmpty
+	}
+
+	for _, c := range vm.Controller {
+		err := validateController(c)
+		if err != nil {
+			return fmt.Errorf("verificationMethod/ValidateControllers: %w", err)
+		}
+	}
+	return nil
 }

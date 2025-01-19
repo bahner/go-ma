@@ -5,7 +5,7 @@ import (
 
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/key"
-	mf "github.com/bahner/go-ma/utils"
+	"github.com/bahner/go-ma/utils"
 	cbor "github.com/fxamacker/cbor/v2"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	log "github.com/sirupsen/logrus"
@@ -64,12 +64,12 @@ func (k Keyset) Pack() (string, error) {
 		return "", fmt.Errorf("KeysetPack: %w", err)
 	}
 
-	return mf.MultibaseEncode(data)
+	return utils.MultibaseEncode(data)
 }
 
 func Unpack(data string) (Keyset, error) {
 
-	decoded, err := mf.MultibaseDecode(data)
+	decoded, err := utils.MultibaseDecode(data)
 	if err != nil {
 		return Keyset{}, fmt.Errorf("KeysetUnpack: %w", err)
 	}

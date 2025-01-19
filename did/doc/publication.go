@@ -22,7 +22,7 @@ func (d *Document) Publish() (ipns.Name, error) {
 
 	ctx := context.Background()
 
-	node, err := d.Node()
+	node, err := d.IPLDNode()
 	if err != nil {
 		return ipns.Name{}, fmt.Errorf("DocPublish: %w", err)
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/bahner/go-ma/did"
 	"github.com/bahner/go-ma/key"
 	"github.com/libp2p/go-libp2p/core/crypto"
+	"github.com/libp2p/go-libp2p/core/peer"
 )
 
 // KeySet struct the encryption and signing keys are actual keys,
@@ -67,6 +68,6 @@ func (ks Keyset) Verify() error {
 	return nil
 }
 
-func (ks Keyset) IsValid() bool {
-	return ks.Verify() == nil
+func (k Keyset) PeerID() (peer.ID, error) {
+	return peer.IDFromPrivateKey(k.Identity)
 }
