@@ -71,3 +71,7 @@ func (ks Keyset) Verify() error {
 func (k Keyset) PeerID() (peer.ID, error) {
 	return peer.IDFromPrivateKey(k.Identity)
 }
+
+func (ks Keyset) IsValid() bool {
+	return ks.Verify() == nil
+}
