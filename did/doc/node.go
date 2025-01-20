@@ -44,6 +44,14 @@ func (d *Document) SetP2PNode(peerid peer.ID) error {
 	return nil
 }
 
+func (d *Document) GetP2PNode() (peer.ID, error) {
+	if d.Node.Type != "p2p" {
+		return "", ErrNodeTypeMissing
+	}
+
+	return peer.IDFromBytes([]byte(d.Node.ID))
+}
+
 func validateNode(node Node) error {
 	if node.Type != "p2p" {
 		return ErrInvalidNodeType

@@ -31,15 +31,14 @@ var (
 
 	ErrDoumentAlreadyPublished = errors.New("document already published")
 
-	ErrContextIsEmpty       = errors.New("context missing")
-	ErrIDIsEmpty            = errors.New("id missing")
-	ErrControllerIsEmpty    = errors.New("controller missing")
-	ErrPeerIDEmpty          = errors.New("endpoint missing")
-	ErrInvalidNodeType      = errors.New("invalid endpoint protocol")
-	ErrEndpointAlreadyExist = errors.New("endpoint already exists")
-	ErrEndpointMissing      = errors.New("endpoint missing")
-	ErrIdentityIsEmpty      = errors.New("identity missing")
-	ErrIdentityInvalid      = errors.New("invalid identity")
+	ErrContextIsEmpty    = errors.New("context missing")
+	ErrIDIsEmpty         = errors.New("id missing")
+	ErrControllerIsEmpty = errors.New("controller missing")
+	ErrNodeIDEmpty       = errors.New("node ID missing")
+	ErrNodeTypeMissing   = errors.New("no such node type")
+	ErrInvalidNodeType   = errors.New("invalid endpoint protocol")
+	ErrIdentityIsEmpty   = errors.New("identity missing")
+	ErrIdentityInvalid   = errors.New("invalid identity")
 
 	ErrDocumentIsNil            = errors.New("document is nil")
 	ErrDocumentInvalid          = errors.New("invalid document")
