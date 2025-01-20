@@ -3,37 +3,46 @@ package set
 import (
 	"bytes"
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"crypto/sha256"
 	"fmt"
 	"io"
 
 	"github.com/bahner/go-ma/api"
 	"github.com/ipfs/boxo/files"
 	"github.com/ipfs/boxo/path"
+	"github.com/tyler-smith/go-bip39"
 )
 
-func (k Keyset) SaveToIPFS() (string, error) {
+func (k Keyset) SaveToIPFS(mnemonic string) (path.ImmutablePath, error) {
 
 	ctx := context.Background()
 
 	packed, err := k.Pack()
 	if err != nil {
-		return "", fmt.Errorf("KeysetSaveToIPFS: %w", err)
+		return path.ImmutablePath{}, fmt.Errorf("KeysetSaveToIPFS: %w", err)
+	}
+
+	encrypted, err := encryptKeysetWithMnemonic(mnemonic, []byte(packed))
+	if err != nil {
+		return path.ImmutablePath{}, fmt.Errorf("KeysetSaveToIPFS: %w", err)
 	}
 
 	shell := api.GetIPFSAPI()
 
-	keysetFile := files.NewBytesFile([]byte(packed))
+	keysetFile := files.NewBytesFile([]byte(encrypted))
 
 	immutablePath, err := shell.Unixfs().Add(ctx, keysetFile)
 	if err != nil {
-		return "", fmt.Errorf("KeysetSaveToIPFS: %w", err)
+		return path.ImmutablePath{}, fmt.Errorf("KeysetSaveToIPFS: %w", err)
 	}
 
-	return immutablePath.String(), nil
+	return immutablePath, nil
 }
 
-func LoadFromIPFS(pathString string) (Keyset, error) {
-
+func LoadFromIPFS(pathString, mnemonic string) (Keyset, error) {
 	ctx := context.Background()
 
 	shell := api.GetIPFSAPI()
@@ -53,7 +62,14 @@ func LoadFromIPFS(pathString string) (Keyset, error) {
 		return Keyset{}, fmt.Errorf("KeysetLoadFromIPFS: %w", err)
 	}
 
-	return Unpack(string(keysetNodeBytes))
+	// Decrypt the data using the mnemonic
+	decrypted, err := decryptKeysetWithMnemonic(mnemonic, keysetNodeBytes)
+	if err != nil {
+		return Keyset{}, fmt.Errorf("KeysetLoadFromIPFS (decryption): %w", err)
+	}
+
+	// Unpack the decrypted data into a Keyset
+	return Unpack(string(decrypted))
 }
 
 func nodeBytes(node files.Node) ([]byte, error) {
@@ -70,4 +86,63 @@ func nodeBytes(node files.Node) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
+}
+
+func encryptKeysetWithMnemonic(mnemonic string, data []byte) ([]byte, error) {
+	seed := bip39.NewSeed(mnemonic, "")
+	secretKey := sha256.Sum256(seed[:32])
+
+	block, err := aes.NewCipher(secretKey[:])
+	if err != nil {
+		return nil, fmt.Errorf("failed to create cipher: %w", err)
+	}
+
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create GCM: %w", err)
+	}
+
+	// Generate a random nonce
+	nonce := make([]byte, aesGCM.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return nil, fmt.Errorf("failed to generate nonce: %w", err)
+	}
+
+	// Encrypt the data
+	encrypted := aesGCM.Seal(nil, nonce, data, nil)
+
+	// Return nonce + encrypted data
+	return append(nonce, encrypted...), nil
+}
+
+func decryptKeysetWithMnemonic(mnemonic string, encryptedData []byte) ([]byte, error) {
+	// Derive the secret key from the BIP39 mnemonic
+	seed := bip39.NewSeed(mnemonic, "")
+	secretKey := sha256.Sum256(seed[:32])
+
+	block, err := aes.NewCipher(secretKey[:])
+	if err != nil {
+		return nil, fmt.Errorf("failed to create cipher: %w", err)
+	}
+
+	aesGCM, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create GCM: %w", err)
+	}
+
+	nonceSize := aesGCM.NonceSize()
+	if len(encryptedData) < nonceSize {
+		return nil, fmt.Errorf("encrypted data is too short")
+	}
+
+	// Split the nonce and ciphertext
+	nonce, ciphertext := encryptedData[:nonceSize], encryptedData[nonceSize:]
+
+	// Decrypt the data
+	plaintext, err := aesGCM.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decrypt data: %w", err)
+	}
+
+	return plaintext, nil
 }

@@ -25,6 +25,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
+	github.com/tyler-smith/go-bip39 v1.1.0
 	golang.org/x/crypto v0.31.0
 	lukechampine.com/blake3 v1.3.0
 )
