@@ -16,9 +16,7 @@ import (
 	"github.com/tyler-smith/go-bip39"
 )
 
-func (k Keyset) SaveToIPFS(mnemonic string) (path.ImmutablePath, error) {
-
-	ctx := context.Background()
+func (k Keyset) SaveToIPFS(ctx context.Context, mnemonic string) (path.ImmutablePath, error) {
 
 	packed, err := k.Pack()
 	if err != nil {
@@ -42,8 +40,7 @@ func (k Keyset) SaveToIPFS(mnemonic string) (path.ImmutablePath, error) {
 	return immutablePath, nil
 }
 
-func LoadFromIPFS(pathString, mnemonic string) (Keyset, error) {
-	ctx := context.Background()
+func LoadFromIPFS(ctx context.Context, pathString, mnemonic string) (Keyset, error) {
 
 	shell := api.GetIPFSAPI()
 
