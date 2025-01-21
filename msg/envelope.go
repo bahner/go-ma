@@ -1,14 +1,12 @@
 package msg
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/bahner/go-ma"
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/key"
 	cbor "github.com/fxamacker/cbor/v2"
-	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"golang.org/x/crypto/curve25519"
 )
 
@@ -87,19 +85,6 @@ func (m *Message) Enclose() (*Envelope, error) {
 		EncryptedHeaders: encryptedHeaders,
 		EncryptedContent: encryptedContent,
 	}, nil
-}
-
-func (e *Envelope) Send(ctx context.Context, t *pubsub.Topic) error {
-
-	eBytes, err := cbor.Marshal(e)
-	if err != nil {
-		return fmt.Errorf("msg_send: %w", err)
-	}
-
-	// t.Publish(ctx, eBytes, nil)
-	t.Publish(ctx, eBytes)
-
-	return nil
 }
 
 // Takes the envelope as a byte array and returns a pointer to an Envelope struct

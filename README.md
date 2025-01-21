@@ -9,8 +9,6 @@ To understand the need for 間 I commend [Alan Kay's talk at OOPSLA 1997][kayma]
 
 A success criterium for this project would be if he looked at the code and described it as: *Mostly harmless*.
 
-So what is it? It's almost, but not quite, entirely unlike [DID][did] and [DIDComm][didcomm] over [libp2 pubsub][pubsub]. Another important point made by Kay is that each [object should have a URL and an IP][kayurl]. 間 provides that by leveraging DID's which express IPNS identities and uses pubsub over [IPFS][ipfs] ..
-
 The envelope contains the encrypted message and the key. The message is a DID Document. The key is the key to unlock the message. The DID Document is signed by the sender. And is structured, so the receiver can parse it for it's intended purpose.
 
 Go language
@@ -44,16 +42,11 @@ As noted above the code is the spec for now, but we'll get to that. RSN.
 
 2023-11-25: bahner
 
-[did]: <https://www.w3.org/TR/did-core/> "Decentralized Identifiers (DIDs) v1.0"
-[didcomm]: <https://identity.foundation/didcomm-messaging/spec/> "DIDComm Messaging v1.0"
 [exipfs]: <https://hex.pm/packages/ex_ipfs> "Elixir IPFS"
 [exipld]: <https://hex.pm/packages/ex_ipfs_ipld> "Elixir IPLD"
 [exipns]: <https://hex.pm/packages/ex_ipfs_ipns> "Elixir IPNS"
 [go-space]: <https://github-com/bahner/go-space> "Go SPACE"
-[ipfs]: <https://ipfs.tech> "InterPlanetary File System"
 [kayma]: <https://www.youtube.com/watch?v=oKg1hTOQXoY&t=2268s> "The space between objects."
-[kayurl]: <https://www.youtube.com/watch?v=oKg1hTOQXoY&t=2582s> "Every object should have a URL and and IP"
 [libp2p]: <https://libp2p.io> "libp2p"
-[pubsub]: <https://docs.libp2p.io/concepts/pubsub/overview/> "libp2p pubsub"
 [SPACE]: <https://github.com/bahner/space> "SPACE"
 [間]: <https://github.com/bahner/ma> "ma specs"

@@ -1,13 +1,11 @@
 package msg
 
 import (
-	"context"
 	"crypto/ed25519"
 	"fmt"
 
 	"github.com/bahner/go-ma"
 	cbor "github.com/fxamacker/cbor/v2"
-	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
@@ -98,22 +96,6 @@ func UnmarshalAndVerifyMessageFromCBOR(b []byte) (*Message, error) {
 	}
 
 	return m, nil
-}
-
-//	message send is meant to send the message signed, but not encrypted
-//
-// Create an envelope by calling Enclose() first and then send *that* with Send()
-func (m *Message) Send(ctx context.Context, t *pubsub.Topic) error {
-
-	eBytes, err := cbor.Marshal(m)
-	if err != nil {
-		return fmt.Errorf("send: envelope serialization error: %w", err)
-	}
-
-	// t.Publish(ctx, eBytes, nil)
-	t.Publish(ctx, eBytes)
-
-	return nil
 }
 
 // Create a new Message from the headers
