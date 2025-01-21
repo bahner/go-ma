@@ -73,9 +73,13 @@ func New(
 	return m, nil
 }
 
-// UnmarshalMessageFromCBOR unmarshals a Message from a CBOR byte slice
+func (m *Message) Bytes() ([]byte, error) {
+	return cbor.Marshal(m)
+}
+
+// UnmarshalMessage unmarshals a Message from a CBOR byte slice
 // and verifies the signature
-func UnmarshalMessageFromCBOR(b []byte) (*Message, error) {
+func UnmarshalMessage(b []byte) (*Message, error) {
 	var m *Message = new(Message)
 	err := cbor.Unmarshal(b, m)
 	if err != nil {
@@ -84,8 +88,8 @@ func UnmarshalMessageFromCBOR(b []byte) (*Message, error) {
 	return m, nil
 }
 
-func UnmarshalAndVerifyMessageFromCBOR(b []byte) (*Message, error) {
-	m, err := UnmarshalMessageFromCBOR(b)
+func UnmarshalAndVerifyMessage(b []byte) (*Message, error) {
+	m, err := UnmarshalMessage(b)
 	if err != nil {
 		return nil, fmt.Errorf("msg_unmarshal_message_from_cbor_and_verify_signature: failed to unmarshal message: %w", err)
 	}

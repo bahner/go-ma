@@ -87,9 +87,13 @@ func (m *Message) Enclose() (*Envelope, error) {
 	}, nil
 }
 
+func (e *Envelope) Bytes() ([]byte, error) {
+	return cbor.Marshal(e)
+}
+
 // Takes the envelope as a byte array and returns a pointer to an Envelope struct
 // Basically this is what you do with a receieved message envelope, eg. in an Open() function.
-func UnmarshalEnvelopeFromCBOR(data []byte) (*Envelope, error) {
+func UnmarshalEnvelope(data []byte) (*Envelope, error) {
 
 	e := &Envelope{}
 
@@ -101,9 +105,9 @@ func UnmarshalEnvelopeFromCBOR(data []byte) (*Envelope, error) {
 	return e, nil
 }
 
-func UnmarshalAndVerifyEnvelopeFromCBOR(data []byte) (*Envelope, error) {
+func UnmarshalAndVerifyEnvelope(data []byte) (*Envelope, error) {
 
-	e, err := UnmarshalEnvelopeFromCBOR(data)
+	e, err := UnmarshalEnvelope(data)
 	if err != nil {
 		return nil, fmt.Errorf("msg_unmarshal_and_verify_envelope: %s", err)
 	}
