@@ -6,6 +6,7 @@ import (
 	"github.com/ipfs/go-cid"
 	"github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/node/basicnode"
+	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/peer"
 )
 
@@ -49,6 +50,16 @@ func (d *Document) SetP2PHost(peerid peer.ID, hostType string) error {
 	d.Host = host
 
 	return nil
+}
+
+func (d *Document) SetP2PHostFromPrivateKey(pk crypto.PrivKey, hostType string) error {
+
+	peerid, err := peer.IDFromPrivateKey(pk)
+	if err != nil {
+		return fmt.Errorf("config.publishDIDDocumentFromKeyset: %w", err)
+	}
+
+	return d.SetP2PHost(peerid, hostType)
 }
 
 func validateHost(host Host) error {
