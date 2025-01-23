@@ -7,6 +7,7 @@ import (
 	"github.com/bahner/go-ma/did/doc"
 	"github.com/bahner/go-ma/key"
 	cbor "github.com/fxamacker/cbor/v2"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/curve25519"
 )
 
@@ -87,8 +88,20 @@ func (m *Message) Enclose() (*Envelope, error) {
 	}, nil
 }
 
-func (e *Envelope) Bytes() ([]byte, error) {
+func (e *Envelope) Marshal() ([]byte, error) {
 	return cbor.Marshal(e)
+}
+
+// Return the byte slice of the envelope.
+// In case of an error, return an empty byte slice.
+func (e *Envelope) Bytes() []byte {
+	eBytes, err := e.Marshal()
+	if err != nil {
+		log.Errorf("msg_bytes: failed to marshal message: %v", err)
+		return []byte{}
+	}
+
+	return eBytes
 }
 
 // Takes the envelope as a byte array and returns a pointer to an Envelope struct

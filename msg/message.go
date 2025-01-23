@@ -7,6 +7,7 @@ import (
 	"github.com/bahner/go-ma"
 	cbor "github.com/fxamacker/cbor/v2"
 	nanoid "github.com/matoous/go-nanoid/v2"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -73,8 +74,20 @@ func New(
 	return m, nil
 }
 
-func (m *Message) Bytes() ([]byte, error) {
+func (m *Message) Marshal() ([]byte, error) {
 	return cbor.Marshal(m)
+}
+
+// Return the byte slice of the message.
+// In case of an error, return an empty byte slice.
+func (m *Message) Bytes() []byte {
+	mBytes, err := m.Marshal()
+	if err != nil {
+		log.Errorf("msg_bytes: failed to marshal message: %v", err)
+		return []byte{}
+	}
+
+	return mBytes
 }
 
 // UnmarshalMessage unmarshals a Message from a CBOR byte slice
