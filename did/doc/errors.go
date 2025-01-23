@@ -34,11 +34,17 @@ var (
 	ErrContextIsEmpty    = errors.New("context missing")
 	ErrIDIsEmpty         = errors.New("id missing")
 	ErrControllerIsEmpty = errors.New("controller missing")
-	ErrNodeIDEmpty       = errors.New("node ID missing")
-	ErrHostTypeMissing   = errors.New("no such node type")
-	ErrInvalidHostType   = errors.New("invalid endpoint protocol")
-	ErrIdentityIsEmpty   = errors.New("identity missing")
-	ErrIdentityInvalid   = errors.New("invalid identity")
+
+	ErrHostIDMissing   = errors.New("host ID missing")
+	ErrHostTypeMissing = errors.New("no such host type")
+	ErrInvalidHostType = errors.New("invalid host type")
+
+	ErrTopicIdMissing   = errors.New("missing topic ID")
+	ErrTopicTypeMissing = errors.New("missing topic type")
+	ErrInvalidTopicType = errors.New("invalid topic type")
+
+	ErrIdentityIsEmpty = errors.New("identity missing")
+	ErrIdentityInvalid = errors.New("invalid identity")
 
 	ErrDocumentIsNil            = errors.New("document is nil")
 	ErrDocumentInvalid          = errors.New("invalid document")

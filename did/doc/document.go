@@ -15,21 +15,31 @@ import (
 const NUM_NODE_FIELDS = 9
 
 type Document struct {
-	Context    []string `cbor:"@context,toarray" json:"@context"`
-	ID         string   `cbor:"id" json:"id"`
-	Controller []string `cbor:"controller,toarray" json:"controller"`
-	// Identity is a cid for the secret keyset of the entity.
-	// It's contents should be encrypted and multibase encoded, but the structure is not defined here.
-	// Each language should have it's own way of parsing the contents of the keyset.
-	Identity string `cbor:"identity" json:"identity"`
-	// The node to dial for communication with the entity.
-	Host               Host                 `cbor:"host" json:"host"`
+	// Standard DID attributes
+	Context            []string             `cbor:"@context,toarray" json:"@context"`
+	ID                 string               `cbor:"id" json:"id"`
+	Controller         []string             `cbor:"controller,toarray" json:"controller"`
 	VerificationMethod []VerificationMethod `cbor:"verificationMethod,toarray" json:"verificationMethod"`
 	AssertionMethod    string               `cbor:"assertionMethod" json:"assertionMethod"`
 	KeyAgreement       string               `cbor:"keyAgreement" json:"keyAgreement"`
 	Proof              Proof                `cbor:"proof" json:"proof"`
-	immutablePath      path.ImmutablePath   // This isn't published
-	did                did.DID              // This isn't published
+
+	// Non-standard attributes
+
+	// Identity is a cid for the secret keyset of the entity.
+	// It's contents should be encrypted and multibase encoded, but the structure is not defined here.
+	// Each entity should have it's own way of parsing the contents of the keyset.
+	Identity string `cbor:"identity" json:"identity"`
+
+	// The node to dial for communication with the entity for synchronous communication.
+	Host Host `cbor:"host" json:"host"`
+
+	// Topic is pubsub topic for the entity for asynchronous communication.
+	Topic Topic `cbor:"topic" json:"topic"`
+
+	// Purely local attributes. Not used in the document.
+	immutablePath path.ImmutablePath // This isn't published
+	did           did.DID            // This isn't published
 }
 
 // Takes an identity DID and a controller DID. They can be the same.
@@ -51,18 +61,20 @@ func New(identity did.DID, controller did.DID) (*Document, error) {
 	return &doc, nil
 }
 
-func (d *Document) MarshalToCBOR() ([]byte, error) {
+func (d *Document) Marshal() ([]byte, error) {
 
 	marshalD := Document{
 		Context:            d.Context,
 		ID:                 d.ID,
 		Controller:         d.Controller,
-		Host:               d.Host,
-		Identity:           d.Identity,
 		VerificationMethod: d.VerificationMethod,
 		AssertionMethod:    d.AssertionMethod,
 		KeyAgreement:       d.KeyAgreement,
 		Proof:              d.Proof,
+
+		Identity: d.Identity,
+		Host:     d.Host,
+		Topic:    d.Topic,
 	}
 
 	bytes, err := cbor.Marshal(marshalD)

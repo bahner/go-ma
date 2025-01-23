@@ -16,7 +16,7 @@ func (m *Message) Sign(privKey ed25519.PrivateKey) error {
 		return fmt.Errorf("message/sign: invalid key size %d. Expected %d", len(privKey), ed25519.PrivateKeySize)
 	}
 
-	bytes_to_sign, err := m.marshalUnsignedHeadersToCBOR()
+	bytes_to_sign, err := m.marshalUnsignedHeaders()
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func (m *Message) Verify() error {
 	}
 
 	// Payload
-	payload, err := m.marshalUnsignedHeadersToCBOR()
+	payload, err := m.marshalUnsignedHeaders()
 	if err != nil {
 		return fmt.Errorf("message/verify: failed to pack payload: %w", err)
 	}

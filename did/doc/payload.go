@@ -17,7 +17,7 @@ func Payload(d Document) (Document, error) {
 }
 
 // Marshals the payload to CBOR for publication
-func (d *Document) MarshalPayloadToCBOR() ([]byte, error) {
+func (d *Document) MarshalPayload() ([]byte, error) {
 	p, err := Payload(*d)
 	if err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func (d *Document) MarshalPayloadToCBOR() ([]byte, error) {
 }
 
 func (d *Document) PayloadHash() ([]byte, error) {
-	p, err := d.MarshalPayloadToCBOR()
+	p, err := d.MarshalPayload()
 	if err != nil {
 		return nil, ErrPayloadMarshal
 	}

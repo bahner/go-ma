@@ -34,7 +34,7 @@ func (m *Message) unsignedHeaders() Headers {
 	}
 }
 
-func (m *Message) marshalUnsignedHeadersToCBOR() ([]byte, error) {
+func (m *Message) marshalUnsignedHeaders() ([]byte, error) {
 	return cbor.Marshal(m.unsignedHeaders())
 }
 
@@ -47,6 +47,6 @@ func (m *Message) Headers() Headers {
 	return hdrs
 }
 
-func (m *Message) marshalHeadersToCBOR() ([]byte, error) {
+func (m *Message) marshalHeaders() ([]byte, error) {
 	return cbor.Marshal(m.Headers())
 }

@@ -11,7 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (ks *Keyset) MarshalToCBOR() ([]byte, error) {
+func (ks *Keyset) Marshal() ([]byte, error) {
 	identityBytes, err := crypto.MarshalPrivateKey(ks.Identity)
 	if err != nil {
 		return nil, fmt.Errorf("marshal identity key: %w", err)
@@ -31,7 +31,7 @@ func (ks *Keyset) MarshalToCBOR() ([]byte, error) {
 	return cbor.Marshal(temp)
 }
 
-func UnmarshalFromCBOR(data []byte) (Keyset, error) {
+func Unmarshal(data []byte) (Keyset, error) {
 	temp := struct {
 		Identity      []byte
 		DID           did.DID
@@ -59,7 +59,7 @@ func UnmarshalFromCBOR(data []byte) (Keyset, error) {
 
 func (k Keyset) Pack() (string, error) {
 
-	data, err := k.MarshalToCBOR()
+	data, err := k.Marshal()
 	if err != nil {
 		return "", fmt.Errorf("KeysetPack: %w", err)
 	}
@@ -74,7 +74,7 @@ func Unpack(data string) (Keyset, error) {
 		return Keyset{}, fmt.Errorf("KeysetUnpack: %w", err)
 	}
 
-	keyset, err := UnmarshalFromCBOR(decoded)
+	keyset, err := Unmarshal(decoded)
 	log.Debugf("Unpacked keyset: %v", keyset)
 
 	return keyset, err

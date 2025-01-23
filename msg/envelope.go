@@ -63,7 +63,7 @@ func (m *Message) Enclose() (*Envelope, error) {
 		return nil, fmt.Errorf("msg_enclose: %w", err)
 	}
 
-	msgHeaders, err := m.marshalHeadersToCBOR()
+	msgHeaders, err := m.marshalHeaders()
 	if err != nil {
 		return nil, fmt.Errorf("msg_enclose: %w", err)
 	}

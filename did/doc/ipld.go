@@ -14,6 +14,8 @@ import (
 	multihash "github.com/multiformats/go-multihash"
 )
 
+const documentNumFields = 10
+
 type documentNode struct {
 	Node format.Node
 	Cid  cid.Cid
@@ -28,7 +30,7 @@ func (d *Document) IPLDNode() (documentNode, error) {
 	}
 
 	var buf []byte
-	buf, err = encodeIPLDNodeToDAGCBOR(node)
+	buf, err = marshalIPLDNode(node)
 	if err != nil {
 		return documentNode{}, fmt.Errorf("error encoding node to DAG-CBOR: %w", err)
 	}
@@ -53,7 +55,7 @@ func (d *Document) IPLDNode() (documentNode, error) {
 
 func (d *Document) ipldStructure() (ipld.Node, error) {
 	nb := basicnode.Prototype.Map.NewBuilder()
-	ma, err := nb.BeginMap(7)
+	ma, err := nb.BeginMap(documentNumFields)
 	if err != nil {
 		return nil, err
 	}
@@ -77,18 +79,6 @@ func (d *Document) ipldStructure() (ipld.Node, error) {
 	}
 	ma.AssembleKey().AssignString("controller")
 	ma.AssembleValue().AssignNode(controllerNode)
-
-	// Host
-	hostNode, err := buildHostNode(d.Host)
-	if err != nil {
-		return nil, err
-	}
-	ma.AssembleKey().AssignString("host")
-	ma.AssembleValue().AssignNode(hostNode)
-
-	// Identity
-	ma.AssembleKey().AssignString("identity")
-	ma.AssembleValue().AssignString(d.Identity)
 
 	// VerificationMethod
 	ma.AssembleKey().AssignString("verificationMethod")
@@ -114,6 +104,26 @@ func (d *Document) ipldStructure() (ipld.Node, error) {
 	ma.AssembleKey().AssignString("proof")
 	ma.AssembleValue().AssignNode(proofNode)
 
+	// Host
+	hostNode, err := buildHostNode(d.Host)
+	if err != nil {
+		return nil, err
+	}
+	ma.AssembleKey().AssignString("host")
+	ma.AssembleValue().AssignNode(hostNode)
+
+	// Topic
+	topicNode, err := buildTopicNode(d.Topic)
+	if err != nil {
+		return nil, err
+	}
+	ma.AssembleKey().AssignString("topic")
+	ma.AssembleValue().AssignNode(topicNode)
+
+	// Identity
+	ma.AssembleKey().AssignString("identity")
+	ma.AssembleValue().AssignString(d.Identity)
+
 	ma.Finish()
 
 	return nb.Build(), nil
@@ -133,7 +143,7 @@ func buildStringListNode(controllers []string) (ipld.Node, error) {
 	return nb.Build(), nil
 }
 
-func encodeIPLDNodeToDAGCBOR(node ipld.Node) ([]byte, error) {
+func marshalIPLDNode(node ipld.Node) ([]byte, error) {
 	var buf bytes.Buffer
 	if err := dagcbor.Encode(node, &buf); err != nil {
 		return nil, err

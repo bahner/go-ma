@@ -9,7 +9,10 @@ import (
 	"github.com/libp2p/go-libp2p/core/peer"
 )
 
-const hostNumFields = 4
+const (
+	hostNumFields     = 2
+	DEFAULT_HOST_TYPE = "p2p"
+)
 
 type Host struct {
 	ID   string `cbor:"id" json:"id"`
@@ -36,9 +39,9 @@ func NewHost(id string, t string) (Host, error) {
 
 // Takes a libp2p PeerID and sets it as the PeerID of the document.
 // This is the PeerID of the node to dial to communicate with the entity.
-func (d *Document) SetP2PHost(peerid peer.ID) error {
+func (d *Document) SetP2PHost(peerid peer.ID, hostType string) error {
 
-	host, err := NewHost(peerid.String(), "p2p")
+	host, err := NewHost(peerid.String(), hostType)
 	if err != nil {
 		return fmt.Errorf("doc/SetP2PHost: %w", err)
 	}
@@ -48,16 +51,17 @@ func (d *Document) SetP2PHost(peerid peer.ID) error {
 	return nil
 }
 
-func (d *Document) GetP2PHost() (peer.ID, error) {
-	if d.Host.Type != "p2p" {
-		return "", ErrHostTypeMissing
+func validateHost(host Host) error {
+
+	if host.ID == "" {
+		return ErrHostIDMissing
 	}
 
-	return peer.IDFromBytes([]byte(d.Host.ID))
-}
+	if host.Type == "" {
+		return ErrHostTypeMissing
+	}
 
-func validateHost(host Host) error {
-	if host.Type != "p2p" {
+	if host.Type != DEFAULT_HOST_TYPE {
 		return ErrInvalidHostType
 	}
 
