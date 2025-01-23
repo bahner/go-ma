@@ -35,8 +35,8 @@ var (
 	ErrIDIsEmpty         = errors.New("id missing")
 	ErrControllerIsEmpty = errors.New("controller missing")
 	ErrNodeIDEmpty       = errors.New("node ID missing")
-	ErrNodeTypeMissing   = errors.New("no such node type")
-	ErrInvalidNodeType   = errors.New("invalid endpoint protocol")
+	ErrHostTypeMissing   = errors.New("no such node type")
+	ErrInvalidHostType   = errors.New("invalid endpoint protocol")
 	ErrIdentityIsEmpty   = errors.New("identity missing")
 	ErrIdentityInvalid   = errors.New("invalid identity")
 

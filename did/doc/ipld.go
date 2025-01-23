@@ -78,6 +78,18 @@ func (d *Document) ipldStructure() (ipld.Node, error) {
 	ma.AssembleKey().AssignString("controller")
 	ma.AssembleValue().AssignNode(controllerNode)
 
+	// Host
+	hostNode, err := buildHostNode(d.Host)
+	if err != nil {
+		return nil, err
+	}
+	ma.AssembleKey().AssignString("host")
+	ma.AssembleValue().AssignNode(hostNode)
+
+	// Identity
+	ma.AssembleKey().AssignString("identity")
+	ma.AssembleValue().AssignString(d.Identity)
+
 	// VerificationMethod
 	ma.AssembleKey().AssignString("verificationMethod")
 	verificationMethodsNode, err := buildVerificationMethodList(d.VerificationMethod)

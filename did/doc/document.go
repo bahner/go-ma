@@ -23,7 +23,7 @@ type Document struct {
 	// Each language should have it's own way of parsing the contents of the keyset.
 	Identity string `cbor:"identity" json:"identity"`
 	// The node to dial for communication with the entity.
-	Node               Node                 `cbor:"node" json:"node"`
+	Host               Host                 `cbor:"host" json:"host"`
 	VerificationMethod []VerificationMethod `cbor:"verificationMethod,toarray" json:"verificationMethod"`
 	AssertionMethod    string               `cbor:"assertionMethod" json:"assertionMethod"`
 	KeyAgreement       string               `cbor:"keyAgreement" json:"keyAgreement"`
@@ -57,7 +57,7 @@ func (d *Document) MarshalToCBOR() ([]byte, error) {
 		Context:            d.Context,
 		ID:                 d.ID,
 		Controller:         d.Controller,
-		Node:               d.Node,
+		Host:               d.Host,
 		Identity:           d.Identity,
 		VerificationMethod: d.VerificationMethod,
 		AssertionMethod:    d.AssertionMethod,
@@ -134,7 +134,7 @@ func (d *Document) Validate() error {
 		return fmt.Errorf("doc/Validate: %w", err)
 	}
 
-	err = validateNode(d.Node)
+	err = validateHost(d.Host)
 	if err != nil {
 		return fmt.Errorf("doc/Validate: %w", err)
 	}
