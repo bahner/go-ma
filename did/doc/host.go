@@ -3,7 +3,6 @@ package doc
 import (
 	"fmt"
 
-	"github.com/ipfs/go-cid"
 	"github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/node/basicnode"
 	"github.com/libp2p/go-libp2p/core/crypto"
@@ -78,9 +77,9 @@ func validateHost(host Host) error {
 		return ErrInvalidHostType
 	}
 
-	_, err := cid.Parse(host.ID)
+	_, err := peer.Decode(host.ID)
 	if err != nil {
-		return fmt.Errorf("doc/validatePeerID: %w", err)
+		return fmt.Errorf("doc/validateHost: %w", err)
 	}
 
 	return nil
