@@ -98,7 +98,7 @@ func (k Keyset) encryptKeysetWithMnemonic(mnemonic string, data []byte) ([]byte,
 		return nil, fmt.Errorf("failed to create GCM: %w", err)
 	}
 
-	nonce := k.DID.Nonce(aesGCM.NonceSize())
+	nonce := Nonce(k.DID)
 
 	encrypted := aesGCM.Seal(nil, nonce, data, nil)
 	return encrypted, nil
