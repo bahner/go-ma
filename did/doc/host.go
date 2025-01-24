@@ -20,6 +20,7 @@ type Host struct {
 	Type string `cbor:"type" json:"type"`
 }
 
+// Creates and validates a new Host object.
 func NewHost(id string, t string) (Host, error) {
 
 	node := Host{
@@ -52,6 +53,7 @@ func (d *Document) SetP2PHost(peerid peer.ID, hostType string) error {
 	return nil
 }
 
+// Takes a libp2p private key and sets the PeerID of the document to the PeerID of the key.
 func (d *Document) SetP2PHostFromPrivateKey(pk crypto.PrivKey, hostType string) error {
 
 	peerid, err := peer.IDFromPrivateKey(pk)

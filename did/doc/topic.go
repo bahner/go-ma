@@ -3,7 +3,6 @@ package doc
 import (
 	"fmt"
 
-	"github.com/ipfs/go-cid"
 	"github.com/ipld/go-ipld-prime"
 	"github.com/ipld/go-ipld-prime/node/basicnode"
 )
@@ -62,11 +61,6 @@ func validateTopic(topic Topic) error {
 
 	if topic.Type != DEFAULT_TOPIC_TYPE {
 		return ErrInvalidTopicType
-	}
-
-	_, err := cid.Parse(topic.ID)
-	if err != nil {
-		return fmt.Errorf("doc/validatePeerID: %w", err)
 	}
 
 	return nil
